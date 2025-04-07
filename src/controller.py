@@ -1,5 +1,6 @@
 import zmq
 from collections import defaultdict
+from models import Heatbeat
 
 def main():
 
@@ -30,12 +31,14 @@ def main():
             break
 
         if heartbeats in socks:
-            message = heartbeats.recv_json()
-            print("Got heartbeat")
-            components[message["component"]] = message["sent_at"]
+            beat = Heatbeat.model_validate_json(heartbeats.recv_string())
+            print(f"Got {beat=}")
+
+            components[beat.component] = beat.sent_at
 
         if interactions in socks:
-            action = interactions.recv()
+            action = interactions.recv_string()
+            print(action)
             if action == "A Timer fired":
                 playing = False
                 control.send_string("C RESET")
@@ -44,6 +47,6 @@ def main():
                     print("Currently playing; do nothing")
                 else:
                     playing = True
-                    control.send_string("C Play scene")
+                    control.send_string("Play scene")
 
 main()
