@@ -1,0 +1,1258 @@
+---
+intros:
+
+outros:
+
+walks:
+  chimchim:
+    category: ad
+    loops: 1
+  chimera:
+    category: ad
+    loops: 1
+  conversationbar:
+    category: ad
+    loops: 1
+  coyotegarden:
+    category: ad
+    loops: 1
+  divinationstation:
+    category: ad
+    loops: 1
+  dragonheights:
+    category: ad
+    loops: 1
+  flockofcybirds:
+    category: ad
+    loops: 1
+  frontporch:
+    category: ad
+    loops: 1
+  hippietrap:
+    category: ad
+    loops: 1
+  hotdogcamp:
+    category: ad
+    loops: 1
+  hotnoods:
+    category: ad
+    loops: 1
+  hypnodrome:
+    category: ad
+    loops: 5
+  idlehands:
+    category: ad
+    loops: 1
+  kevinbacon:
+    category: ad
+    loops: 1
+  labyrinth:
+    category: ad
+    loops: 1
+  mintyfresh:
+    category: ad
+    loops: 1
+  pickleparadise:
+    category: ad
+    loops: 1
+  sandworm:
+    category: ad
+    loops: 1
+  teahousecollective:
+    category: ad
+    loops: 1
+  thewell:
+    category: ad
+    loops: 1
+  abolishice:
+    category: rare
+    loops: 7
+  aircello:
+    category: airguitar
+    loops: 1
+  airdrum:
+    category: airguitar
+    loops: 1
+  airguitar_wed1:
+    category: airguitar
+    loops: 1
+  airguitar_wed2:
+    category: airguitar
+    loops: 1
+  airguitar_wed3:
+    category: airguitar
+    loops: 1
+  airguitar_wed4:
+    category: airguitar
+    loops: 1
+  airguitar_thu1:
+    category: airguitar
+    loops: 1
+  airguitar_thu2:
+    category: airguitar
+    loops: 1
+  airguitar_thu3:
+    category: airguitar
+    loops: 1
+  airguitar_thu4:
+    category: airguitar
+    loops: 1
+  airguitar_fri1:
+    category: airguitar
+    loops: 1
+  airguitar_fri2:
+    category: airguitar
+    loops: 1
+  airguitar_fri3:
+    category: airguitar
+    loops: 1
+  airguitar_fri4:
+    category: airguitar
+    loops: 1
+  airguitar_sat1:
+    category: airguitar
+    loops: 1
+  airguitar_sat2:
+    category: airguitar
+    loops: 1
+  airguitar_sat3:
+    category: airguitar
+    loops: 1
+  airguitar_sat4:
+    category: airguitar
+    loops: 1
+  airsax:
+    category: airguitar
+    loops: 1
+  airtrombone:
+    category: airguitar
+    loops: 1
+  applaud:
+    category: normalish
+    loops: 1
+  appreciate:
+    category: normalish
+  babyshark:
+    category: rare
+    loops: 1
+  baseball:
+    category: actions
+    loops: 1
+  bike:
+    category: actions
+  bird:
+    category: animals
+    loops: 1
+  bowl:
+    category: actions
+    loops: 1
+  burp:
+    category: actions
+    loops: 1
+  carryHeavy:
+    category: actionsplus
+    loops: 1
+  cartwheel:
+    category: actions
+    loops: 4
+  cat:
+    category: animals
+    loops: 1
+  chestbump:
+    category: social
+  clickHeels:
+    category: actions
+    loops: 1
+  cocoadome:
+    category: inactive
+  conga:
+    category: dance
+    loops: 1
+  converse:
+    category: social
+  cow:
+    category: animals
+    loops: 1
+  cowboy:
+    category: silly
+    loops: 1
+  crabwalk:
+    category: actionsplus
+  crawl:
+    category: actions
+  crossingguard:
+    category: silly
+    loops: 1
+  crossingguard-wizard:
+    category: silly
+    loops: 1
+  cry:
+    category: actionsplus
+    loops: 1
+  dab:
+    category: dance
+    loops: 1
+  daftpunk-1:
+    category: silly
+    loops: 1
+  daftpunk-2:
+    category: inactive
+    loops: 1
+  daftpunk-3:
+    category: silly
+    loops: 1
+  daftpunk-4:
+    category: silly
+    loops: 1
+  dance-hustle:
+    category: dance
+    loops: 1
+  dance-macarena:
+    category: dance
+    loops: 1
+  dance-twerk:
+    category: dance
+    loops: 1
+  dance-twist:
+    category: dance
+    loops: 1
+  dancemove-chacha:
+    category: dance
+    loops: 1
+  dancemove-cupidshuffle:
+    category: dance
+    loops: 1
+  dancemove-hokeypokey:
+    category: dance
+    loops: 1
+  dancemove-whipnaenae:
+    category: dance
+    loops: 3
+  dfv:
+    category: ad
+    loops: 1
+  dog:
+    category: animals
+    loops: 1
+  duck:
+    category: animals
+    loops: 1
+  fall:
+    category: actionsplus
+    loops: 1
+  fartbox:
+    category: inactive
+  flying:
+    category: actionsplus
+  frankensteinsmonsterwalk:
+    category: animalsplus
+    loops: 1
+  getschwifty:
+    category: inactive
+    loops: 1
+  ghost:
+    category: animalsplus
+    loops: 1
+  gif-corgi:
+    category: rare
+    loops: 8
+  gif-cube:
+    category: inactive
+    loops: 7
+    audio: trip.wav
+  gif-dots:
+    category: inactive
+    loops: 10
+    audio: trip.wav
+  gif-frida:
+    category: inactive
+    loops: 7
+    audio: trip.wav
+  gif-nyan:
+    category: rare
+    loops: 5
+  gif-rainbow_heart:
+    category: inactive
+    loops: 3
+    audio: trip.wav
+  gif-weirddog:
+    category: inactive
+    loops: 10
+    audio: trip.wav
+  gif-weirdeyes:
+    category: inactive
+    loops: 6
+    audio: trip.wav
+  gif-zebra:
+    category: inactive
+    loops: 15
+    audio: trip.wav
+  golf:
+    category: actionsplus
+    loops: 1
+  hadouken:
+    category: rare
+    loops: 1
+  hammertime:
+    category: normalish
+    loops: 1
+  handshake:
+    category: normalish
+    loops: 1
+  handstand:
+    category: actionsplus
+  headpatbellyrub:
+    category: normalish
+    loops: 1
+  highfive:
+    category: social
+  home:
+    category: fin
+  hop:
+    category: normalish
+    loops: 1
+  hopscotch:
+    category: actionsplus
+    loops: 1
+  horsebackriding:
+    category: animals
+  hug:
+    category: social
+  hug3:
+    category: social
+  hug4:
+    category: social
+  hug5:
+    category: social
+  hurdle:
+    category: actionsplus
+    loops: 1
+  hydrate:
+    category: actionsplus
+  invisibleCar:
+    category: actionscharade
+    loops: 1
+  inw:
+    category: inactive
+    audio: seacompression.wav
+  jump:
+    category: actions
+  jumpingjacks:
+    category: actions
+    loops: 1
+  jumprope:
+    category: actionscharade
+    loops: 1
+  kangaroo:
+    category: animals
+    loops: 1
+  karaoke-ABC:
+    category: karaoke
+    loops: 1
+  karaoke-heyYa:
+    category: karaoke
+    loops: 1
+  karaoke-hookedOnAFeeling:
+    category: karaoke
+    loops: 1
+  karaoke-iAmTheWalrus:
+    category: karaoke
+    loops: 1
+  karaoke-iWantItThatWay:
+    category: karaoke
+    loops: 1
+  karaoke-loveShack:
+    category: karaoke
+    loops: 1
+  karaoke-returnOfTheMack:
+    category: karaoke
+    loops: 1
+  karaoke-sayMyName:
+    category: karaoke
+    loops: 1
+  karaoke-sinceYouBeenGone:
+    category: karaoke
+    loops: 1
+  karaoke-sweetHomeAlabama:
+    category: karaoke
+    loops: 1
+  karaoke-totalEclipse:
+    category: karaoke
+    loops: 1
+  karaoke-tubthumping:
+    category: karaoke
+    loops: 1
+  karaoke-wannaDance:
+    category: karaoke
+    loops: 1
+  laugh:
+    category: actions
+    loops: 1
+  leapfrog:
+    category: social
+  longjump:
+    category: actionsplus
+    loops: 1
+  meditationWednesday:
+    loops: 1
+  meditationThursday:
+    loops: 1
+  meditationFriday:
+    loops: 1
+  meditationSaturday:
+    loops: 1
+  mime:
+    category: actionscharade
+    loops: 1
+  monkey:
+    category: animals
+    loops: 1
+  orderByHeight:
+    category: game
+    loops: 1
+  penguin:
+    category: animals
+    loops: 1
+  pickUpMoop:
+    category: ad
+    loops: 1
+  piggyback:
+    category: social
+  poetry-dreams:
+    category: rare
+    loops: 1
+  poetry-hope:
+    category: rare
+    loops: 1
+  poetry-loveAfterLove:
+    category: rare
+    loops: 1
+  poetry-meFromMyself:
+    category: rare
+    loops: 1
+  poetry-theWindOneBrilliantDay:
+    category: rare
+    loops: 1
+  pose:
+    category: actionsplus
+  propose:
+    category: actionsplus
+    loops: 1
+  pushup:
+    category: actions
+    loops: 1
+  race:
+    category: game
+    loops: 1
+  raptor:
+    category: animalsplus
+    loops: 1
+  rickroll:
+    category: silly
+    loops: 1
+  rowboat:
+    category: actionscharade
+  rps1:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps2:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps3:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps4:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps5:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps6:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps7:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps8:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps9:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps10:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps11:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps12:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps13:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps14:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps15:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps16:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps17:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps18:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps19:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps20:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps21:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps22:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps23:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps24:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps25:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps26:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  rps27:
+    category: rps
+    loops: 1
+    audio: rps.wav
+  run:
+    category: actions
+  screenless:
+    category: rare
+    loops: 1
+  ski:
+    category: actionscharade
+  skip:
+    category: actions
+    loops: 1
+  sleep:
+    category: sleep
+  sloth:
+    category: animalsplus
+    audio: turtle.wav
+  smile:
+    category: actions
+    loops: 1
+  snake:
+    category: animals
+    loops: 1
+  snap:
+    category: actions
+    loops: 1
+  sneeze:
+    category: actions
+    loops: 1
+  somersault:
+    category: actions
+    loops: 1
+  spaceodyssea:
+    category: inactive
+    frame_delay: 25.0
+    audio: seacompression.wav
+  spin:
+    category: actionsplus
+    loops: 1
+  staringContest:
+    category: game
+    loops: 1
+  surf:
+    category: actionscharade
+  swashbuckle:
+    category: actionsplus
+    loops: 1
+  sweep:
+    category: actionsplus
+    loops: 1
+  swim:
+    category: actionsplus
+  tag:
+    category: game
+  tapDance:
+    category: actionsplus
+    loops: 1
+  teamCheer:
+    category: game
+    loops: 1
+  teleport:
+    category: silly
+  thankRangers:
+    category: ad
+    loops: 1
+  tightrope:
+    category: actionscharade
+    loops: 1
+  tongueTwister1:
+    category: rare
+    loops: 2
+    audio: tongueTwister.wav
+  tongueTwister2:
+    category: rare
+    loops: 2
+    audio: tongueTwister.wav
+  tongueTwister3:
+    category: rare
+    loops: 2
+    audio: tongueTwister.wav
+  tongueTwister4:
+    category: rare
+    loops: 2
+    audio: tongueTwister.wav
+  toothbrush:
+    category: actions
+    loops: 1
+  trip-cauliflower:
+    category: trip
+    loops: 10
+    audio: trip.wav
+  trip-cauliflower_mask:
+    category: trip
+    loops: 10
+    audio: trip.wav
+  trip-cube:
+    category: trip
+    loops: 5
+    audio: trip.wav
+  trip-cube_mask:
+    category: trip
+    loops: 5
+    audio: trip.wav
+  trip-dizzy:
+    category: trip
+    loops: 5
+    audio: trip.wav
+  trip-dizzy_mask:
+    category: trip
+    loops: 5
+    audio: trip.wav
+  trip-dots:
+    category: trip
+    loops: 10
+    audio: trip.wav
+  trip-dots_mask:
+    category: trip
+    loops: 10
+    audio: trip.wav
+  trip-glorbs:
+    category: trip
+    loops: 1
+    audio: trip.wav
+  trip-glorbs_mask:
+    category: trip
+    loops: 1
+    audio: trip.wav
+  trip-grillz:
+    category: trip
+    loops: 2
+    audio: trip.wav
+  trip-grillz_mask:
+    category: trip
+    loops: 2
+    audio: trip.wav
+  trip-jellyRainbow:
+    category: trip
+    loops: 4
+    audio: trip.wav
+  trip-jellyRainbow_mask:
+    category: trip
+    loops: 4
+    audio: trip.wav
+  trip-lasercats:
+    category: trip
+    loops: 4
+    audio: trip.wav
+  trip-lavalamp:
+    category: trip
+    loops: 4
+    audio: trip.wav
+  trip-lavalamp_mask:
+    category: trip
+    loops: 4
+    audio: trip.wav
+  trip-plaidSpeed:
+    category: trip
+    loops: 7
+    audio: trip.wav
+  trip-plaidSpeed_mask:
+    category: trip
+    loops: 7
+    audio: trip.wav
+  trip-rainbowKnot:
+    category: trip
+    loops: 8
+    audio: trip.wav
+  trip-rainbowKnot_mask:
+    category: trip
+    loops: 8
+    audio: trip.wav
+  trip-rainbowTunnel:
+    category: trip
+    loops: 5
+    audio: trip.wav
+  trip-rainbowTunnel_mask:
+    category: trip
+    loops: 5
+    audio: trip.wav
+  trip-rainbowWiggles:
+    category: trip
+    loops: 2
+    audio: trip.wav
+  trip-rainbowWiggles_mask:
+    category: trip
+    loops: 2
+    audio: trip.wav
+  trip-redEye:
+    category: trip
+    loops: 3
+    audio: trip.wav
+  trip-redEye_mask:
+    category: trip
+    loops: 3
+    audio: trip.wav
+  trip-scopey:
+    category: trip
+    loops: 5
+    audio: trip.wav
+  trip-scopey_mask:
+    category: trip
+    loops: 5
+    audio: trip.wav
+  trip-warpSpeed:
+    category: trip
+    loops: 7
+    audio: trip.wav
+  trip-warpSpeed_mask:
+    category: trip
+    loops: 7
+    audio: trip.wav
+  trip-weirdEyes:
+    category: trip
+    loops: 3
+    audio: trip.wav
+  trip-weirdEyes_mask:
+    category: trip
+    loops: 3
+    audio: trip.wav
+  trip-weirdStatic:
+    category: trip
+    loops: 10
+    audio: trip.wav
+  trip-weirdStatic_mask:
+    category: trip
+    loops: 10
+    audio: trip.wav
+  trip-zebra:
+    category: trip
+    loops: 11
+    audio: trip.wav
+  trip-zebraSphere:
+    category: trip
+    loops: 20
+    audio: trip.wav
+  trip-zebra_mask:
+    category: trip
+    loops: 11
+    audio: trip.wav
+  trip-zebraSphere_mask:
+    category: trip
+    loops: 20
+    audio: trip.wav
+  turtle:
+    category: animalsplus
+    loops: 12
+  unicycle:
+    category: silly
+  vacuum:
+    category: actionsplus
+    loops: 3
+  walk-arabic:
+    category: language
+    loops: 1
+    skip_intro: true
+    skip_outro: true
+  walk-danish:
+    category: language
+    loops: 1
+    skip_intro: true
+    skip_outro: true
+  walk-dutch:
+    category: language
+    loops: 1
+    skip_intro: true
+    skip_outro: true
+  walk-german:
+    category: language
+    loops: 1
+    skip_intro: true
+    skip_outro: true
+  walk-japanese:
+    category: language
+    loops: 1
+    skip_intro: true
+    skip_outro: true
+  walk-mandarin_taiwan:
+    category: language
+    loops: 1
+    skip_intro: true
+    skip_outro: true
+  walkBackwards:
+    category: normal
+    loops: 3
+  walkdress:
+    category: normal
+  walkingLunge:
+    category: actions
+    loops: 1
+  walkpants:
+    category: normal
+  werewolf:
+    category: animalsplus
+  wheelbarrow:
+    category: social
+  whistle:
+    category: actionsplus
+    loops: 1
+  why-cross:
+    category: normalish
+    loops: 1
+  witch:
+    category: animalsplus
+    loops: 1
+  wizard:
+    category: ad
+  wok:
+    category: silly
+  workoutWednesday:
+    loops: 1
+  workoutThursday:
+    loops: 1
+  workoutFriday:
+    loops: 1
+  workoutSaturday:
+    loops: 1
+  worm:
+    category: animals
+    loops: 1
+  yogaWednesday:
+    loops: 1
+  yogaThursday:
+    loops: 1
+  yogaFriday:
+    loops: 1
+  yogaSaturday:
+    loops: 1
+  zombie:
+    category: animalsplus
+
+weights:
+  all:
+    _: 1
+  demo:
+    actions: 18
+    actionscharade: 7
+    actionsplus: 20
+    ad: 0
+    airguitar: 2
+    animals: 11
+    animalsplus: 8
+    dance: 10
+    fin: 0
+    game: 1
+    karaoke: 5
+    language: 2
+    normal: 7
+    normalish: 7
+    rare: 2
+    rps: 2
+    silly: 11
+    sleep: 0
+    social: 10
+    trip: 2
+  seacompression2019day:
+    actions: 19
+    actionscharade: 7
+    actionsplus: 20
+    ad: 0
+    airguitar: 24
+    animals: 11
+    animalsplus: 8
+    dance: 10
+    fin: 0
+    game: 0
+    karaoke: 13
+    language: 10
+    normal: 10
+    normalish: 7
+    rare: 5
+    rps: 2
+    silly: 10
+    sleep: 0
+    social: 10
+    trip: 0
+  seacompression2019night:
+    actions: 15
+    actionscharade: 7
+    actionsplus: 15
+    ad: 0
+    airguitar: 10
+    animals: 11
+    animalsplus: 8
+    dance: 10
+    fin: 0
+    game: 0
+    karaoke: 13
+    language: 7
+    normal: 3
+    normalish: 7
+    rare: 5
+    rps: 2
+    silly: 10
+    sleep: 1
+    social: 10
+    trip: 15
+  sunday:
+    action: 0
+    action charade: 0
+    action plus: 0
+    ad: 0
+    airguitar: 0
+    animals: 0
+    animal plus: 0
+    dance: 0
+    fin: 0
+    game: 0
+    karaoke: 0
+    language: 25
+    normal: 75
+    normalish: 0
+    rare: 0
+    RPS: 0
+    silly: 0
+    sleep: 0
+    social: 0
+    trip: 0
+  monday:
+    action: 0
+    action charade: 0
+    action plus: 0
+    ad: 0
+    airguitar: 0
+    animals: 0
+    animal plus: 0
+    dance: 0
+    fin: 0
+    game: 0
+    karaoke: 0
+    language: 25
+    normal: 75
+    normalish: 0
+    rare: 0
+    RPS: 0
+    silly: 0
+    sleep: 0
+    social: 0
+    trip: 0
+  tuesday:
+    action: 5
+    action charade: 0
+    action plus: 0
+    ad: 0
+    airguitar: 0
+    animals: 25
+    animal plus: 0
+    dance: 0
+    fin: 0
+    game: 0
+    karaoke: 0
+    language: 25
+    normal: 25
+    normalish: 20
+    rare: 0
+    RPS: 0
+    silly: 0
+    sleep: 0
+    social: 0
+    trip: 0
+  wednesday_day:
+    action: 15
+    action charade: 0
+    action plus: 0
+    ad: 0
+    airguitar: 10
+    animals: 20
+    animal plus: 0
+    dance: 0
+    fin: 0
+    game: 0
+    karaoke: 0
+    language: 20
+    normal: 20
+    normalish: 5
+    rare: 0
+    RPS: 0
+    silly: 0
+    sleep: 0
+    social: 10
+    trip: 0
+  wednesday_night:
+    action: 15
+    action charade: 0
+    action plus: 0
+    ad: 0
+    airguitar: 10
+    animals: 15
+    animal plus: 0
+    dance: 5
+    fin: 0
+    game: 0
+    karaoke: 0
+    language: 15
+    normal: 15
+    normalish: 5
+    rare: 0
+    RPS: 0
+    silly: 0
+    sleep: 0
+    social: 10
+    trip: 5
+  thursday:
+    action: 11
+    action charade: 0
+    action plus: 0
+    ad: 0
+    airguitar: 5
+    animals: 11
+    animal plus: 0
+    dance: 11
+    fin: 0
+    game: 0
+    karaoke: 0
+    language: 13
+    normal: 10
+    normalish: 12
+    rare: 5
+    RPS: 0
+    silly: 5
+    sleep: 0
+    social: 10
+    trip: 0
+  thursday_night:
+    action: 11
+    action charade: 0
+    action plus: 0
+    ad: 0
+    airguitar: 6
+    animals: 10
+    animal plus: 0
+    dance: 11
+    fin: 0
+    game: 0
+    karaoke: 0
+    language: 8
+    normal: 5
+    normalish: 5
+    rare: 0
+    RPS: 0
+    silly: 8
+    sleep: 0
+    social: 8
+    trip: 15
+  friday:
+    actions: 14
+    actionscharade: 7
+    actionsplus: 20
+    ad: 0
+    airguitar: 1
+    animals: 11
+    animalsplus: 8
+    dance: 10
+    fin: 0
+    game: 5
+    karaoke: 1
+    language: 0
+    normal: 1
+    normalish: 7
+    rare: 14
+    rps: 2
+    silly: 11
+    sleep: 0
+    social: 10
+    trip: 0
+  friday_night:
+    actions: 18
+    actionscharade: 0
+    actionsplus: 20
+    ad: 0
+    airguitar: 2
+    animals: 11
+    animalsplus: 5
+    dance: 5
+    fin: 0
+    game: 0
+    karaoke: 6
+    language: 0
+    normal: 0
+    normalish: 5
+    rare: 2
+    rps: 2
+    silly: 6
+    sleep: 0
+    social: 5
+    trip: 15
+  saturday:
+    actions: 18
+    actionscharade: 7
+    actionsplus: 20
+    ad: 0
+    airguitar: 1
+    animals: 11
+    animalsplus: 8
+    dance: 10
+    fin: 0
+    game: 5
+    karaoke: 2
+    language: 6
+    normal: 0
+    normalish: 7
+    rare: 14
+    rps: 2
+    silly: 11
+    sleep: 0
+    social: 10
+    trip: 0
+  saturday_night:
+    actions: 18
+    actionscharade: 0
+    actionsplus: 20
+    ad: 0
+    airguitar: 2
+    animals: 11
+    animalsplus: 5
+    dance: 5
+    fin: 0
+    game: 0
+    karaoke: 6
+    language: 5
+    normal: 0
+    normalish: 5
+    rare: 2
+    rps: 2
+    silly: 6
+    sleep: 0
+    social: 5
+    trip: 15
+  quiethours:
+    sleep: 1
+  gohome:
+    fin: 1
+  luminata2024:
+    actions: 19
+    actionscharade: 7
+    actionsplus: 20
+    ad: 0
+    airguitar: 24
+    animals: 11
+    animalsplus: 8
+    dance: 10
+    fin: 0
+    game: 0
+    karaoke: 13
+    language: 10
+    normal: 10
+    normalish: 7
+    rare: 5
+    rps: 2
+    silly: 10
+    sleep: 0
+    social: 10
+    trip: 0
+
+
+menu:
+  - start: '2024-09-01T01:45:00'
+    weights: luminata2024
+
+schedule: []
+  #- time: '2019-07-06T21:00:00'
+  #  label: workoutWednesday
+  #  ad_prefix: workout
+  #- time: '2019-07-10T10:00:00'
+  #  label: yogaWednesday
+  #  ad_prefix: yoga
+  #- time: '2019-07-10T14:00:00'
+  #  label: meditationWednesday
+  #  ad_prefix: meditation
+  #- time: '2019-07-10T17:00:00'
+  #  label: workoutWednesday
+  #  ad_prefix: workout
+  #- time: '2019-07-11T10:00:00'
+  #  label: yogaThursday
+  #  ad_prefix: yoga
+  #- time: '2019-07-11T14:00:00'
+  #  label: meditationThursday
+  #  ad_prefix: meditation
+  #- time: '2019-07-11T17:00:00'
+  #  label: workoutThursday
+  #  ad_prefix: workout
+  #- time: '2019-07-12T10:00:00'
+  #  label: yogaFriday
+  #  ad_prefix: yoga
+  #- time: '2019-07-12T14:00:00'
+  #  label: meditationFriday
+  #  ad_prefix: meditation
+  #- time: '2019-07-12T17:00:00'
+  #  label: workoutFriday
+  #  ad_prefix: workout
+  #- time: '2019-07-13T10:00:00'
+  #  label: yogaSaturday
+  #  ad_prefix: yoga
+  #- time: '2019-07-13T14:00:00'
+  #  label: meditationSaturday
+  #  ad_prefix: meditation
+  #- time: '2019-07-13T17:00:00'
+  #  label: workoutSaturday
+  #  ad_prefix: workout
