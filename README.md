@@ -13,17 +13,10 @@ The Python-based control system for managing Crosswalk, an interactive art proje
 ### The Normal Way
 
 1. https://docs.astral.sh/uv/getting-started/installation/ (a Python package and project manager):
-2. Create and activate a virtual environment:
-   ```bash
-   uv venv
-   source .venv/bin/activate  # On Unix/macOS
-   # or
-   .venv\Scripts\activate  # On Windows
-   ```
-3. Install dependencies:
-   ```bash
-   uv pip install -e .
-   ```
+2. To run a command:
+    ```bash 
+    uv run xwalk2/controller.py 
+    ```
 
 ### The Nix Way
 
