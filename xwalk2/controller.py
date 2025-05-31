@@ -3,6 +3,8 @@ from collections import defaultdict
 from models import Heatbeat
 
 def main():
+    print("Starting Crosswalk V2 Controller...")
+    print("Initializing ZMQ sockets...")
 
     context = zmq.Context()
     interactions = context.socket(zmq.SUB)
@@ -16,6 +18,14 @@ def main():
     heartbeats.bind("tcp://*:5558")
     heartbeats.setsockopt_string(zmq.SUBSCRIBE, "")
 
+    print("ZMQ sockets initialized successfully")
+    print("Listening on ports:")
+    print("  - 5556: Interactions")
+    print("  - 5557: Control")
+    print("  - 5558: Heartbeats")
+    print("\nController is running. Press Ctrl+C to exit.")
+    print("Waiting for components to connect...\n")
+
     # Initialize poll set
     poller = zmq.Poller()
     poller.register(interactions, zmq.POLLIN)
@@ -26,8 +36,9 @@ def main():
     while True:
         print(components)
         try:
-            socks = dict(poller.poll())
+            socks = dict(poller.poll(1000))  # 1 second timeout
         except KeyboardInterrupt:
+            print("\n🛑 Shutting down controller...")
             break
 
         if heartbeats in socks:
@@ -42,11 +53,13 @@ def main():
             if action == "A Timer fired":
                 playing = False
                 control.send_string("C RESET")
+                print("Reset sent to components")
             elif action == "A button pressed":
                 if playing:
                     print("Currently playing; do nothing")
                 else:
                     playing = True
                     control.send_string("Play scene")
+                    print("Play command sent to components")
 
 main()

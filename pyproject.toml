@@ -7,4 +7,5 @@ requires-python = ">=3.13"
 dependencies = [
     "pyzmq>=26.4.0",
     "zmq>=0.0.0",
+    "pydantic>=2.0.0",
 ]
