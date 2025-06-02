@@ -1,17 +1,58 @@
-
-
+import os
 import zmq
+import argparse
+import sys
+import time
+from datetime import datetime
+# from gpiozero import LED, Button
 from util import heatbeat
+from models import ButtonPress
 
 
-#  Socket to talk to server
-context = zmq.Context()
-socket = context.socket(zmq.PUB)
+# button_switch can run in console mode or physical mode.
+# python xwalk2/button_switch.py -m console
+# python xwalk2/button_switch.py -m physical
+def main():
+    parser = argparse.ArgumentParser(description='Button switch process')
+    parser.add_argument('-m', '--mode', choices=['console', 'physical'], required=True,
+                      help='Mode of operation: console or physical')
+    args = parser.parse_args()
 
-socket.connect("tcp://127.0.0.1:5556")
-t = heatbeat('button_switch', "crosswalk-a")
+    print(f"Starting button switch in {args.mode} mode")
 
+    context = zmq.Context()
+    socket = context.socket(zmq.PUB)
+    socket.connect("tcp://127.0.0.1:5556")
+    t = heatbeat('button_switch', "crosswalk-a")
 
-while True:
-    input("Press enter to trigger button")
-    socket.send_string("A button pressed")
+    if args.mode == "console":
+        try:
+            while True:
+                input("Press enter to simulate button press down")
+                print("Button pressed")
+                press_start = time.time()
+                
+                input("Press enter to simulate button release")
+                press_duration = int((time.time() - press_start) * 1000)  # Convert to milliseconds
+                print(f"Button released (held for {press_duration}ms)")
+                
+                button_press = ButtonPress(
+                    host="crosswalk-a",
+                    component="button_switch",
+                    press_duration=press_duration,
+                    sent_at=datetime.now()
+                )
+                socket.send_string(button_press.model_dump_json())
+        except KeyboardInterrupt:
+            print("\nShutting down...")
+            t.stop()
+            socket.close()
+            context.term()
+            sys.exit(0)
+    else:
+        print("Physical mode not implemented yet")
+        pass
+
+if __name__ == "__main__":
+    main()
+
