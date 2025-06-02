@@ -65,6 +65,94 @@ To stop the program, press Ctrl+C.
   - `timer.py` - Timing utilities
   - `util.py` - Utility functions
 
+## Architecture
+At a high level there, one crosswalk box will host the controller which has two [0MQ](https://zeromq.org/) sockets:
+- **Interactions**: Receives events (from button switch, timer, and scheduler) that will eventually trigger something to happen on the boxes. The controller is regularly polling Interactions then taking actions with the events it finds.
+- **Control**: Receives events from the controller which are broadcast out to all subscribed components. Events will be things like "turn the button light off", "matrix driver, display this gif", etc.
+
+Note that one goal is to have the ability to restart all components, so even components like button press that seem like they will only emit events are still subscribed to the Control socket so they can be reset.
+
+```mermaid
+flowchart LR
+    subgraph xwalk
+        direction TB
+
+        subgraph Crosswalk_a[crosswalk_a]
+            direction TB
+
+            %% Objects
+            Controller_subgraph
+            Matrix_Driver_a(matrix driver)
+            Button_Switch_a(button switch)
+            Button_Lights_a(button lights)
+            Timer_a(timer)
+            Scheduler_a(scheduler)
+            Wifi_AP_a(wifi)
+
+            %% Invisible links for arranging
+            Matrix_Driver_a ~~~ Button_Switch_a
+            Button_Switch_a ~~~ Button_Lights_a
+            Button_Lights_a ~~~ Timer_a
+            Timer_a ~~~ Scheduler_a
+            Scheduler_a ~~~ Wifi_AP_a
+        end
+
+        subgraph Crosswalk_b[crosswalk_b]
+            direction TB
+
+            %% Objects
+            Matrix_Driver_b(matrix driver)
+            Button_Switch_b(button switch)
+            Button_Lights_b(button lights)
+
+            %% Invisible links for arranging
+            Matrix_Driver_b ~~~ Button_Switch_b
+            Button_Switch_b ~~~ Button_Lights_b
+            Button_Lights_b ~~~ Matrix_Driver_b
+        end
+
+        subgraph Controller_subgraph[controller]
+            Controller[self]
+            Control(control)
+            Interactions(interactions)
+        end
+
+        Control ~~~ Crosswalk_a
+        Control ~~~ Crosswalk_b
+        Crosswalk_a ~~~ Interactions
+        Crosswalk_b ~~~ Interactions
+        Control ~~~ Interactions
+    end
+
+    Control e1@--> Matrix_Driver_a
+    Control e2@--> Button_Switch_a
+    Control e3@--> Button_Lights_a
+    Control e4@--> Timer_a
+    Control e5@--> Scheduler_a
+    Control e6@--> Matrix_Driver_b
+    Control e7@--> Button_Switch_b
+    Control e8@--> Button_Lights_b
+
+    Button_Switch_a e9@--> Interactions
+    Timer_a e10@--> Interactions
+    Scheduler_a e11@--> Interactions
+    Button_Switch_b e12@--> Interactions
+
+    e9@{ animate: true }
+    e10@{ animate: true }
+    e11@{ animate: true }
+    e12@{ animate: true }
+
+    Interactions --> Controller
+    Controller --> Control
+
+    %% Styles
+    style Wifi_AP_a fill:red
+    style Control fill:orange
+    style Interactions fill:orange
+```
+
+
 ## Development
 
 The project uses modern Python tooling:
