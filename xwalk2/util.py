@@ -1,7 +1,7 @@
 import threading
 import zmq
 import time
-from models import Heatbeat
+from xwalk2.models import Heatbeat
 from datetime import datetime
 
 

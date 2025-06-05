@@ -2,11 +2,11 @@ import sys
 import time
 from datetime import datetime
 
+import os
 import zmq
+from gpiozero import LED, Button
 
 from xwalk2.models import ButtonPress
-
-# from gpiozero import LED, Button
 from xwalk2.util import heatbeat
 
 
@@ -46,8 +46,21 @@ def main(mode):
             context.term()
             sys.exit(0)
     else:
-        print("Physical mode not implemented yet")
-        pass
+        button_pin = int(os.getenv('XWALK_BUTTON_PIN', 19))
+        button = Button(button_pin)
+        try:
+            while True:
+                button.wait_for_active()
+                button.wait_for_inactive()
+                held_time = button.held_time
+                button_press = ButtonPress(host="crosswalk-a", component="button_switch", press_duration=held_time*1000, sent_at=datetime.now())
+                socket.send_string(button_press.model_dump_json())
+        except KeyboardInterrupt:
+            print("\nShutting down...")
+            t.stop() 
+            socket.close()
+            context.term()
+            sys.exit(0)
 
 
 if __name__ == "__main__":
