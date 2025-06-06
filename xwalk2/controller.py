@@ -1,6 +1,7 @@
 import zmq
 from collections import defaultdict
-from models import Heatbeat
+from xwalk2.models import Heatbeat
+
 
 def main():
     print("Starting Crosswalk V2 Controller...")
