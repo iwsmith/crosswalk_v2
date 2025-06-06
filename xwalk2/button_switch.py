@@ -46,14 +46,15 @@ def main(mode):
             context.term()
             sys.exit(0)
     else:
-        button_pin = int(os.getenv('XWALK_BUTTON_PIN', 19))
-        button = Button(button_pin)
+        button_pin = int(os.getenv('XWALK_BUTTON_PIN', 25))
+        button = Button(button_pin, pull_up=True, bounce_time=0.05)
         try:
             while True:
                 button.wait_for_active()
                 button.wait_for_inactive()
                 held_time = button.held_time
                 button_press = ButtonPress(host="crosswalk-a", component="button_switch", press_duration=held_time*1000, sent_at=datetime.now())
+                print(button_press)
                 socket.send_string(button_press.model_dump_json())
         except KeyboardInterrupt:
             print("\nShutting down...")
