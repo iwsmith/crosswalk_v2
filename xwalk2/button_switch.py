@@ -50,10 +50,11 @@ def main(mode):
         button = Button(button_pin, pull_up=True, bounce_time=0.05)
         try:
             while True:
-                button.wait_for_active()
-                button.wait_for_inactive()
-                held_time = button.held_time
-                button_press = ButtonPress(host="crosswalk-a", component="button_switch", press_duration=held_time*1000, sent_at=datetime.now())
+                button.wait_for_press()()
+                s = time.time()
+                button.wait_for_release()
+                d = int(time.time() - s)
+                button_press = ButtonPress(host="crosswalk-a", component="button_switch", press_duration=d, sent_at=datetime.now())
                 print(button_press)
                 socket.send_string(button_press.model_dump_json())
         except KeyboardInterrupt:
