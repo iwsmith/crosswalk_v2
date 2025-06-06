@@ -50,7 +50,7 @@ def main(mode):
         button = Button(button_pin, pull_up=True, bounce_time=0.05)
         try:
             while True:
-                button.wait_for_press()()
+                button.wait_for_press()
                 s = time.time()
                 button.wait_for_release()
                 d = int(time.time() - s)
