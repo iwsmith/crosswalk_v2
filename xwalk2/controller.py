@@ -1,6 +1,8 @@
 import zmq
 from collections import defaultdict
-from xwalk2.models import Heatbeat
+from datetime import datetime
+from xwalk2.models import Heatbeat, APIRequest, APIResponse
+import json
 
 
 def main():
@@ -19,11 +21,16 @@ def main():
     heartbeats.bind("tcp://*:5558")
     heartbeats.setsockopt_string(zmq.SUBSCRIBE, "")
 
+    # Unified API socket for both status and action requests
+    api_socket = context.socket(zmq.REP)
+    api_socket.bind("tcp://*:5559")
+
     print("ZMQ sockets initialized successfully")
     print("Listening on ports:")
     print("  - 5556: Interactions")
     print("  - 5557: Control")
     print("  - 5558: Heartbeats")
+    print("  - 5559: API Requests")
     print("\nController is running. Press Ctrl+C to exit.")
     print("Waiting for components to connect...\n")
 
@@ -31,9 +38,32 @@ def main():
     poller = zmq.Poller()
     poller.register(interactions, zmq.POLLIN)
     poller.register(heartbeats, zmq.POLLIN)
+    poller.register(api_socket, zmq.POLLIN)
 
     playing = False
     components = {}
+    
+    def handle_action(action):
+        """Handle an action and return success status"""
+        nonlocal playing
+        
+        if action == "A Timer fired":
+            playing = False
+            control.send_string("C RESET")
+            print("Reset sent to components")
+            return True, "Reset triggered successfully"
+        elif action == "A button pressed":
+            if playing:
+                print("Currently playing; do nothing")
+                return False, "Already playing - action ignored"
+            else:
+                playing = True
+                control.send_string("Play scene")
+                print("Play command sent to components")
+                return True, "Play scene triggered successfully"
+        else:
+            return False, f"Unknown action: {action}"
+    
     while True:
         print(components)
         try:
@@ -45,22 +75,70 @@ def main():
         if heartbeats in socks:
             beat = Heatbeat.model_validate_json(heartbeats.recv_string())
             print(f"Got {beat=}")
-
             components[beat.component] = beat.sent_at
 
-        if interactions in socks:
-            action = interactions.recv_string()
-            print(action)
-            if action == "A Timer fired":
-                playing = False
-                control.send_string("C RESET")
-                print("Reset sent to components")
-            elif action == "A button pressed":
-                if playing:
-                    print("Currently playing; do nothing")
+        if api_socket in socks:
+            try:
+                # Receive API request
+                request_data = api_socket.recv_string()
+                print(f"Received API request: {request_data}")
+                
+                # Parse request
+                api_request = APIRequest.model_validate_json(request_data)
+                
+                if api_request.request_type == "status":
+                    # Handle status request
+                    response = APIResponse(
+                        request_id=api_request.request_id,
+                        success=True,
+                        message="Status retrieved successfully",
+                        playing=playing,
+                        components=components.copy(),
+                        timestamp=datetime.now()
+                    )
+                    print(f"Sending status response for request {api_request.request_id}")
+                    
+                elif api_request.request_type == "action":
+                    # Handle action request
+                    if api_request.action:
+                        success, message = handle_action(api_request.action)
+                        response = APIResponse(
+                            request_id=api_request.request_id,
+                            success=success,
+                            message=message
+                        )
+                        print(f"Processed action '{api_request.action}': {message}")
+                    else:
+                        response = APIResponse(
+                            request_id=api_request.request_id,
+                            success=False,
+                            message="Action request missing action field"
+                        )
                 else:
-                    playing = True
-                    control.send_string("Play scene")
-                    print("Play command sent to components")
+                    response = APIResponse(
+                        request_id=api_request.request_id,
+                        success=False,
+                        message=f"Unknown request type: {api_request.request_type}"
+                    )
+                
+                # Send response
+                api_socket.send_string(response.model_dump_json())
+                
+            except Exception as e:
+                print(f"Error handling API request: {e}")
+                # Send error response
+                error_response = APIResponse(
+                    request_id="unknown",
+                    success=False,
+                    message=f"Server error: {str(e)}"
+                )
+                api_socket.send_string(error_response.model_dump_json())
+
+        if interactions in socks:
+            # Handle interactions from other components (like button_switch)
+            action = interactions.recv_string()
+            print(f"Received interaction from component: {action}")
+            success, message = handle_action(action)
+            print(f"Component interaction result: {message}")
 
 main()
