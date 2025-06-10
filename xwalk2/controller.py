@@ -51,7 +51,7 @@ def main():
         control.send_string(s)
 
     while True:
-        #print(components)
+        # print(components)
         print(state.state)
         try:
             socks = dict(poller.poll(1000))  # 1 second timeout
@@ -78,12 +78,14 @@ def main():
                         playing=playing,
                         components=components,
                         timestamp=datetime.now(),
+                        state=state.state
                     )
 
                 elif api_request.request_type == "action":
                     # Handle action request
                     if api_request.action:
-                        success, message = handle_action(api_request.action)
+                        success = True
+                        message = "Not implemented"
                         response = APIResponse(
                             success=success,
                             message=message,
@@ -94,6 +96,9 @@ def main():
                             success=False,
                             message="Action request missing action field",
                         )
+                elif api_request.request_type == "reset":
+                    state.reset(send_string)
+                    response = APIResponse( success=True, message="State reset")
                 else:
                     response = APIResponse(
                         success=False,
