@@ -19,6 +19,8 @@
             python
             pyzmq
             pydantic
+            fastapi
+            uvicorn
           ] ++ [
             pkgs.uv
           ];
@@ -28,6 +30,8 @@
             echo "Available packages:"
             echo "  - pyzmq"
             echo "  - pydantic"
+            echo "  - fastapi"
+            echo "  - uvicorn"
             echo "  - uv (package manager)"
             
             # Install package in development mode using uv

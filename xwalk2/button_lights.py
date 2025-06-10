@@ -1,6 +1,6 @@
 
 import zmq
-from util import heatbeat
+from xwalk2.util import heatbeat
 
 
 #  Socket to talk to server
@@ -17,6 +17,7 @@ while True:
     print(f"{lights_on=}")
     try:
       string = socket.recv_string()
+      print(string)
     except KeyboardInterrupt:
        t.join()
     if string == "C Play scene":
