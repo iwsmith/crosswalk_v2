@@ -8,9 +8,10 @@ class Controller:
     self.machine.add_transition('button_press', source='ready', dest='walk')
     self.machine.add_transition('reset', source='*', dest='ready')
 
-  def on_enter_walk(self, send_fn):
-    # We would choose a walk here
-    send_fn(PlayScene().model_dump_json())
+  # I don't think I understood how to use these
+  # def on_enter_walk(self, send_fn):
+  #   # We would choose a walk here
+  #   send_fn(PlayScene().model_dump_json())
 
-  def on_enter_ready(self, send_fn):
-    send_fn(EndScene().model_dump_json())
+  # def on_enter_ready(self, send_fn):
+  #   send_fn(EndScene().model_dump_json())
