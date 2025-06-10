@@ -2,7 +2,8 @@ from datetime import datetime
 
 import zmq
 
-from xwalk2.models import APIRequest, APIResponse, Heatbeat
+from xwalk2.models import APIRequest, APIResponse, Heatbeat, parse_message, ButtonPress
+from xwalk2.fsm import Controller
 
 
 def main():
@@ -40,32 +41,18 @@ def main():
     poller.register(heartbeats, zmq.POLLIN)
     poller.register(api_socket, zmq.POLLIN)
 
+    state = Controller()
+
     playing = False
     components = {}
 
-    def handle_action(action):
-        """Handle an action and return success status"""
-        nonlocal playing
-
-        if action == "A Timer fired":
-            playing = False
-            control.send_string("C RESET")
-            print("Reset sent to components")
-            return True, "Reset triggered successfully"
-        elif action == "A button pressed":
-            if playing:
-                print("Currently playing; do nothing")
-                return False, "Already playing - action ignored"
-            else:
-                playing = True
-                control.send_string("Play scene")
-                print("Play command sent to components")
-                return True, "Play scene triggered successfully"
-        else:
-            return False, f"Unknown action: {action}"
+    def send_string(s):
+        print(f"Sending: {s}")
+        control.send_string(s)
 
     while True:
-        print(components)
+        #print(components)
+        print(state.state)
         try:
             socks = dict(poller.poll(1000))  # 1 second timeout
         except KeyboardInterrupt:
@@ -81,9 +68,6 @@ def main():
             try:
                 # Receive API request
                 request_data = api_socket.recv_string()
-                print(f"Received API request: {request_data}")
-
-                # Parse request
                 api_request = APIRequest.model_validate_json(request_data)
 
                 if api_request.request_type == "status":
@@ -130,10 +114,9 @@ def main():
 
         if interactions in socks:
             # Handle interactions from other components (like button_switch)
-            action = interactions.recv_string()
-            print(f"Received interaction from component: {action}")
-            success, message = handle_action(action)
-            print(f"Component interaction result: {message}")
+            action = parse_message(interactions.recv_string())
+            if isinstance(action, ButtonPress):
+                state.button_press(send_string)
 
 
 main()
