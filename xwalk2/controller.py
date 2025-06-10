@@ -1,8 +1,8 @@
-import zmq
-from collections import defaultdict
 from datetime import datetime
-from xwalk2.models import Heatbeat, APIRequest, APIResponse
-import json
+
+import zmq
+
+from xwalk2.models import APIRequest, APIResponse, Heatbeat
 
 
 def main():
@@ -42,11 +42,11 @@ def main():
 
     playing = False
     components = {}
-    
+
     def handle_action(action):
         """Handle an action and return success status"""
         nonlocal playing
-        
+
         if action == "A Timer fired":
             playing = False
             control.send_string("C RESET")
@@ -63,7 +63,7 @@ def main():
                 return True, "Play scene triggered successfully"
         else:
             return False, f"Unknown action: {action}"
-    
+
     while True:
         print(components)
         try:
@@ -82,55 +82,49 @@ def main():
                 # Receive API request
                 request_data = api_socket.recv_string()
                 print(f"Received API request: {request_data}")
-                
+
                 # Parse request
                 api_request = APIRequest.model_validate_json(request_data)
-                
+
                 if api_request.request_type == "status":
                     # Handle status request
                     response = APIResponse(
-                        request_id=api_request.request_id,
                         success=True,
                         message="Status retrieved successfully",
                         playing=playing,
-                        components=components.copy(),
-                        timestamp=datetime.now()
+                        components=components,
+                        timestamp=datetime.now(),
                     )
-                    print(f"Sending status response for request {api_request.request_id}")
-                    
+
                 elif api_request.request_type == "action":
                     # Handle action request
                     if api_request.action:
                         success, message = handle_action(api_request.action)
                         response = APIResponse(
-                            request_id=api_request.request_id,
                             success=success,
-                            message=message
+                            message=message,
                         )
                         print(f"Processed action '{api_request.action}': {message}")
                     else:
                         response = APIResponse(
-                            request_id=api_request.request_id,
                             success=False,
-                            message="Action request missing action field"
+                            message="Action request missing action field",
                         )
                 else:
                     response = APIResponse(
-                        request_id=api_request.request_id,
                         success=False,
-                        message=f"Unknown request type: {api_request.request_type}"
+                        message=f"Unknown request type: {api_request.request_type}",
                     )
-                
+
                 # Send response
                 api_socket.send_string(response.model_dump_json())
-                
+
             except Exception as e:
                 print(f"Error handling API request: {e}")
                 # Send error response
                 error_response = APIResponse(
-                    request_id="unknown",
                     success=False,
-                    message=f"Server error: {str(e)}"
+                    message=f"Server error: {str(e)}",
                 )
                 api_socket.send_string(error_response.model_dump_json())
 
@@ -140,5 +134,6 @@ def main():
             print(f"Received interaction from component: {action}")
             success, message = handle_action(action)
             print(f"Component interaction result: {message}")
+
 
 main()

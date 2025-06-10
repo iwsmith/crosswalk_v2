@@ -1,11 +1,11 @@
-import zmq
+import time
 from contextlib import asynccontextmanager
 from typing import Dict
+
+import zmq
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
-import time
-import uuid
 
 from xwalk2.models import APIRequest, APIResponse
 
@@ -25,87 +25,80 @@ class APIController:
         self.context = zmq.Context()
         self.api_socket = None  # Single REQ socket for all communication
         self.start_time = time.time()
-        
+
     def start(self):
         """Initialize ZMQ connection"""
         try:
             # Single REQ socket for all API communication
             self.api_socket = self.context.socket(zmq.REQ)
             self.api_socket.connect("tcp://localhost:5559")
-            
+
             print("API Controller initialized successfully")
             print("Connected to controller on port 5559")
-            
+
         except Exception as e:
             print(f"Failed to initialize API Controller: {e}")
             raise
-    
+
     def stop(self):
         """Clean up ZMQ connection"""
         if self.api_socket:
             self.api_socket.close()
         if self.context:
             self.context.term()
-    
+
     def _send_request(self, request: APIRequest) -> APIResponse:
         """Send a request to the controller and return the response"""
         if not self.api_socket:
             raise RuntimeError("API Controller not initialized")
-        
+
         try:
             # Send request
             self.api_socket.send_string(request.model_dump_json())
-            
+
             # Wait for response with timeout
             if self.api_socket.poll(timeout=5000):  # 5 second timeout
                 response_data = self.api_socket.recv_string()
                 response = APIResponse.model_validate_json(response_data)
-                
+
                 if not response.success:
                     raise RuntimeError(response.message or "Request failed")
-                
+
                 return response
             else:
                 raise TimeoutError("Controller did not respond within timeout")
-                
+
         except zmq.ZMQError as e:
             print(f"ZMQ communication error: {e}")
             raise ConnectionError("Failed to communicate with controller")
-    
+
     def send_action(self, action: str) -> str:
         """Send an action to the controller"""
-        request = APIRequest(
-            request_id=str(uuid.uuid4()),
-            request_type="action",
-            action=action
-        )
-        
+        request = APIRequest(request_type="action", action=action)
+
         response = self._send_request(request)
         print(f"Action '{action}' result: {response.message}")
         return response.message or "Action completed"
-    
+
     def get_status(self) -> SystemStatus:
         """Get current system status from controller"""
-        request = APIRequest(
-            request_id=str(uuid.uuid4()),
-            request_type="status"
-        )
-        
+        request = APIRequest(request_type="status")
+
         response = self._send_request(request)
-        
+
         # Convert datetime objects to timestamps
         components_timestamps = {}
         if response.components:
             for component, dt in response.components.items():
-                if hasattr(dt, 'timestamp'):
+                if hasattr(dt, "timestamp"):
                     components_timestamps[component] = dt.timestamp()
                 else:
                     components_timestamps[component] = time.time()
-        
+
         return SystemStatus(
             playing=response.playing or False,
             components=components_timestamps,
-            uptime=time.time() - self.start_time
+            uptime=time.time() - self.start_time,
         )
 
 
@@ -126,7 +119,7 @@ app = FastAPI(
     title="Crosswalk V2 API",
     description="API for controlling the Crosswalk V2 system",
     version="0.1.0",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 
@@ -255,7 +248,9 @@ async def fire_timer():
 async def reset_system():
     """Reset the system"""
     try:
-        message = api_controller.send_action("A Timer fired")  # Timer fired triggers reset
+        message = api_controller.send_action(
+            "A Timer fired"
+        )  # Timer fired triggers reset
         return {"message": message}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -263,4 +258,5 @@ async def reset_system():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)
