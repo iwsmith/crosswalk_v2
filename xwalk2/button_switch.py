@@ -4,7 +4,7 @@ from datetime import datetime
 
 import os
 import zmq
-from gpiozero import LED, Button
+from gpiozero import Button
 
 from xwalk2.models import ButtonPress
 from xwalk2.util import heatbeat

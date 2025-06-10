@@ -24,7 +24,7 @@ class ButtonPress(BaseModel):
 
 
 class APIRequest(BaseModel):
-    request_type: Literal["status", "action"]
+    request_type: Literal["status", "action", "reset"]
     action: Optional[str] = None  # Only used for action requests
 
 
@@ -35,6 +35,7 @@ class APIResponse(BaseModel):
     playing: Optional[bool] = None
     components: Optional[Dict[str, datetime]] = None
     timestamp: Optional[datetime] = None
+    state: Optional[str] = None
 
 
 message_registry = {"button_press": ButtonPress, "heartbeat": Heatbeat}

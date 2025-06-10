@@ -80,6 +80,13 @@ class APIController:
         print(f"Action '{action}' result: {response.message}")
         return response.message or "Action completed"
 
+    def send_reset(self) -> str:
+        """Send an action to the controller"""
+        request = APIRequest(request_type="reset")
+
+        response = self._send_request(request)
+        return response.message or "Action completed"
+
     def get_status(self) -> SystemStatus:
         """Get current system status from controller"""
         request = APIRequest(request_type="status")
@@ -150,6 +157,10 @@ async def root():
         <div class="button-group">
             <button onclick="getStatus()">Refresh Status</button>
         </div>
+
+        <div class="button-group">
+            <button onclick="reset()">Reset</button>
+        </div>
         
         <div class="status" id="status">
             <h3>System Status</h3>
@@ -177,7 +188,27 @@ async def root():
                     alert('Network error: ' + error.message);
                 }
             }
-            
+
+            async function reset() {
+                try {
+                    const response = await fetch('/reset', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
+                    const result = await response.json();
+                    if (response.ok) {
+                        alert('Action result: ' + result.message);
+                        getStatus(); // Refresh status
+                    } else {
+                        alert('Error: ' + result.detail);
+                    }
+                } catch (error) {
+                    alert('Network error: ' + error.message);
+                }
+            }
+
             async function getStatus() {
                 try {
                     const response = await fetch('/status');
@@ -248,9 +279,7 @@ async def fire_timer():
 async def reset_system():
     """Reset the system"""
     try:
-        message = api_controller.send_action(
-            "A Timer fired"
-        )  # Timer fired triggers reset
+        message = api_controller.send_reset()  # Timer fired triggers reset
         return {"message": message}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

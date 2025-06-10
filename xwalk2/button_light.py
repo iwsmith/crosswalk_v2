@@ -20,7 +20,7 @@ while True:
       print(string)
     except KeyboardInterrupt:
        t.join()
-    if string == "C Play scene":
+    if string == "corgi":
         lights_on = False
-    elif string == "C RESET":
+    elif string == "reset":
       lights_on = True
