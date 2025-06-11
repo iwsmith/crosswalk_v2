@@ -12,5 +12,5 @@ class Controller:
     # We would choose a walk here
     send_fn(PlayScene().model_dump_json())
 
-  def on_enter_reset(self, send_fn):
+  def on_enter_ready(self, send_fn):
     send_fn(EndScene().model_dump_json())

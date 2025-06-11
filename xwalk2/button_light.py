@@ -20,9 +20,7 @@ def main():
     while True:
         try:
             msg = socket.recv_string()
-            print(msg)
             action = parse_message(msg)
-            print(action)
         except KeyboardInterrupt:
             t.join()
             socket.close()
