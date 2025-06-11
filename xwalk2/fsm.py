@@ -1,3 +1,4 @@
+from xwalk2.models import PlayScene, EndScene
 from transitions import Machine
 
 class Controller:
@@ -9,7 +10,7 @@ class Controller:
 
   def on_enter_walk(self, send_fn):
     # We would choose a walk here
-    send_fn("corgi")
+    send_fn(PlayScene().model_dump_json())
 
-  def on_enter_reset(self, send_fn):
-    send_fn("reset")
+  def on_enter_ready(self, send_fn):
+    send_fn(EndScene().model_dump_json())

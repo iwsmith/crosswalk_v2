@@ -14,6 +14,9 @@ class Heatbeat(BaseModel):
     component: str
     sent_at: datetime
 
+    def __hash__(self) -> int:
+        return hash(f"{self.host}/{self.component}")
+
 
 class ButtonPress(BaseModel):
     type: Literal["button_press"] = "button_press"
@@ -38,7 +41,25 @@ class APIResponse(BaseModel):
     state: Optional[str] = None
 
 
-message_registry = {"button_press": ButtonPress, "heartbeat": Heatbeat}
+class PlayScene(BaseModel):
+    type: Literal["play_scene"] = "play_scene"
+
+
+class EndScene(BaseModel):
+    type: Literal["end_scene"] = "end_scene"
+
+class CurrentState(BaseModel):
+    type: Literal["current_state"] = "current_state"
+    state: str
+
+
+message_registry = {
+    "button_press": ButtonPress,
+    "heartbeat": Heatbeat,
+    "play_scene": PlayScene,
+    "end_scene": EndScene,
+    "current_state": CurrentState
+}
 
 
 def parse_message(message_str: str) -> BaseModel:
