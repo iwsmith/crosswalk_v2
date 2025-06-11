@@ -10,6 +10,7 @@ def main():
   context = zmq.Context()
   socket = context.socket(zmq.SUB)
   led = LED(24)
+  led.on()
 
   socket.connect("tcp://127.0.0.1:5557")
 
@@ -17,6 +18,7 @@ def main():
   while True:
       try:
           action = parse_message(socket.recv_string())
+          print(action)
       except KeyboardInterrupt:
           t.join()
           socket.close()
