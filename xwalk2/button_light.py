@@ -21,20 +21,20 @@ def main():
         try:
             msg = socket.recv_string()
             action = parse_message(msg)
+            if isinstance(action, PlayScene):
+                led.off()
+            elif isinstance(action, EndScene):
+                led.on()
+            elif isinstance(action, CurrentState):
+                if action.state == "playing":
+                    led.off()
+                else:
+                    led.on()
         except KeyboardInterrupt:
             t.join()
             socket.close()
             context.term()
             sys.exit(0)
-        if isinstance(action, PlayScene):
-            led.off()
-        elif isinstance(action, EndScene):
-            led.on()
-        elif isinstance(action, CurrentState):
-            if action.state == "playing":
-                led.off()
-            else:
-                led.on()
               
 
 
