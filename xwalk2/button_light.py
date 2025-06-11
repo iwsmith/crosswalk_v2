@@ -13,6 +13,7 @@ def main():
   led.on()
 
   socket.connect("tcp://127.0.0.1:5557")
+  socket.setsockopt_string(zmq.SUBSCRIBE, "")
 
   t = heatbeat("button_light", "crosswalk-a")
   while True:
