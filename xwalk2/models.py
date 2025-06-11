@@ -37,13 +37,21 @@ class APIResponse(BaseModel):
     timestamp: Optional[datetime] = None
     state: Optional[str] = None
 
+
 class PlayScene(BaseModel):
     type: Literal["play_scene"] = "play_scene"
+
 
 class EndScene(BaseModel):
     type: Literal["end_scene"] = "end_scene"
 
-message_registry = {"button_press": ButtonPress, "heartbeat": Heatbeat}
+
+message_registry = {
+    "button_press": ButtonPress,
+    "heartbeat": Heatbeat,
+    "play_scene": PlayScene,
+    "end_scene": EndScene,
+}
 
 
 def parse_message(message_str: str) -> BaseModel:
