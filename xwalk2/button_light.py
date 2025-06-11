@@ -17,7 +17,9 @@ def main():
   t = heatbeat("button_light", "crosswalk-a")
   while True:
       try:
-          action = parse_message(socket.recv_string())
+          msg = socket.recv_string()
+          print(msg)
+          action = parse_message(msg)
           print(action)
       except KeyboardInterrupt:
           t.join()
