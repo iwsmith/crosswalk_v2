@@ -1,26 +1,31 @@
-
+import sys
 import zmq
+from gpiozero import LED
+
+from xwalk2.models import EndScene, PlayScene, parse_message
 from xwalk2.util import heatbeat
 
+def main():
+  #  Socket to talk to server
+  context = zmq.Context()
+  socket = context.socket(zmq.SUB)
+  led = LED(24)
 
-#  Socket to talk to server
-context = zmq.Context()
-socket = context.socket(zmq.SUB)
+  socket.connect("tcp://127.0.0.1:5557")
 
-socket.connect("tcp://127.0.0.1:5557")
+  t = heatbeat("button_light", "crosswalk-a")
+  while True:
+      try:
+          action = parse_message(socket.recv_string())
+      except KeyboardInterrupt:
+          t.join()
+          socket.close()
+          context.term()
+          sys.exit(0)
+      if isinstance(action, PlayScene):
+          led.off()
+      elif isinstance(action, EndScene):
+          led.on()
 
-# Subscribe to zipcode, default is NYC, 10001
-socket.setsockopt_string(zmq.SUBSCRIBE, "")
-lights_on = True
-t = heatbeat("button_lights", "crosswalk-a")
-while True:
-    print(f"{lights_on=}")
-    try:
-      string = socket.recv_string()
-      print(string)
-    except KeyboardInterrupt:
-       t.join()
-    if string == "corgi":
-        lights_on = False
-    elif string == "reset":
-      lights_on = True
+if __name__ == "__main__":
+    main()

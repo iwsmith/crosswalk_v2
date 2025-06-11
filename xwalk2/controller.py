@@ -2,8 +2,14 @@ from datetime import datetime
 
 import zmq
 
-from xwalk2.models import APIRequest, APIResponse, Heatbeat, parse_message, ButtonPress
 from xwalk2.fsm import Controller
+from xwalk2.models import (
+    APIRequest,
+    APIResponse,
+    ButtonPress,
+    Heatbeat,
+    parse_message,
+)
 
 
 def main():
