@@ -8,6 +8,7 @@ from xwalk2.models import (
     APIResponse,
     ButtonPress,
     Heatbeat,
+    CurrentState,
     parse_message,
 )
 
@@ -53,12 +54,14 @@ def main():
     components = {}
 
     def send_string(s):
-        print(f"Sending: {s}")
+        # print(f"Sending: {s}")
         control.send_string(s)
 
     while True:
         # print(components)
         print(state.state)
+
+        new_component = False
         try:
             socks = dict(poller.poll(1000))  # 1 second timeout
         except KeyboardInterrupt:
@@ -67,8 +70,14 @@ def main():
 
         if heartbeats in socks:
             beat = Heatbeat.model_validate_json(heartbeats.recv_string())
-            print(f"Got {beat=}")
-            components[beat.component] = beat.sent_at
+            # print(f"Got {beat=}")
+            if beat not in components:
+                new_component = True
+            components[beat] = beat.sent_at
+
+        # If there is a new component it will need our current state
+        if new_component:
+            send_string(CurrentState(state=state.state).model_dump_json())
 
         if api_socket in socks:
             try:
@@ -84,7 +93,7 @@ def main():
                         playing=playing,
                         components=components,
                         timestamp=datetime.now(),
-                        state=state.state
+                        state=state.state,
                     )
 
                 elif api_request.request_type == "action":
@@ -104,7 +113,7 @@ def main():
                         )
                 elif api_request.request_type == "reset":
                     state.reset(send_string)
-                    response = APIResponse( success=True, message="State reset")
+                    response = APIResponse(success=True, message="State reset")
                 else:
                     response = APIResponse(
                         success=False,

@@ -2,7 +2,7 @@ import sys
 import zmq
 from gpiozero import LED
 
-from xwalk2.models import EndScene, PlayScene, parse_message
+from xwalk2.models import EndScene, PlayScene, CurrentState, parse_message
 from xwalk2.util import heatbeat
 
 
@@ -11,7 +11,7 @@ def main():
     context = zmq.Context()
     socket = context.socket(zmq.SUB)
     led = LED(24)
-    led.on()
+    led.off()
 
     socket.connect("tcp://127.0.0.1:5557")
     socket.setsockopt_string(zmq.SUBSCRIBE, "")
@@ -30,6 +30,12 @@ def main():
             led.off()
         elif isinstance(action, EndScene):
             led.on()
+        elif isinstance(action, CurrentState):
+            if action.state == "playing":
+                led.off()
+            else:
+                led.on()
+              
 
 
 if __name__ == "__main__":
