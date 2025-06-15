@@ -1,29 +1,25 @@
-import json
 from datetime import datetime
 
 import zmq
+from pydantic import BaseModel
 
 from xwalk2.fsm import Controller
 from xwalk2.models import (
     APIRequest,
     APIResponse,
     ButtonPress,
-    Heatbeat,
     CurrentState,
-    EndScene,
-    PlayScene,
-    ResetCommand,
+    Heatbeat,
+    TimerExpired,
     parse_message,
 )
-from xwalk2.animation_library import AnimationLibrary
 
 
 def main():
     print("Starting Crosswalk V2 Controller with FSM...")
     print("Initializing animation library...")
-    
+
     # Initialize animation library (crash early if not available)
-    animation_lib = AnimationLibrary()
     print("Animation library loaded successfully")
     print("Initializing ZMQ sockets...")
 
@@ -49,7 +45,7 @@ def main():
     print("  - 5557: Control")
     print("  - 5558: Heartbeats")
     print("  - 5559: API Requests")
-    print("\Controller is running. Press Ctrl+C to exit.")
+    print("Controller is running. Press Ctrl+C to exit.")
     print("Waiting for components to connect...\n")
 
     # Initialize poll set
@@ -58,89 +54,39 @@ def main():
     poller.register(heartbeats, zmq.POLLIN)
     poller.register(api_socket, zmq.POLLIN)
 
+    def send_command(command_obj: BaseModel):
+        """Send command as consistent JSON"""
+        command_json = command_obj.model_dump_json()
+        # print(f"📤 Sending: {command_json}")
+        control.send_string(command_json)
+
     # Initialize FSM controller
-    state = Controller()
+    state = Controller(send_command)
 
     playing = False
     components = {}
 
-    def send_command(command_obj):
-        """Send command as consistent JSON"""
-        command_json = command_obj.model_dump_json()
-        print(f"📤 Sending: {command_json}")
-        control.send_string(command_json)
-
-    def handle_reset() -> tuple[bool, str]:
-        """Handle reset action - consolidated logic"""
-        state.reset()
-        print(f"🎛️  FSM transition: {state.state} -> ready")
-        
-        reset_command = ResetCommand()
-        send_command(reset_command)
-        return True, "System reset command sent"
-
-    def handle_timer_expired() -> tuple[bool, str]:
-        """Handle timer expired action - consolidated logic"""
-        state.reset()
-        print(f"🎛️  FSM transition: {state.state} -> ready")
-        
-        reset_command = ResetCommand()
-        send_command(reset_command)
-        return True, "Timer expired - reset command sent"
-
-    def handle_button_pressed() -> tuple[bool, str]:
-        """Handle button pressed action - consolidated logic"""
-        if playing:
-            return False, "Already playing - action ignored"
-        else:
-            # Trigger FSM transition to 'walk' state
-            state.button_press()
-            print(f"🎛️  FSM transition: ready -> walk")
-            
-            # Select sophisticated animation sequence
-            intro, walk, outro = animation_lib.select_animation_sequence()
-            
-            # Get durations for timing
-            intro_duration, walk_duration, outro_duration = animation_lib.get_sequence_durations(
-                intro, walk, outro
-            )
-            total_duration = intro_duration + walk_duration + outro_duration
-            
-            # Create PlayScene
-            play_command = PlayScene(
-                intro=intro,
-                walk=walk,
-                outro=outro,
-                intro_duration=intro_duration,
-                walk_duration=walk_duration,
-                outro_duration=outro_duration,
-                total_duration=total_duration
-            )
-            
-            print(f"🎬 Controller: Selected animation sequence: {intro} -> {walk} -> {outro}")
-            
-            # Send command
-            send_command(play_command)
-            
-            return True, f"Animation sequence started: {intro} -> {walk} -> {outro}"
-
     def handle_api_action(action: str) -> tuple[bool, str]:
         """Handle API actions - now calls consolidated handlers"""
         if action == "button_pressed":
-            return handle_button_pressed()
+            return state.button_press()
         elif action == "timer_expired":
-            return handle_timer_expired()
+            return state.timer_expired()
         elif action == "reset":
-            return handle_reset()
+            return state.reset()()
         else:
             return False, f"Unknown action: {action}"
 
     # Main control loop, wrapped in try for graceful shutdown
+    last_state = state.state
+    print(f"🎛️  FSM State: {state.state} | Playing: {playing}")
     try:
         while True:
-            # Update playing status based on FSM state
-            playing = (state.state == 'walk')
-            print(f"🎛️  FSM State: {state.state} | Playing: {playing}")
+            # Update playing status based on FSM state, but only when changed
+            if state.state != last_state:
+                playing = state.state == "walk"
+                print(f"🎛️  FSM State: {state.state} | Playing: {playing}")
+                last_state = state.state
 
             new_component = False
             try:
@@ -151,10 +97,11 @@ def main():
 
             if heartbeats in socks:
                 beat = Heatbeat.model_validate_json(heartbeats.recv_string())
+                component_name = f"{beat.component}/{beat.host}"
                 # print(f"Got {beat=}")
-                if beat not in components:
+                if component_name not in components:
                     new_component = True
-                components[beat] = beat.sent_at
+                components[component_name] = beat.sent_at
 
             # If there is a new component it will need our current state
             if new_component:
@@ -186,7 +133,9 @@ def main():
                                 success=success,
                                 message=message,
                             )
-                            print(f"🎮 Processed action '{api_request.action}': {message}")
+                            print(
+                                f"🎮 Processed action '{api_request.action}': {message}"
+                            )
                         else:
                             response = APIResponse(
                                 success=False,
@@ -194,11 +143,8 @@ def main():
                             )
                     elif api_request.request_type == "reset":
                         # Handle reset using consolidated handler
-                        success, message = handle_reset()
-                        response = APIResponse(
-                            success=success, 
-                            message=message
-                        )
+                        success, message = handle_api_action(api_request.action)
+                        response = APIResponse(success=success, message=message)
                     else:
                         response = APIResponse(
                             success=False,
@@ -221,40 +167,26 @@ def main():
                 # Handle interactions from other components
                 interaction_data = interactions.recv_string()
                 print(f"📨 Received interaction: {interaction_data}")
-                
-                try:
-                    action = parse_message(interaction_data)
-                    
-                    if isinstance(action, ButtonPress):
-                        print(f"🔘 Button press from {action.component} ({action.press_duration}ms)")
-                        success, message = handle_button_pressed()
-                        print(f"🎮 Button interaction result: {message}")
-                    
-                    elif isinstance(action, EndScene):
-                        print(f"⏰ Timer expired: {action.timer_id} after {action.duration:.2f}s")
-                        success, message = handle_timer_expired()
-                        print(f"🎮 Timer interaction result: {message}")
-                    
-                    else:
-                        print(f"📋 Other structured message: {type(action).__name__}")
-                        
-                except (json.JSONDecodeError, ValueError) as e:
-                    print(f"❓ Invalid interaction format: {interaction_data} (Error: {e})")
-                        
-                except Exception as e:
-                    print(f"💥 Error processing interaction: {e}")
+
+                action = parse_message(interaction_data)
+
+                if isinstance(action, ButtonPress):
+                    state.button_press()
+
+                elif isinstance(action, TimerExpired):
+                    state.timer_expired()
 
     except KeyboardInterrupt:
         print("\nController interrupted")
-    
+        # TODO: Add state shutdown
     finally:
         # Cleanup
         print("🧹 Cleaning up controller...")
         try:
-            interactions.close()
-            control.close()
-            heartbeats.close()
-            api_socket.close()
+            interactions.close(0)
+            control.close(1)
+            heartbeats.close(0)
+            api_socket.close(0)
             context.term()
             print("Controller cleanup complete")
         except Exception as e:

@@ -7,14 +7,13 @@ from pydantic import BaseModel
 # Models represent things we send over the wire for easy
 # jsonification with pydantic.
 
+
 class Heatbeat(BaseModel):
     type: Literal["heartbeat"] = "heartbeat"
     host: str
     component: str
     sent_at: datetime
 
-    def __hash__(self) -> int:
-        return hash(f"{self.host}/{self.component}")
 
 class ButtonPress(BaseModel):
     type: Literal["button_press"] = "button_press"
@@ -23,9 +22,11 @@ class ButtonPress(BaseModel):
     press_duration: int
     sent_at: datetime
 
+
 class APIRequest(BaseModel):
     request_type: Literal["status", "action", "reset"]
     action: Optional[str] = None  # Only used for action requests
+
 
 class APIResponse(BaseModel):
     success: bool
@@ -36,17 +37,23 @@ class APIResponse(BaseModel):
     timestamp: Optional[datetime] = None
     state: Optional[str] = None
 
+
 class ResetCommand(BaseModel):
     """Command to reset all components to idle state"""
+
     type: Literal["reset"] = "reset"
+
 
 class CurrentState(BaseModel):
     """Current FSM state notification"""
+
     type: Literal["current_state"] = "current_state"
-    state: str
+    state: Literal["walk", "ready"]
+
 
 class PlayScene(BaseModel):
     """Command to play an animation sequence"""
+
     type: Literal["play_scene"] = "play_scene"
     intro: str
     walk: str
@@ -56,11 +63,18 @@ class PlayScene(BaseModel):
     outro_duration: float
     total_duration: float
 
+
 class EndScene(BaseModel):
     """Event sent when a scene timer expires"""
+
     type: Literal["end_scene"] = "end_scene"
+
+
+class TimerExpired(BaseModel):
+    type: Literal["timer_expired"] = "timer_expired"
     timer_id: str
     duration: float
+
 
 message_registry = {
     "button_press": ButtonPress,
@@ -69,7 +83,9 @@ message_registry = {
     "end_scene": EndScene,
     "current_state": CurrentState,
     "reset": ResetCommand,
+    "timer_expired": TimerExpired,
 }
+
 
 def parse_message(message_str: str) -> BaseModel:
     """Parse message string into appropriate model"""
