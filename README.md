@@ -10,12 +10,14 @@ The Python-based control system for managing Crosswalk, an interactive art proje
 
 ## Installation
 
+Make sure [git-lfs](https://git-lfs.com/) is installed! Assets are stored there.
+
 ### The Normal Way
 
 1. https://docs.astral.sh/uv/getting-started/installation/ (a Python package and project manager):
 2. To run a command:
     ```bash 
-    uv run xwalk2/controller.py 
+    uv run -m xwalk2.controller
     ```
 
 ### The Nix Way

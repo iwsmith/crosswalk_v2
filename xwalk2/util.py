@@ -1,7 +1,8 @@
 import threading
+from pathlib import Path
 import time
 from datetime import datetime
-from typing import Optional
+from typing import Dict, List, Optional
 
 import zmq
 from pydantic import BaseModel
@@ -122,13 +123,15 @@ class InteractComponent:
                 self.socket.close(1)
                 context.term()
 
+
 class SubscribeInteractComponent:
-    def __init__(self,
+    def __init__(
+        self,
         component_name: str,
         host_name: str,
         interact_address="tcp://127.0.0.1:5556",
         subscribe_address="tcp://127.0.0.1:5557",
-    )-> None:
+    ) -> None:
         self.component_name = component_name
         self.host_name = host_name
         self.interact_address = interact_address
@@ -159,3 +162,44 @@ class SubscribeInteractComponent:
                 subscribe_socket.close(0)
                 self.interact_socket.close(0)
                 context.term()
+
+class FileLibrary:
+    def __init__(self, root_dir: str, extensions: Optional[List[str]] = None):
+        """
+        :param root_dir: The root directory to walk.
+        :param extensions: List of file extensions to include (e.g., ['.txt', '.py']).
+                           If None, includes all files.
+        """
+        self.root_path = Path(root_dir).resolve()
+        self.extensions = {ext.lower() for ext in extensions} if extensions else None
+        self.file_map = self.build_map()
+
+    def build_map(self) -> Dict[str, Path]:
+        """
+        Recursively walks the directory and maps filenames (without extension) to absolute paths.
+
+        :return: Dictionary mapping filename (no extension) to absolute Path objects.
+        """
+        file_map: dict[str, Path] = {}
+        for path in self.root_path.rglob('*'):
+            if path.is_file():
+                if self.extensions and path.suffix.lower() not in self.extensions:
+                    continue
+                name_without_ext = path.stem
+                if name_without_ext in file_map:
+                    raise ValueError(f"Entry {name_without_ext} already exists! {path} and {file_map[name_without_ext]}")
+                file_map[name_without_ext] = path.resolve()
+        return file_map
+
+class ImageLibrary(FileLibrary):
+    def __init__(self, root_dir: str, extensions: List[str] | None = None):
+        if not extensions:
+            extensions = [".gif"]
+        super().__init__(root_dir, extensions)
+
+class AudioLibrary(FileLibrary):
+    def __init__(self, root_dir: str, extensions: List[str] | None = None):
+        if not extensions:
+            extensions = ['.mp3', '.m4a', '.wav']
+        super().__init__(root_dir, extensions)
+
