@@ -214,3 +214,7 @@ The project uses modern Python tooling:
 - `pyproject.toml` for project configuration and dependencies
 - `flake.nix` for Nix development environment
 - `uv.lock` for dependency locking
+
+## Handy Commands
+
+`identify -format "%n %T\n" /opt/crosswalk/img/walks/walk-backwards.gif`
