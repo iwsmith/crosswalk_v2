@@ -218,3 +218,5 @@ The project uses modern Python tooling:
 ## Handy Commands
 
 `identify -format "%n %T\n" /opt/crosswalk/img/walks/walk-backwards.gif`
+
+`led-image-viewer --led-cols=64 --led-chain=2 --led-gpio-mapping=adafruit-hat-pwm --led-pwm-lsb-nanoseconds=400 --led-pixel-mapper "U-mapper;Rotate:90" --led-no-drop-privs -l 1 countdown5.gif -Ocountdown5.stream`
