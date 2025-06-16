@@ -38,7 +38,7 @@ class MatrixViewer(SubscribeComponent):
         args.extend(VIEWER_COMMAND)
         if not forever:
             args.append("-l=1")
-        args.append(animation)
+        args.append(self.animations[animation])
         return args
 
     def kill(self):

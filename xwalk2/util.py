@@ -191,6 +191,9 @@ class FileLibrary:
                 file_map[name_without_ext] = path.resolve()
         return file_map
 
+    def __getitem__(self, key) -> Path:
+        return self.file_map[key]
+
 class ImageLibrary(FileLibrary):
     def __init__(self, root_dir: str, extensions: List[str] | None = None):
         if not extensions:
