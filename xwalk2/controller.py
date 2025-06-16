@@ -57,7 +57,6 @@ def main():
     def send_command(command_obj: BaseModel):
         """Send command as consistent JSON"""
         command_json = command_obj.model_dump_json()
-        # print(f"📤 Sending: {command_json}")
         control.send_string(command_json)
 
     # Initialize FSM controller
@@ -93,13 +92,12 @@ def main():
             try:
                 socks = dict(poller.poll(1000))  # 1 second timeout
             except KeyboardInterrupt:
-                print("\n🛑 Shutting down controller...")
+                print("\nShutting down controller...")
                 break
 
             if heartbeats in socks:
                 beat = Heatbeat.model_validate_json(heartbeats.recv_string())
                 component_name = f"{beat.component}/{beat.host}"
-                # print(f"Got {beat=}")
                 if component_name not in components:
                     new_component = True
                 components[component_name] = beat.sent_at
@@ -169,13 +167,17 @@ def main():
                 interaction_data = interactions.recv_string()
                 print(f"📨 Received interaction: {interaction_data}")
 
-                action = parse_message(interaction_data)
+                try:
+                    action = parse_message(interaction_data)
 
-                if isinstance(action, ButtonPress):
-                    state.button_press()
+                    if isinstance(action, ButtonPress):
+                        state.button_press()
 
-                elif isinstance(action, TimerExpired):
-                    state.timer_expired()
+                    elif isinstance(action, TimerExpired):
+                        state.timer_expired()
+                    
+                except Exception as e:
+                    print(f"💥 Error parsing interaction: {e}")
 
     except KeyboardInterrupt:
         print("\nController interrupted")

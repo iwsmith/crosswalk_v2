@@ -11,7 +11,7 @@ import tkinter as tk
 from tkinter import Canvas
 
 from xwalk2.util import Heartbeat
-from xwalk2.models import PlayScene, ResetCommand, parse_message
+from xwalk2.models import EndScene, PlayScene, ResetCommand, parse_message
 
 
 # Constants
@@ -41,7 +41,7 @@ class GIFPlayer:
                 print(f"📁 Loaded {gif_path.name}: {len(result[0])} frames")
                 return result
             except Exception as e:
-                print(f"❌ Error loading GIF {gif_path}: {e}")
+                print(f"Error loading GIF {gif_path}: {e}")
         
         # Return default black frame
         return self._default_frame(filename)
@@ -80,7 +80,7 @@ class GIFPlayer:
         default_frame = Image.new('RGB', (MATRIX_SIZE, MATRIX_SIZE), color='black')
         result = ([default_frame], [0.1])
         self._cache[filename] = result
-        print(f"⚠️  GIF not found for {filename}, using black frame")
+        print(f"GIF not found for {filename}, using black frame")
         return result
 
 
@@ -92,6 +92,8 @@ class MatrixDisplay:
         self.gif_player = GIFPlayer()
         self.animation_thread: Optional[threading.Thread] = None
         self.stop_event = threading.Event()
+        self.current_sequence = None
+        self.sequence_start_time = None
         
         # GUI components (console mode)
         self.root: Optional[tk.Tk] = None
@@ -135,7 +137,7 @@ class MatrixDisplay:
         print("🚏 WAIT")
         if self.console_mode and self.status_label:
             self.status_label.config(text="WAIT", fg='white')
-        self.display_gif("stop")
+        self.display_static("stop")
     
     def show_walk(self):
         """Show walk state"""
@@ -143,13 +145,33 @@ class MatrixDisplay:
         if self.console_mode and self.status_label:
             self.status_label.config(text="WALK SIGN IS ON", fg='green')
     
-    def display_gif(self, animation_name: str):
-        """Display a GIF animation"""
+    def display_static(self, animation_name: str):
+        """Display a static image (no looping)"""
         if self.animation_thread and self.animation_thread.is_alive():
             self.stop_event.set()
-            self.animation_thread.join(timeout=1.0)
+            self.animation_thread.join(timeout=0.1)  # Much shorter timeout
         
         self.stop_event.clear()
+        self.current_sequence = [animation_name]
+        self.sequence_start_time = time.time()
+        
+        self.animation_thread = threading.Thread(
+            target=self._static_worker, 
+            args=(animation_name,), 
+            daemon=True
+        )
+        self.animation_thread.start()
+    
+    def display_gif(self, animation_name: str):
+        """Display a GIF animation (with looping)"""
+        if self.animation_thread and self.animation_thread.is_alive():
+            self.stop_event.set()
+            self.animation_thread.join(timeout=0.1)  # Much shorter timeout
+        
+        self.stop_event.clear()
+        self.current_sequence = [animation_name]
+        self.sequence_start_time = time.time()
+        
         self.animation_thread = threading.Thread(
             target=self._animation_worker, 
             args=(animation_name,), 
@@ -163,9 +185,12 @@ class MatrixDisplay:
         
         if self.animation_thread and self.animation_thread.is_alive():
             self.stop_event.set()
-            self.animation_thread.join(timeout=1.0)
+            self.animation_thread.join(timeout=0.1)  # Much shorter timeout
         
         self.stop_event.clear()
+        self.current_sequence = [intro, walk, outro]
+        self.sequence_start_time = time.time()
+        
         self.animation_thread = threading.Thread(
             target=self._sequence_worker, 
             args=(intro, walk, outro), 
@@ -173,32 +198,92 @@ class MatrixDisplay:
         )
         self.animation_thread.start()
     
+    def _static_worker(self, animation_name: str):
+        """Worker thread for static display (no looping, no continuous logging)"""
+        frames, durations = self.gif_player.load_gif(animation_name)
+        
+        # For static display, just show the first frame and then wait quietly
+        if frames:
+            self._display_frame(frames[0])
+            
+        # Wait quietly until stop event is set (check every 50ms for fast response)
+        while not self.stop_event.is_set():
+            time.sleep(0.05)  # Much more responsive
+    
     def _animation_worker(self, animation_name: str):
-        """Worker thread for single animation"""
+        """Worker thread for looping animation"""
         frames, durations = self.gif_player.load_gif(animation_name)
         
         while not self.stop_event.is_set():
-            for frame, duration in zip(frames, durations):
+            for i, (frame, duration) in enumerate(zip(frames, durations)):
                 if self.stop_event.is_set():
-                    break
+                    return
+                
                 self._display_frame(frame)
-                time.sleep(duration)
+                
+                # Use simple sleep with periodic checking (every 100ms max)
+                sleep_time = min(duration, 0.1)
+                remaining_time = duration - sleep_time
+                
+                time.sleep(sleep_time)
+                
+                # If there's remaining time, sleep in larger chunks
+                while remaining_time > 0 and not self.stop_event.is_set():
+                    chunk = min(remaining_time, 0.1)
+                    time.sleep(chunk)
+                    remaining_time -= chunk
+                
+                if self.stop_event.is_set():
+                    return
     
     def _sequence_worker(self, intro: str, walk: str, outro: str):
         """Worker thread for animation sequence"""
         sequence = [intro, walk, outro]
+        sequence_names = ["intro", "walk", "outro"]
         
         for anim_name in sequence:
             if self.stop_event.is_set():
-                break
+                return
             
+            # Load animation just-in-time, not pre-loaded
             frames, durations = self.gif_player.load_gif(anim_name)
             
-            for frame, duration in zip(frames, durations):
+            for frame_idx, (frame, duration) in enumerate(zip(frames, durations)):
                 if self.stop_event.is_set():
-                    break
+                    return
+                
+                frame_start = time.time()
                 self._display_frame(frame)
-                time.sleep(duration)
+                
+                # More precise timing - use larger chunks and fewer checks
+                if duration > 0.2:
+                    # For longer durations, sleep in fewer, larger chunks
+                    sleep_time = min(duration, 0.2)
+                    remaining_time = duration - sleep_time
+                    
+                    time.sleep(sleep_time)
+                    
+                    # Sleep in larger chunks (200ms) to reduce overhead
+                    while remaining_time > 0 and not self.stop_event.is_set():
+                        chunk = min(remaining_time, 0.2)
+                        time.sleep(chunk)
+                        remaining_time -= chunk
+                else:
+                    # For short durations, just sleep once
+                    time.sleep(duration)
+                
+                # Check elapsed time and adjust if needed
+                frame_elapsed = time.time() - frame_start
+                timing_error = frame_elapsed - duration
+                
+                if frame_elapsed < duration and not self.stop_event.is_set():
+                    # If we're running fast, add a small correction sleep
+                    correction = duration - frame_elapsed
+                    if correction > 0.01:  # Only correct if significant
+                        time.sleep(correction)
+                
+                if self.stop_event.is_set():
+                    return
     
     def _display_frame(self, frame: Image.Image):
         """Display a single frame"""
@@ -221,7 +306,7 @@ class MatrixDisplay:
         """Clean up resources"""
         self.stop_event.set()
         if self.animation_thread and self.animation_thread.is_alive():
-            self.animation_thread.join(timeout=2.0)
+            self.animation_thread.join(timeout=3.0)
         
         if self.root:
             self.root.quit()
@@ -279,7 +364,11 @@ def main():
                         elif isinstance(command_obj, ResetCommand):
                             print("🔄 Reset command")
                             display.show_idle()
-                        
+
+                        elif isinstance(command_obj, EndScene):
+                            print("🔚 EndScene command")
+                            display.show_idle()
+
                         else:
                             print(f"📋 Other command: {type(command_obj).__name__}")
                             
@@ -289,11 +378,11 @@ def main():
                 except zmq.Again:
                     time.sleep(0.1)  # No message available
                 except zmq.ZMQError as e:
-                    print(f"💥 ZMQ error: {e}")
+                    print(f"ZMQ error: {e}")
                     break
                     
         except Exception as e:
-            print(f"💥 Command worker error: {e}")
+            print(f"Command worker error: {e}")
     
     # Start command processing thread
     command_thread = threading.Thread(target=command_worker, daemon=True)
@@ -308,7 +397,7 @@ def main():
             while True:
                 time.sleep(1)
     except KeyboardInterrupt:
-        print("\n🛑 Shutting down matrix driver...")
+        print("\nShutting down matrix driver...")
     finally:
         display.close()
         try:

@@ -86,7 +86,7 @@ class SubscribeComponent:
                     message = parse_message(msg)
                     self.process_message(message)
             except KeyboardInterrupt:
-                print(f"\n🛑 Shutting down {self.component_name}")
+                print(f"\nShutting down {self.component_name}")
             finally:
                 socket.close(0)
                 context.term()
@@ -118,7 +118,7 @@ class InteractComponent:
             try:
                 self.loop()
             except KeyboardInterrupt:
-                print(f"\n🛑 Shutting down {self.component_name}")
+                print(f"\nShutting down {self.component_name}")
             finally:
                 self.socket.close(1)
                 context.term()
@@ -157,7 +157,7 @@ class SubscribeInteractComponent:
                     message = parse_message(msg)
                     self.process_message(message)
             except KeyboardInterrupt:
-                print(f"\n🛑 Shutting down {self.component_name}")
+                print(f"\nShutting down {self.component_name}")
             finally:
                 subscribe_socket.close(0)
                 self.interact_socket.close(0)
