@@ -85,8 +85,6 @@ class MatrixViewer(SubscribeComponent):
         """
         self.kill()
 
-        animations = [image for image in animations if image]
-
         if not animations:
             return
 
@@ -94,7 +92,7 @@ class MatrixViewer(SubscribeComponent):
 
         script = " && ".join(commands)
 
-        logger.info("Playing all: %s", [image for image in animations])
+        logger.info("Playing all: %s", animations)
         logger.info("Script: %s", script)
         self._exec(script, shell=True)
         self._playing = animations
