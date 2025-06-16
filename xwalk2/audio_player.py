@@ -25,7 +25,7 @@ class AudioPlayer(SubscribeComponent):
 
     def process_message(self, message: BaseModel):
         if isinstance(message, PlayScene):
-            pass
+            self.play_all([message.intro, message.walk, message.outro])
 
     def _build_command(self, animation, forever=False):
         """
