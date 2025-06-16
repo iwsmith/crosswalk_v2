@@ -69,13 +69,14 @@ def main():
     def handle_api_action(action: str) -> tuple[bool, str]:
         """Handle API actions - now calls consolidated handlers"""
         if action == "button_pressed":
-            return state.button_press()
+            state.button_press()
         elif action == "timer_expired":
-            return state.timer_expired()
+            state.timer_expired()
         elif action == "reset":
-            return state.reset()()
+            state.reset()()
         else:
             return False, f"Unknown action: {action}"
+        return True, "Whatever"
 
     # Main control loop, wrapped in try for graceful shutdown
     last_state = state.state
