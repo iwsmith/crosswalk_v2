@@ -3,7 +3,7 @@ import subprocess
 
 from pydantic import BaseModel
 from xwalk2.util import SubscribeComponent, ImageLibrary
-from xwalk2.models import PlayScene, EndScene
+from xwalk2.models import PlayScene, EndScene, CurrentState
 # ./led-image-viewer --led-cols=64 --led-chain=2 --led-gpio-mapping=adafruit-hat-pwm --led-pwm-lsb-nanoseconds=50 --led-show-refresh --led-pixel-mapper "U-mapper;Rotate:90" -l 1  countdown3.gif
 
 VIEWER_COMMAND = [
@@ -12,8 +12,10 @@ VIEWER_COMMAND = [
     "--led-chain=2",
     "--led-gpio-mapping=adafruit-hat-pwm",
     "--led-pwm-lsb-nanoseconds=400",
-    '--led-pixel-mapper "U-mapper;Rotate:90"',  # TODO: Add rotate in here
+    "--led-drop-priv-user=crosswalk"
 ]
+SHELL_MAPPER = '--led-pixel-mapper="U-mapper;Rotate:90"'  # When execing in shell we need to quote
+EXEC_MAPPER = '--led-pixel-mapper=U-mapper;Rotate:90'  # When calling popen without a shell we don't quote
 
 logger = logging.getLogger(__name__)
 
@@ -29,13 +31,18 @@ class MatrixViewer(SubscribeComponent):
         super().__init__(component_name, host_name, subscribe_address)
         self.animations = ImageLibrary(image_root)
         self._process = None
+        self._playing = None
 
-    def _display_command(self, animation, forever=False):
+    def _display_command(self, animation, shell=False, forever=False):
         """
         Return a list of command line arguments for showing the animated image.
         """
         args = []
         args.extend(VIEWER_COMMAND)
+        if shell:
+            args.append(SHELL_MAPPER)
+        else:
+            args.append(EXEC_MAPPER)
         if not forever:
             args.append("-l 1") # Note: `l=1` doesn't work, `l 1` does
         args.append(str(self.animations[animation]))
@@ -44,7 +51,7 @@ class MatrixViewer(SubscribeComponent):
     def kill(self):
         """Kill the currently playing animation, if any."""
         if self._process:
-            # logger.debug("Killing: %s", self.playing())
+            logger.debug(f"Killing: {self._playing} {self._process.pid}")
             subprocess.call(["/usr/bin/pkill", "-P", str(self._process.pid)])
             self._process.kill()
             self._process = None
@@ -63,9 +70,11 @@ class MatrixViewer(SubscribeComponent):
         self.kill()
 
         if animation is None:
+            logging.info(f"{animation=}")
             return
 
-        command = self._display_command(animation, forever=True)
+        command = self._display_command(animation, shell=False, forever=True)
+        #command = " ".join(command)
 
         logger.info("Playing: %s", animation)
         self._exec(command)
@@ -75,8 +84,10 @@ class MatrixViewer(SubscribeComponent):
         if isinstance(message, PlayScene):
             self.play_all([message.intro, message.walk, message.outro])
         elif isinstance(message, EndScene):
-            self.play
-
+            self.play("stop")
+        elif isinstance(message, CurrentState):
+            if message.state == 'ready':
+                self.play("stop")
 
     def play_all(self, animations):
         """
@@ -85,17 +96,15 @@ class MatrixViewer(SubscribeComponent):
         """
         self.kill()
 
-        animations = [image for image in animations if image]
-
         if not animations:
             return
 
-        commands = [" ".join(self._display_command(image)) for image in animations]
+        commands = [" ".join(self._display_command(image, shell=True)) for image in animations]
 
         script = " && ".join(commands)
 
-        logger.info("Playing all: %s", [image for image in animations])
-        logger.info("Script: %s", script)
+        logger.info("Playing all: %s", animations)
+        logger.debug("Script: %s", script)
         self._exec(script, shell=True)
         self._playing = animations
 
