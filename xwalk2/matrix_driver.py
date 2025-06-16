@@ -67,9 +67,10 @@ class MatrixViewer(SubscribeComponent):
             return
 
         command = self._display_command(animation, forever=True)
+        command = " ".join(command)
 
         logger.info("Playing: %s", animation)
-        self._exec(command)
+        self._exec(command, True)
         self._playing = [animation]
 
     def process_message(self, message: BaseModel):
@@ -78,10 +79,9 @@ class MatrixViewer(SubscribeComponent):
         elif isinstance(message, EndScene):
             self.play("stop")
         elif isinstance(message, CurrentState):
+            print(message)
             if message.state == 'ready':
                 self.play("stop")
-
-
 
     def play_all(self, animations):
         """
