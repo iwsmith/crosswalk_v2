@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from xwalk2.models import EndScene, PlayScene
 from xwalk2.util import AudioLibrary, SubscribeComponent
 
-MPG123_COMMAND = ["mpg123", "-o", "alsa"]
+MPG123_COMMAND = ["mpg123", "-o", "alsa", "-q"]
 
 logger = logging.getLogger(__name__)
 
