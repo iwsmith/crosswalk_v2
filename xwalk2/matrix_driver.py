@@ -12,7 +12,8 @@ VIEWER_COMMAND = [
     "--led-chain=2",
     "--led-gpio-mapping=adafruit-hat-pwm",
     "--led-pwm-lsb-nanoseconds=400",
-    '--led-pixel-mapper "U-mapper;Rotate:90"',  # TODO: Add rotate in here
+    '--led-pixel-mapper', 
+    '"U-mapper;Rotate:90"',  # TODO: Add rotate in here
 ]
 
 logger = logging.getLogger(__name__)
@@ -29,6 +30,7 @@ class MatrixViewer(SubscribeComponent):
         super().__init__(component_name, host_name, subscribe_address)
         self.animations = ImageLibrary(image_root)
         self._process = None
+        self._playing = None
 
     def _display_command(self, animation, forever=False):
         """
@@ -44,7 +46,7 @@ class MatrixViewer(SubscribeComponent):
     def kill(self):
         """Kill the currently playing animation, if any."""
         if self._process:
-            # logger.debug("Killing: %s", self.playing())
+            logger.debug(f"Killing: {self._playing} {self._process.pid}")
             subprocess.call(["/usr/bin/pkill", "-P", str(self._process.pid)])
             self._process.kill()
             self._process = None
@@ -67,10 +69,10 @@ class MatrixViewer(SubscribeComponent):
             return
 
         command = self._display_command(animation, forever=True)
-        command = " ".join(command)
+        #command = " ".join(command)
 
         logger.info("Playing: %s", animation)
-        self._exec(command, True)
+        self._exec(command)
         self._playing = [animation]
 
     def process_message(self, message: BaseModel):
@@ -79,7 +81,6 @@ class MatrixViewer(SubscribeComponent):
         elif isinstance(message, EndScene):
             self.play("stop")
         elif isinstance(message, CurrentState):
-            print(message)
             if message.state == 'ready':
                 self.play("stop")
 
