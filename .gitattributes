@@ -18,3 +18,4 @@ test/data/img/walks/baseball.gif filter=lfs diff=lfs merge=lfs -text
 test/data/img/walks/walk-backwards.gif filter=lfs diff=lfs merge=lfs -text
 test/data/img/walks/walkdress.gif filter=lfs diff=lfs merge=lfs -text
 test/data/snd/walkBackwards.m4a filter=lfs diff=lfs merge=lfs -text
+test/data/img/outros/countdown5.stream filter=lfs diff=lfs merge=lfs -text
