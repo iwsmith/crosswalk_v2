@@ -75,7 +75,7 @@ class MatrixViewer(SubscribeComponent):
         if isinstance(message, PlayScene):
             self.play_all([message.intro, message.walk, message.outro])
         elif isinstance(message, EndScene):
-            self.play
+            self.play("stop")
 
 
     def play_all(self, animations):
