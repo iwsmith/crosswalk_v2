@@ -12,8 +12,9 @@ VIEWER_COMMAND = [
     "--led-chain=2",
     "--led-gpio-mapping=adafruit-hat-pwm",
     "--led-pwm-lsb-nanoseconds=400",
-    '--led-pixel-mapper=U-mapper;Rotate:90',  # TODO: Add rotate in here
 ]
+SHELL_MAPPER = '--led-pixel-mapper="U-mapper;Rotate:90"'  # When execing in shell we need to quote
+EXEC_MAPPER = '--led-pixel-mapper=U-mapper;Rotate:90'  # When calling popen without a shell we don't quote
 
 logger = logging.getLogger(__name__)
 
@@ -31,12 +32,16 @@ class MatrixViewer(SubscribeComponent):
         self._process = None
         self._playing = None
 
-    def _display_command(self, animation, forever=False):
+    def _display_command(self, animation, shell=False, forever=False):
         """
         Return a list of command line arguments for showing the animated image.
         """
         args = []
         args.extend(VIEWER_COMMAND)
+        if shell:
+            args.append(SHELL_MAPPER)
+        else:
+            args.append(EXEC_MAPPER)
         if not forever:
             args.append("-l 1") # Note: `l=1` doesn't work, `l 1` does
         args.append(str(self.animations[animation]))
@@ -67,7 +72,7 @@ class MatrixViewer(SubscribeComponent):
             logging.info(f"{animation=}")
             return
 
-        command = self._display_command(animation, forever=True)
+        command = self._display_command(animation, shell=False, forever=True)
         #command = " ".join(command)
 
         logger.info("Playing: %s", animation)
@@ -93,7 +98,7 @@ class MatrixViewer(SubscribeComponent):
         if not animations:
             return
 
-        commands = [" ".join(self._display_command(image)) for image in animations]
+        commands = [" ".join(self._display_command(image, shell=True)) for image in animations]
 
         script = " && ".join(commands)
 
