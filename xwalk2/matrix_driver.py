@@ -12,7 +12,7 @@ VIEWER_COMMAND = [
     "--led-chain=2",
     "--led-gpio-mapping=adafruit-hat-pwm",
     "--led-pwm-lsb-nanoseconds=400",
-    '--led-pixel-mapper="U-mapper;Rotate:90"',  # TODO: Add rotate in here
+    '--led-pixel-mapper=U-mapper;Rotate:90',  # TODO: Add rotate in here
 ]
 
 logger = logging.getLogger(__name__)
