@@ -3,7 +3,7 @@ import subprocess
 
 from pydantic import BaseModel
 from xwalk2.util import SubscribeComponent, ImageLibrary
-from xwalk2.models import PlayScene, EndScene
+from xwalk2.models import PlayScene, EndScene, CurrentState
 # ./led-image-viewer --led-cols=64 --led-chain=2 --led-gpio-mapping=adafruit-hat-pwm --led-pwm-lsb-nanoseconds=50 --led-show-refresh --led-pixel-mapper "U-mapper;Rotate:90" -l 1  countdown3.gif
 
 VIEWER_COMMAND = [
@@ -77,6 +77,10 @@ class MatrixViewer(SubscribeComponent):
             self.play_all([message.intro, message.walk, message.outro])
         elif isinstance(message, EndScene):
             self.play("stop")
+        elif isinstance(message, CurrentState):
+            if message.state == 'ready':
+                self.play("stop")
+
 
 
     def play_all(self, animations):
@@ -94,7 +98,7 @@ class MatrixViewer(SubscribeComponent):
         script = " && ".join(commands)
 
         logger.info("Playing all: %s", animations)
-        logger.info("Script: %s", script)
+        logger.debug("Script: %s", script)
         self._exec(script, shell=True)
         self._playing = animations
 
