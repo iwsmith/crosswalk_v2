@@ -63,6 +63,7 @@ class MatrixViewer(SubscribeComponent):
         self.kill()
 
         if animation is None:
+            logging.info(f"{animation=}")
             return
 
         command = self._display_command(animation, forever=True)
