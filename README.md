@@ -10,12 +10,14 @@ The Python-based control system for managing Crosswalk, an interactive art proje
 
 ## Installation
 
+Make sure [git-lfs](https://git-lfs.com/) is installed! Assets are stored there.
+
 ### The Normal Way
 
 1. https://docs.astral.sh/uv/getting-started/installation/ (a Python package and project manager):
 2. To run a command:
     ```bash 
-    uv run xwalk2/controller.py 
+    uv run -m xwalk2.controller
     ```
 
 ### The Nix Way
@@ -212,3 +214,9 @@ The project uses modern Python tooling:
 - `pyproject.toml` for project configuration and dependencies
 - `flake.nix` for Nix development environment
 - `uv.lock` for dependency locking
+
+## Handy Commands
+
+`identify -format "%n %T\n" /opt/crosswalk/img/walks/walk-backwards.gif`
+
+`led-image-viewer --led-cols=64 --led-chain=2 --led-gpio-mapping=adafruit-hat-pwm --led-pwm-lsb-nanoseconds=400 --led-pixel-mapper "U-mapper;Rotate:90" --led-no-drop-privs -l 1 countdown5.gif -Ocountdown5.stream`

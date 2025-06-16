@@ -2,8 +2,14 @@
 __pycache__/
 *.egg-info/
 *.egg
+.venv/
 
 # Nix
 .direnv/
 result
 result-*
+.devenv/
+.cursor/
+
+# Mac
+.DS_Store

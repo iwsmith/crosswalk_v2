@@ -1,20 +1,26 @@
 from datetime import datetime
 
 import zmq
+from pydantic import BaseModel
 
 from xwalk2.fsm import Controller
 from xwalk2.models import (
     APIRequest,
     APIResponse,
     ButtonPress,
-    Heatbeat,
     CurrentState,
+    Heatbeat,
+    TimerExpired,
     parse_message,
 )
 
 
 def main():
-    print("Starting Crosswalk V2 Controller...")
+    print("Starting Crosswalk V2 Controller with FSM...")
+    print("Initializing animation library...")
+
+    # Initialize animation library (crash early if not available)
+    print("Animation library loaded successfully")
     print("Initializing ZMQ sockets...")
 
     context = zmq.Context()
@@ -39,7 +45,7 @@ def main():
     print("  - 5557: Control")
     print("  - 5558: Heartbeats")
     print("  - 5559: API Requests")
-    print("\nController is running. Press Ctrl+C to exit.")
+    print("Controller is running. Press Ctrl+C to exit.")
     print("Waiting for components to connect...\n")
 
     # Initialize poll set
@@ -48,95 +54,147 @@ def main():
     poller.register(heartbeats, zmq.POLLIN)
     poller.register(api_socket, zmq.POLLIN)
 
-    state = Controller()
+    def send_command(command_obj: BaseModel):
+        """Send command as consistent JSON"""
+        command_json = command_obj.model_dump_json()
+        control.send_string(command_json)
+
+    # Initialize FSM controller
+    state = Controller(send_command)
 
     playing = False
     components = {}
 
-    def send_string(s):
-        # print(f"Sending: {s}")
-        control.send_string(s)
+    def handle_api_action(action: str) -> tuple[bool, str]:
+        """Handle API actions - now calls consolidated handlers"""
+        if action == "button_pressed":
+            state.button_press()
+        elif action == "timer_expired":
+            state.timer_expired()
+        elif action == "reset":
+            state.reset()()
+        else:
+            return False, f"Unknown action: {action}"
+        return True, "Whatever"
 
-    while True:
-        # print(components)
-        print(state.state)
+    # Main control loop, wrapped in try for graceful shutdown
+    last_state = state.state
+    print(f"🎛️  FSM State: {state.state} | Playing: {playing}")
+    try:
+        while True:
+            # Update playing status based on FSM state, but only when changed
+            if state.state != last_state:
+                playing = state.state == "walk"
+                print(f"🎛️  FSM State: {state.state} | Playing: {playing}")
+                last_state = state.state
 
-        new_component = False
-        try:
-            socks = dict(poller.poll(1000))  # 1 second timeout
-        except KeyboardInterrupt:
-            print("\n🛑 Shutting down controller...")
-            break
-
-        if heartbeats in socks:
-            beat = Heatbeat.model_validate_json(heartbeats.recv_string())
-            # print(f"Got {beat=}")
-            if beat not in components:
-                new_component = True
-            components[beat] = beat.sent_at
-
-        # If there is a new component it will need our current state
-        if new_component:
-            send_string(CurrentState(state=state.state).model_dump_json())
-
-        if api_socket in socks:
+            new_component = False
             try:
-                # Receive API request
-                request_data = api_socket.recv_string()
-                api_request = APIRequest.model_validate_json(request_data)
+                socks = dict(poller.poll(1000))  # 1 second timeout
+            except KeyboardInterrupt:
+                print("\nShutting down controller...")
+                break
 
-                if api_request.request_type == "status":
-                    # Handle status request
-                    response = APIResponse(
-                        success=True,
-                        message="Status retrieved successfully",
-                        playing=playing,
-                        components=components,
-                        timestamp=datetime.now(),
-                        state=state.state,
-                    )
+            if heartbeats in socks:
+                beat = Heatbeat.model_validate_json(heartbeats.recv_string())
+                component_name = f"{beat.component}/{beat.host}"
+                if component_name not in components:
+                    new_component = True
+                components[component_name] = beat.sent_at
 
-                elif api_request.request_type == "action":
-                    # Handle action request
-                    if api_request.action:
-                        success = True
-                        message = "Not implemented"
+            # If there is a new component it will need our current state
+            if new_component:
+                current_state = CurrentState(state=state.state)
+                send_command(current_state)
+
+            if api_socket in socks:
+                try:
+                    # Receive API request
+                    request_data = api_socket.recv_string()
+                    api_request = APIRequest.model_validate_json(request_data)
+
+                    if api_request.request_type == "status":
+                        # Handle status request
                         response = APIResponse(
-                            success=success,
-                            message=message,
+                            success=True,
+                            message="Status retrieved successfully",
+                            playing=playing,
+                            components=components,
+                            timestamp=datetime.now(),
+                            state=state.state,
                         )
-                        print(f"Processed action '{api_request.action}': {message}")
+
+                    elif api_request.request_type == "action":
+                        # Handle action request
+                        if api_request.action:
+                            success, message = handle_api_action(api_request.action)
+                            response = APIResponse(
+                                success=success,
+                                message=message,
+                            )
+                            print(
+                                f"🎮 Processed action '{api_request.action}': {message}"
+                            )
+                        else:
+                            response = APIResponse(
+                                success=False,
+                                message="Action request missing action field",
+                            )
+                    elif api_request.request_type == "reset":
+                        # Handle reset using consolidated handler
+                        success, message = handle_api_action(api_request.action)
+                        response = APIResponse(success=success, message=message)
                     else:
                         response = APIResponse(
                             success=False,
-                            message="Action request missing action field",
+                            message=f"Unknown request type: {api_request.request_type}",
                         )
-                elif api_request.request_type == "reset":
-                    state.reset(send_string)
-                    response = APIResponse(success=True, message="State reset")
-                else:
-                    response = APIResponse(
+
+                    # Send response
+                    api_socket.send_string(response.model_dump_json())
+
+                except Exception as e:
+                    print(f"💥 Error handling API request: {e}")
+                    # Send error response
+                    error_response = APIResponse(
                         success=False,
-                        message=f"Unknown request type: {api_request.request_type}",
+                        message=f"Server error: {str(e)}",
                     )
+                    api_socket.send_string(error_response.model_dump_json())
 
-                # Send response
-                api_socket.send_string(response.model_dump_json())
+            if interactions in socks:
+                # Handle interactions from other components
+                interaction_data = interactions.recv_string()
+                print(f"📨 Received interaction: {interaction_data}")
 
-            except Exception as e:
-                print(f"Error handling API request: {e}")
-                # Send error response
-                error_response = APIResponse(
-                    success=False,
-                    message=f"Server error: {str(e)}",
-                )
-                api_socket.send_string(error_response.model_dump_json())
+                try:
+                    action = parse_message(interaction_data)
 
-        if interactions in socks:
-            # Handle interactions from other components (like button_switch)
-            action = parse_message(interactions.recv_string())
-            if isinstance(action, ButtonPress):
-                state.button_press(send_string)
+                    if isinstance(action, ButtonPress):
+                        state.button_press()
+
+                    elif isinstance(action, TimerExpired):
+                        state.timer_expired()
+                    
+                except Exception as e:
+                    print(f"💥 Error parsing interaction: {e}")
+
+    except KeyboardInterrupt:
+        print("\nController interrupted")
+        # TODO: Add state shutdown
+    finally:
+        # Cleanup
+        print("🧹 Cleaning up controller...")
+        try:
+            interactions.close(0)
+            control.close(1)
+            heartbeats.close(0)
+            api_socket.close(0)
+            context.term()
+            print("Controller cleanup complete")
+        except Exception as e:
+            print(f"⚠️  Error during cleanup: {e}")
 
 
-main()
+if __name__ == "__main__":
+    main()

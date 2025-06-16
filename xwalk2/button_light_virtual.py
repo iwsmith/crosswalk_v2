@@ -1,8 +1,20 @@
-from gpiozero import LED
 from pydantic import BaseModel
 
 from xwalk2.models import CurrentState, EndScene, PlayScene
 from xwalk2.util import SubscribeComponent
+
+
+class VirtualLED:
+    def __init__(self) -> None:
+        self.light = "off"
+
+    def on(self):
+        self.light = "on"
+        print(f"{self.light=}")
+
+    def off(self):
+        self.light = "off"
+        print(f"{self.light=}")
 
 
 class ButtonLight(SubscribeComponent):
@@ -13,7 +25,7 @@ class ButtonLight(SubscribeComponent):
         subscribe_address="tcp://127.0.0.1:5557",
     ) -> None:
         super().__init__(component_name, host_name, subscribe_address)
-        self.led = LED(24)
+        self.led = VirtualLED()
 
         self.led.off()
 
@@ -28,9 +40,9 @@ class ButtonLight(SubscribeComponent):
             elif message.state == "ready":
                 self.led.on()
             else:
-                print(f"Unknown State {message=}")
+                print(f"Unknown state {message=}")
 
 
 if __name__ == "__main__":
-    component = ButtonLight("button_led", "crosswalk-a")
+    component = ButtonLight("button_led_virtual", "crosswalk-a")
     component.run()

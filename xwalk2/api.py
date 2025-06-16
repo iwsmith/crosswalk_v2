@@ -74,22 +74,29 @@ class APIController:
 
     def send_action(self, action: str) -> str:
         """Send an action to the controller"""
-        request = APIRequest(request_type="action", action=action)
+        request = APIRequest(
+            request_type="action", 
+            action=action
+        )
 
         response = self._send_request(request)
         print(f"Action '{action}' result: {response.message}")
         return response.message or "Action completed"
 
     def send_reset(self) -> str:
-        """Send an action to the controller"""
-        request = APIRequest(request_type="reset")
+        """Send a reset to the controller (FSM-based)"""
+        request = APIRequest(
+            request_type="reset"
+        )
 
         response = self._send_request(request)
-        return response.message or "Action completed"
+        return response.message or "Reset completed"
 
     def get_status(self) -> SystemStatus:
         """Get current system status from controller"""
-        request = APIRequest(request_type="status")
+        request = APIRequest(
+            request_type="status"
+        )
 
         response = self._send_request(request)
 
@@ -125,7 +132,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Crosswalk V2 API",
     description="API for controlling the Crosswalk V2 system",
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
 )
 
@@ -150,16 +157,14 @@ async def root():
         
         <div class="button-group">
             <h3>Actions</h3>
-            <button onclick="triggerAction('A button pressed')">Press Button</button>
-            <button onclick="triggerAction('A Timer fired')">Fire Timer</button>
+            <button onclick="triggerAction('button_pressed')">🔘 Press Button</button>
+            <button onclick="triggerAction('timer_expired')">⏰ Timer Expired</button>
+            <button onclick="triggerAction('reset')">🔄 Reset</button>
         </div>
         
         <div class="button-group">
-            <button onclick="getStatus()">Refresh Status</button>
-        </div>
-
-        <div class="button-group">
-            <button onclick="reset()">Reset</button>
+            <button onclick="getStatus()">📊 Refresh Status</button>
+            <button onclick="reset()">🔄 Reset System</button>
         </div>
         
         <div class="status" id="status">
@@ -199,7 +204,7 @@ async def root():
                     });
                     const result = await response.json();
                     if (response.ok) {
-                        alert('Action result: ' + result.message);
+                        alert('Reset result: ' + result.message);
                         getStatus(); // Refresh status
                     } else {
                         alert('Error: ' + result.detail);
@@ -220,19 +225,14 @@ async def root():
                         <p><strong>Components:</strong></p>
                         <ul>
                             ${Object.entries(status.components).map(([name, timestamp]) => 
-                                `<li>${name}: Last seen ${Math.round(Date.now()/1000 - timestamp)}s ago</li>`
+                                `<li><strong>${name}</strong>: Last seen ${Math.round(Date.now()/1000 - timestamp)}s ago</li>`
                             ).join('')}
                         </ul>
                     `;
                 } catch (error) {
-                    document.getElementById('status').innerHTML = 
-                        '<p>Error loading status: ' + error.message + '</p>';
+                    alert('Error getting status: ' + error.message);
                 }
             }
-            
-            // Auto-refresh status every 5 seconds
-            setInterval(getStatus, 5000);
-            getStatus(); // Initial load
         </script>
     </body>
     </html>
@@ -241,51 +241,54 @@ async def root():
 
 @app.get("/status", response_model=SystemStatus)
 async def get_status():
-    """Get current system status"""
-    return api_controller.get_status()
+    """Get system status from controller"""
+    try:
+        return api_controller.get_status()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to get status: {e}")
 
 
 @app.post("/trigger")
 async def trigger_action(request: ActionRequest):
-    """Trigger an action in the controller"""
+    """Trigger an action through the controller"""
     try:
-        message = api_controller.send_action(request.action)
-        return {"message": message}
+        result = api_controller.send_action(request.action)
+        return {"success": True, "message": result}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Action failed: {e}")
 
 
 @app.post("/button")
 async def press_button():
-    """Trigger a button press"""
+    """Button press action"""
     try:
-        message = api_controller.send_action("A button pressed")
-        return {"message": message}
+        result = api_controller.send_action("button_pressed")
+        return {"success": True, "message": result}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Button press failed: {e}")
 
 
 @app.post("/timer")
 async def fire_timer():
-    """Trigger a timer event"""
+    """Timer expiration action"""
     try:
-        message = api_controller.send_action("A Timer fired")
-        return {"message": message}
+        result = api_controller.send_action("timer_expired")
+        return {"success": True, "message": result}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Timer action failed: {e}")
 
 
 @app.post("/reset")
 async def reset_system():
-    """Reset the system"""
+    """System reset action"""
     try:
-        message = api_controller.send_reset()  # Timer fired triggers reset
-        return {"message": message}
+        result = api_controller.send_reset()
+        return {"success": True, "message": result}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Reset failed: {e}")
 
 
 if __name__ == "__main__":
     import uvicorn
-
+    print("🚀 Starting Crosswalk V2 API server...")
     uvicorn.run(app, host="0.0.0.0", port=8000)

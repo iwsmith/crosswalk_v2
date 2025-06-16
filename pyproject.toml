@@ -17,4 +17,8 @@ dependencies = [
 [dependency-groups]
 dev = [
     "ipython>=9.3.0",
+    "PyYAML>=6.0.0",
+    "numpy>=1.24.0",
+    "mutagen>=1.47.0",
+    "Pillow>=10.0.0",
 ]

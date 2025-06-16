@@ -21,8 +21,15 @@
             pydantic
             fastapi
             uvicorn
+            pyyaml
+            numpy
+            mutagen
+            pillow
+            tkinter
           ] ++ [
             pkgs.uv
+            pkgs.tk
+            pkgs.tcl
           ];
 
           shellHook = ''
@@ -32,6 +39,11 @@
             echo "  - pydantic"
             echo "  - fastapi"
             echo "  - uvicorn"
+            echo "  - pyyaml"
+            echo "  - numpy"
+            echo "  - mutagen"
+            echo "  - pillow"
+            echo "  - tkinter"
             echo "  - uv (package manager)"
             
             # Install package in development mode using uv
