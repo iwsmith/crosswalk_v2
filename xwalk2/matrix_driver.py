@@ -14,8 +14,8 @@ VIEWER_COMMAND = [
     "--led-slowdown-gpio=2",
     "--led-drop-priv-user=crosswalk"
 ]
-SHELL_MAPPER = '--led-pixel-mapper="U-mapper;Rotate:90"'  # When execing in shell we need to quote
-EXEC_MAPPER = '--led-pixel-mapper=U-mapper;Rotate:90'  # When calling popen without a shell we don't quote
+SHELL_MAPPER = '--led-pixel-mapper="U-mapper;Rotate:-90"'  # When execing in shell we need to quote
+EXEC_MAPPER = '--led-pixel-mapper=U-mapper;Rotate:-90'  # When calling popen without a shell we don't quote
 
 logger = logging.getLogger(__name__)
 
