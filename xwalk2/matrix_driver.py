@@ -11,7 +11,7 @@ VIEWER_COMMAND = [
     "--led-cols=64",
     "--led-chain=2",
     "--led-gpio-mapping=adafruit-hat-pwm",
-    "--led-pwm-lsb-nanoseconds=400",
+    "--led-slowdown-gpio=2",
     "--led-drop-priv-user=crosswalk"
 ]
 SHELL_MAPPER = '--led-pixel-mapper="U-mapper;Rotate:90"'  # When execing in shell we need to quote
