@@ -3,8 +3,8 @@ import subprocess
 
 from pydantic import BaseModel
 
-from xwalk2.models import EndScene, PlayScene
-from xwalk2.util import AudioLibrary, SubscribeComponent
+from xwalk2.models import PlayScene
+from xwalk2.util import AudioLibrary, SubscribeComponent, add_default_args
 
 MPG123_COMMAND = ["mpg123", "-o", "alsa", "-q"]
 
@@ -17,9 +17,12 @@ class AudioPlayer(SubscribeComponent):
         component_name: str,
         host_name: str,
         audio_root: str,
-        subscribe_address="tcp://127.0.0.1:5557",
+        subscribe_address,
+        heartbeat_address,
     ) -> None:
-        super().__init__(component_name, host_name, subscribe_address)
+        super().__init__(
+            component_name, host_name, subscribe_address, heartbeat_address
+        )
         self.audio = AudioLibrary(audio_root)
         self._process = None
 
@@ -79,12 +82,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("audio_dir")
-    parser.add_argument(
-        "--log-level",
-        default="INFO",
-        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-        help="Set the logging level",
-    )
+    add_default_args(parser)
 
     args = parser.parse_args()
 
@@ -92,5 +90,8 @@ if __name__ == "__main__":
         level=getattr(logging, args.log_level),
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
-    a = AudioPlayer("audio-player", "crosswalk-a", args.audio_dir)
+
+    a = AudioPlayer(
+        "audio-player", args.hostname, args.audio_dir, args.controller, args.heartbeat
+    )
     a.run()

@@ -1,11 +1,14 @@
+import logging
 import threading
 from typing import Optional
 
 import zmq
 from pydantic import BaseModel
 
-from xwalk2.models import TimerExpired, PlayScene, ResetCommand, EndScene
-from xwalk2.util import SubscribeInteractComponent
+from xwalk2.models import EndScene, PlayScene, ResetCommand, TimerExpired
+from xwalk2.util import SubscribeInteractComponent, add_default_args
+
+logger = logging.getLogger(__name__)
 
 
 class SceneTimer(SubscribeInteractComponent):
@@ -15,10 +18,17 @@ class SceneTimer(SubscribeInteractComponent):
         self,
         component_name: str,
         host_name: str,
-        interact_address="tcp://127.0.0.1:5556",
-        subscribe_address="tcp://127.0.0.1:5557",
+        interact_address: str,
+        subscribe_address: str,
+        heartbeat_address: str,
     ) -> None:
-        super().__init__(component_name, host_name, interact_address, subscribe_address)
+        super().__init__(
+            component_name,
+            host_name,
+            interact_address,
+            subscribe_address,
+            heartbeat_address,
+        )
         self.current_timer: Optional[threading.Timer] = None
         self.timer_lock = threading.Lock()
         self.timer_id_counter = 0
@@ -31,7 +41,7 @@ class SceneTimer(SubscribeInteractComponent):
 
         elif isinstance(message, ResetCommand):
             self.stop_timer()
-        
+
         elif isinstance(message, EndScene):
             self.stop_timer()
 
@@ -54,7 +64,9 @@ class SceneTimer(SubscribeInteractComponent):
             # Start new timer with buffer duration
             def timer_expired():
                 print(f"Scene timer expired after {base_duration:.2f}s")
-                timer_event = TimerExpired(timer_id=timer_id, duration=base_duration)  # Use original duration in event
+                timer_event = TimerExpired(
+                    timer_id=timer_id, duration=base_duration
+                )  # Use original duration in event
                 try:
                     interaction_socket.send_string(timer_event.model_dump_json())
                 except Exception as e:
@@ -76,5 +88,17 @@ class SceneTimer(SubscribeInteractComponent):
 
 
 if __name__ == "__main__":
-    timer = SceneTimer("timer", "crosswalk-a")
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    add_default_args(parser)
+    args = parser.parse_args()
+
+    logging.basicConfig(
+        level=getattr(logging, args.log_level),
+        format="%(asctime)s - %(levelname)s - %(message)s",
+    )
+    timer = SceneTimer(
+        "timer", args.hostname, args.interact, args.controller, args.heartbeat
+    )
     timer.run()

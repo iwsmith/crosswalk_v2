@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 
 import zmq
 from pydantic import BaseModel
@@ -14,6 +15,7 @@ from xwalk2.models import (
     parse_message,
 )
 
+logger = logging.getLogger(__name__)
 
 def main():
     print("Starting Crosswalk V2 Controller with FSM...")

@@ -1,7 +1,9 @@
+import logging
+
 from pydantic import BaseModel
 
 from xwalk2.models import CurrentState, EndScene, PlayScene
-from xwalk2.util import SubscribeComponent
+from xwalk2.util import SubscribeComponent, add_default_args
 
 
 class VirtualLED:
@@ -22,9 +24,12 @@ class ButtonLight(SubscribeComponent):
         self,
         component_name: str,
         host_name: str,
-        subscribe_address="tcp://127.0.0.1:5557",
+        subscribe_address: str,
+        heartbeat_address: str,
     ) -> None:
-        super().__init__(component_name, host_name, subscribe_address)
+        super().__init__(
+            component_name, host_name, subscribe_address, heartbeat_address
+        )
         self.led = VirtualLED()
 
         self.led.off()
@@ -44,5 +49,16 @@ class ButtonLight(SubscribeComponent):
 
 
 if __name__ == "__main__":
-    component = ButtonLight("button_led_virtual", "crosswalk-a")
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    add_default_args(parser)
+    args = parser.parse_args()
+    logging.basicConfig(
+        level=getattr(logging, args.log_level),
+        format="%(asctime)s - %(levelname)s - %(message)s",
+    )
+    component = ButtonLight(
+        "button_led_virtual", args.hostname, args.controller, args.heartbeat
+    )
     component.run()

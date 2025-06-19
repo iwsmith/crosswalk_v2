@@ -1,3 +1,5 @@
+import os
+from argparse import ArgumentParser
 import threading
 from pathlib import Path
 import time
@@ -11,18 +13,25 @@ from xwalk2.models import Heatbeat, parse_message
 
 
 class Heartbeat:
-    def __init__(self, component: str, host: str, every_s: int = 1):
+    def __init__(
+        self,
+        component: str,
+        host: str,
+        heartbeat_address,
+        every_s: int = 1,
+    ):
         self.component = component
         self.host = host
         self.every_s = every_s
         self.stop_event = threading.Event()
         self.thread: Optional[threading.Thread] = None
         self._started = False
+        self.heartbeat_address = heartbeat_address
 
     def _beat(self):
         context = zmq.Context.instance()
         socket = context.socket(zmq.PUB)
-        socket.connect("tcp://127.0.0.1:5558")  # TODO: make configurable
+        socket.connect(self.heartbeat_address)
 
         try:
             while not self.stop_event.is_set():
@@ -64,11 +73,13 @@ class SubscribeComponent:
         self,
         component_name: str,
         host_name: str,
-        subscribe_address="tcp://127.0.0.1:5557",
+        subscribe_address: str,
+        heartbeat_address: str,
     ) -> None:
         self.component_name = component_name
         self.host_name = host_name
         self.subscribe_address = subscribe_address
+        self.heartbeat_address = heartbeat_address
 
     def process_message(self, message: BaseModel):
         raise NotImplementedError()
@@ -79,7 +90,11 @@ class SubscribeComponent:
         socket.connect(self.subscribe_address)
         socket.setsockopt_string(zmq.SUBSCRIBE, "")
 
-        with Heartbeat(self.component_name, self.host_name):
+        with Heartbeat(
+            self.component_name,
+            self.host_name,
+            heartbeat_address=self.heartbeat_address,
+        ):
             try:
                 while True:
                     msg = socket.recv_string()
@@ -97,11 +112,13 @@ class InteractComponent:
         self,
         component_name: str,
         host_name: str,
-        interact_address="tcp://127.0.0.1:5556",
+        interact_address: str,
+        heartbeat_address: str,
     ) -> None:
         self.component_name = component_name
         self.host_name = host_name
         self.interact_address = interact_address
+        self.heartbeat_address = heartbeat_address
 
     def loop(self):
         raise NotImplementedError()
@@ -114,7 +131,7 @@ class InteractComponent:
         self.socket = context.socket(zmq.PUB)
         self.socket.connect(self.interact_address)
 
-        with Heartbeat(self.component_name, self.host_name):
+        with Heartbeat(self.component_name, self.host_name, self.heartbeat_address):
             try:
                 self.loop()
             except KeyboardInterrupt:
@@ -129,13 +146,15 @@ class SubscribeInteractComponent:
         self,
         component_name: str,
         host_name: str,
-        interact_address="tcp://127.0.0.1:5556",
-        subscribe_address="tcp://127.0.0.1:5557",
+        interact_address,
+        subscribe_address,
+        heartbeat_address,
     ) -> None:
         self.component_name = component_name
         self.host_name = host_name
         self.interact_address = interact_address
         self.subscribe_address = subscribe_address
+        self.heartbeat_address = heartbeat_address
 
     def process_message(self, message: BaseModel):
         raise NotImplementedError()
@@ -150,7 +169,7 @@ class SubscribeInteractComponent:
         subscribe_socket.connect(self.subscribe_address)
         subscribe_socket.setsockopt_string(zmq.SUBSCRIBE, "")
 
-        with Heartbeat(self.component_name, self.host_name):
+        with Heartbeat(self.component_name, self.host_name, self.heartbeat_address):
             try:
                 while True:
                     msg = subscribe_socket.recv_string()
@@ -162,6 +181,7 @@ class SubscribeInteractComponent:
                 subscribe_socket.close(0)
                 self.interact_socket.close(0)
                 context.term()
+
 
 class FileLibrary:
     def __init__(self, root_dir: str, extensions: Optional[List[str]] = None):
@@ -181,18 +201,21 @@ class FileLibrary:
         :return: Dictionary mapping filename (no extension) to absolute Path objects.
         """
         file_map: dict[str, Path] = {}
-        for path in self.root_path.rglob('*'):
+        for path in self.root_path.rglob("*"):
             if path.is_file():
                 if self.extensions and path.suffix.lower() not in self.extensions:
                     continue
                 name_without_ext = path.stem
                 if name_without_ext in file_map:
-                    raise ValueError(f"Entry {name_without_ext} already exists! {path} and {file_map[name_without_ext]}")
+                    raise ValueError(
+                        f"Entry {name_without_ext} already exists! {path} and {file_map[name_without_ext]}"
+                    )
                 file_map[name_without_ext] = path.resolve()
         return file_map
 
     def __getitem__(self, key) -> Path:
         return self.file_map[key]
+
 
 class ImageLibrary(FileLibrary):
     def __init__(self, root_dir: str, extensions: List[str] | None = None):
@@ -200,9 +223,39 @@ class ImageLibrary(FileLibrary):
             extensions = [".gif"]
         super().__init__(root_dir, extensions)
 
+
 class AudioLibrary(FileLibrary):
     def __init__(self, root_dir: str, extensions: List[str] | None = None):
         if not extensions:
-            extensions = ['.mp3', '.m4a', '.wav']
+            extensions = [".mp3", ".m4a", ".wav"]
         super().__init__(root_dir, extensions)
 
+
+def add_default_args(parser: ArgumentParser):
+    parser.add_argument(
+        "--interaction",
+        type=str,
+        default=os.getenv("XWALK_INTERACTION", "tcp://localhost:5556"),
+    )
+    parser.add_argument(
+        "--controller",
+        type=str,
+        default=os.getenv("XWALK_CONTROLLER", "tcp://localhost:5557"),
+    )
+    parser.add_argument(
+        "--heartbeat",
+        type=str,
+        default=os.getenv("XWALK_HEARTBEAT", "tcp://localhost:5558"),
+    )
+    parser.add_argument(
+        "--hostname",
+        type=str,
+        default=os.getenv("XWALK_HOSTNAME", "crosswalk-unknown"),
+    )
+
+    parser.add_argument(
+        "--log-level",
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Set the logging level",
+    )
