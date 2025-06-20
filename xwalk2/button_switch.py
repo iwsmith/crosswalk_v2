@@ -49,6 +49,6 @@ if __name__ == "__main__":
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
     button = PhysicalButton(
-        "button_physical", args.hostname, args.interact, args.heartbeat
+        "button_physical", args.hostname, args.interaction, args.heartbeat
     )
     button.run()
