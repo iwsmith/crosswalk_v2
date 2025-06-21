@@ -22,6 +22,7 @@ class PhysicalButton(InteractComponent):
         super().__init__(component_name, host_name, interact_address, heartbeat_address)
         self.button_pin = int(os.getenv("XWALK_BUTTON_PIN", 25))
         self.button = Button(self.button_pin, pull_up=True, bounce_time=0.05)
+        logger.info(f"Initialized button with pin {self.button_pin}")
 
     def loop(self):
         while True:
