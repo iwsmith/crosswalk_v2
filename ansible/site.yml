@@ -1,0 +1,5 @@
+---
+- hosts: signs
+  become: true
+  roles:
+    - crosswalk
