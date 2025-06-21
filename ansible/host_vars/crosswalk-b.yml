@@ -5,3 +5,8 @@ crosswalk_interaction: tcp://192.168.1.110:5556
 crosswalk_controller: tcp://192.168.1.110:5557
 crosswalk_heartbeat: tcp://192.168.1.110:5558
 crosswalk_hostname: crosswalk-b
+crosswalk_services: 
+  - xwalk_audio_player
+  - xwalk_button_light
+  - xwalk_button_switch
+  - xwalk_matrix_driver

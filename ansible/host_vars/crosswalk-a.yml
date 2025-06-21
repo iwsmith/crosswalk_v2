@@ -5,3 +5,11 @@ crosswalk_interaction: tcp://localhost:5556
 crosswalk_controller: tcp://localhost:5557
 crosswalk_heartbeat: tcp://localhost:5558
 crosswalk_hostname: crosswalk-a
+crosswalk_services: 
+  - xwalk_controller
+  - xwalk_api
+  - xwalk_timer
+  - xwalk_audio_player
+  - xwalk_button_light
+  - xwalk_button_switch
+  - xwalk_matrix_driver
