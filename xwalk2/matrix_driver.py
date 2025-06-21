@@ -134,6 +134,6 @@ if __name__ == "__main__":
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
     m = MatrixViewer(
-        "matrix-viewer", "crosswalk-a", args.image_dir, args.controller, args.heartbeat
+        "matrix-viewer", args.hostname, args.image_dir, args.controller, args.heartbeat
     )
     m.run()
