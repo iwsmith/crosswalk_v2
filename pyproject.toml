@@ -12,7 +12,7 @@ dependencies = [
     "fastapi>=0.104.0",
     "uvicorn>=0.24.0",
     "transitions>=0.9.2",
-    "lgpio>=0.2.2.0; sys_platform == 'linux'"
+    "lgpio>=0.2.2.0; sys_platform == 'linux'",
     "PyYAML>=6.0.0",
     "mutagen>=1.47.0",
     "numpy>=1.24.0",
