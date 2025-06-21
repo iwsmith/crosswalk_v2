@@ -1,0 +1,10 @@
+---
+crosswalk_home: /opt/crosswalk
+crosswalk_services:
+  - xwalk_controller
+  - xwalk_audio_player
+  - xwalk_button_light
+  - xwalk_button_switch
+  - xwalk_matrix_driver
+  - xwalk_api
+  - xwalk_timer

@@ -1,0 +1,156 @@
+---
+- name: Download uv binary for aarch64 (64-bit Raspberry Pi OS)
+  become: yes
+  get_url:
+    url: https://github.com/astral-sh/uv/releases/latest/download/uv-aarch64-unknown-linux-gnu.tar.gz
+    dest: /tmp/uv.tar.gz
+
+- name: Extract uv binary
+  become: yes
+  unarchive:
+    src: /tmp/uv.tar.gz
+    dest: /usr/local/bin/
+    remote_src: yes
+    extra_opts: [--strip-components=1]
+
+- name: Ensure uv is executable
+  become: yes
+  file:
+    path: /usr/local/bin/uv
+    mode: '0755'
+    state: file
+
+- name: Check uv version
+  command: uv --version
+  register: uv_version
+  changed_when: false
+
+- name: Display uv version
+  debug:
+    var: uv_version.stdout
+
+- name: Ensure /opt/crosswalk is owned by crosswalk
+  become: yes
+  file:
+    path: /opt/crosswalk
+    state: directory
+    owner: crosswalk
+    group: crosswalk
+    mode: '0755'
+    
+- name: Clone crosswalk from GitHub
+  become: yes
+  become_user: crosswalk
+  git:
+    repo: https://github.com/iwsmith/crosswalk_v2.git 
+    dest: /opt/crosswalk
+    version: main  
+    update: yes
+
+- name: Install crosswalk dependencies with uv sync
+  become: yes
+  become_user: crosswalk  
+  command: uv sync --no-dev --frozen
+  args:
+    chdir: /opt/crosswalk
+
+- name: Clone rpi-rgb-led-matrix from GitHub
+  git:
+    repo: https://github.com/hzeller/rpi-rgb-led-matrix.git 
+    dest: /opt/rpi-rgb-led-matrix
+    version: master  # or a branch name, tag, or commit hash
+    update: yes
+
+- name: Build led-image-viewer
+  make:
+    chdir: /opt/rpi-rgb-led-matrix/utils
+
+- name: Copy led-iamge-viewer to /usr/local/bin with setuid
+  become: yes
+  copy:
+    src: /opt/rpi-rgb-led-matrix/utils/led-image-viewer
+    dest: /usr/local/bin/led-image-viewer
+    mode: '4755'
+    remote_src: yes
+
+- name: Install xwalk service files
+  become: yes
+  template:
+    src: "{{ item }}.service"
+    dest: "/etc/systemd/system/{{ item }}.service"
+    owner: root
+    group: root
+    mode: '0644'
+  loop: "{{ crosswalk_services }}"
+
+- name: Reload systemd to register new service
+  become: yes
+  command: systemctl daemon-reload
+
+- name: Start xwalk_controller service
+  become: yes
+  systemd:
+    name: "{{ item }}"
+    enabled: yes
+    state: started
+  loop: "{{ crosswalk_services }}"
+
+
+# - name: Create code directory
+#   file:
+#     path: '{{crosswalk_home}}/code'
+#     state: directory
+#     owner: crosswalk
+#     group: crosswalk
+#     mode: '0755'
+
+# # NOTE: this is obviated by the deploy.sh script - maybe run that directly?
+# #- name: Copy crosswalk code
+# #  copy:
+# #    src: "../../../../{{item}}"
+# #    dest: "{{crosswalk_home}}/code/"
+# #    owner: crosswalk
+# #    group: crosswalk
+# #    #mode: '0755'
+# #  with_items:
+# #    - xwalk
+# #    - templates
+# #    - config.yml
+# #    - button.py
+# #    - run.py
+# #  notify:
+# #    - Restart crosswalk
+
+# - name: Write button service unit
+#   template:
+#     src: button.service
+#     dest: /lib/systemd/system/button.service
+#     owner: root
+#     group: root
+#     mode: '0644'
+#   notify:
+#     - Restart button
+
+# - name: Enable button service
+#   systemd:
+#     name: button
+#     state: started
+#     enabled: true
+#     daemon_reload: true
+
+# - name: Write crosswalk service unit
+#   template:
+#     src: crosswalk.service
+#     dest: /lib/systemd/system/crosswalk.service
+#     owner: root
+#     group: root
+#     mode: '0644'
+#   notify:
+#     - Restart crosswalk
+
+# - name: Enable crosswalk service
+#   systemd:
+#     name: crosswalk
+#     state: started
+#     enabled: true
+#     daemon_reload: true

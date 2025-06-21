@@ -1,0 +1,65 @@
+---
+- name: Disable Wi-Fi power saving via NetworkManager
+  copy:
+    dest: /etc/NetworkManager/conf.d/wifi-powersave.conf
+    content: |
+      [connection]
+      wifi.powersave = 2
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart NetworkManager
+
+- name: Append isolcpus=3 to cmdline.txt if missing
+  shell: |
+    grep -qw 'isolcpus=3' /boot/firmware/cmdline.txt || \
+    sed -i '1s/$/ isolcpus=3/' /boot/firmware/cmdline.txt
+  args:
+    executable: /bin/bash
+
+- name: Blacklist snd_bcm2835 module
+  lineinfile:
+    path: /etc/modprobe.d/blacklist-snd_bcm2835.conf
+    line: "blacklist snd_bcm2835"
+    create: yes
+
+- name: Remove unwanted packages
+  apt:
+    name:
+      - bluez
+      - bluez-firmware
+      - pi-bluetooth
+      - triggerhappy
+      - pigpio
+    state: absent
+    autoremove: yes
+    purge: yes
+
+- name: Create /etc/asound.conf with default PCM and CTL device
+  copy:
+    dest: /etc/asound.conf
+    content: |
+      pcm.!default {
+        type hw
+        card Device
+      }
+
+      ctl.!default {
+        type hw
+        card Device
+      }
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Install required packages
+  apt:
+    name:
+      - git-lfs
+      - liblgpio-dev
+      - mpg123
+      - swig
+      - libgraphicsmagick++-dev
+      - libwebp-dev
+    state: present
+    update_cache: yes

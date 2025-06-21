@@ -1,0 +1,19 @@
+[Unit]
+Description=crosswalk controller
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/uv run --frozen --no-dev python -m xwalk2.controller
+WorkingDirectory=/opt/crosswalk
+Restart=on-failure
+User=crosswalk
+Group=crosswalk
+Environment=PYTHONUNBUFFERED=1
+Environment=XWALK_CONTROLLER={{crosswalk_controller}}
+Environment=XWALK_INTERACTION={{crosswalk_interaction}}
+Environment=XWALK_HEARTBEAT={{crosswalk_heartbeat}}
+Environment=XWALK_HOSTNAME={{crosswalk_hostname}}
+
+[Install]
+WantedBy=multi-user.target

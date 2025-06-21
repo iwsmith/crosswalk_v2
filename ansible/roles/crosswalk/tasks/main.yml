@@ -1,0 +1,8 @@
+---
+- import_tasks: initial.yml
+  tags:
+    -initial
+
+- import_tasks: code.yml
+  tags:
+    - code

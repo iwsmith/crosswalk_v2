@@ -1,0 +1,7 @@
+---
+crosswalk_led_angle: -90
+crosswalk_button_pin: 25
+crosswalk_interaction: tcp://localhost:5556
+crosswalk_controller: tcp://localhost:5557
+crosswalk_heartbeat: tcp://localhost:5558
+crosswalk_hostname: crosswalk-a

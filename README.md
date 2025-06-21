@@ -12,11 +12,30 @@ The Python-based control system for managing Crosswalk, an interactive art proje
 
 Make sure [git-lfs](https://git-lfs.com/) is installed! Assets are stored there.
 
+### To an RPI
+
+We use anisble playboks to deploy to the RPI.
+
+`cd anisble`
+`uv run ansible-playbook site.yml -i inventory.ini`
+
+You can start at a specific step by using:
+`uv run ansible-playbook site.yml -i inventory.ini --start-at-task "Install xwalk service files"`
+
+Each component is run as a separate systemd service, all prefixed with `xwalk_`.
+
+Some useful commands:
+
+- `journalctl -f --unit  xwalk_button_switch.service`
+- `systemctl stop xwalk_*` stop all xwalk services
+- `systemctl status xwalk_*` get xwalk status
+
 ### The Normal Way
 
-1. https://docs.astral.sh/uv/getting-started/installation/ (a Python package and project manager):
+1. <https://docs.astral.sh/uv/getting-started/installation/> (a Python package and project manager):
 2. To run a command:
-    ```bash 
+
+    ```bash
     uv run -m xwalk2.controller
     ```
 
@@ -26,9 +45,11 @@ To get started:
 
 1. Install [Nix](https://nixos.org/download.html) if you haven't already
 2. Run the following command in the project directory:
+
    ```bash
    nix develop
    ```
+
    This will drop you into a development shell with all dependencies installed.
 
 ## Running the Program
@@ -42,6 +63,7 @@ uv run xwalk2/controller.py
 ```
 
 You should see output similar to this:
+
 ```
 Starting Crosswalk V2 Controller...
 Initializing ZMQ sockets...
@@ -63,11 +85,13 @@ To stop the program, press Ctrl+C.
 To test the system, you'll need to run multiple components in separate terminal windows:
 
 #### Terminal 1: Start the Controller
+
 ```bash
 uv run xwalk2/controller.py
 ```
 
 You should see:
+
 ```
 Starting Crosswalk V2 Controller...
 Listening on ports:
@@ -79,6 +103,7 @@ Controller is running. Press Ctrl+C to exit.
 ```
 
 #### Terminal 2: Start the Button Switch (Console Mode)
+
 ```bash
 uv run xwalk2/button_switch.py -m console
 ```
@@ -86,6 +111,7 @@ uv run xwalk2/button_switch.py -m console
 This allows you to simulate button presses by pressing Enter twice (once for press, once for release).
 
 #### Terminal 3: Start the Web API (Optional)
+
 ```bash
 uv run xwalk2/api.py
 ```
@@ -106,7 +132,9 @@ The web interface will be available at `http://localhost:8000` with a control pa
   - `util.py` - Utility functions
 
 ## Architecture
+
 At a high level there, one crosswalk box will host the controller which has three [0MQ](https://zeromq.org/) sockets:
+
 - **Interactions**: Receives events (from button switch, timer, and scheduler) that will eventually trigger something to happen on the boxes. The controller is regularly polling Interactions then taking actions with the events it finds.
 - **Control**: Receives events from the controller which are broadcast out to all subscribed components. Events will be things like "turn the button light off", "matrix driver, display this gif", etc.
 - **API**: Handles HTTP API requests for system status and triggering actions, served through a FastAPI web interface.
@@ -207,10 +235,10 @@ flowchart LR
     style API_web fill:orange
 ```
 
-
 ## Development
 
 The project uses modern Python tooling:
+
 - `pyproject.toml` for project configuration and dependencies
 - `flake.nix` for Nix development environment
 - `uv.lock` for dependency locking
@@ -222,3 +250,6 @@ The project uses modern Python tooling:
 `led-image-viewer --led-cols=64 --led-chain=2 --led-gpio-mapping=adafruit-hat-pwm --led-pwm-lsb-nanoseconds=400 --led-pixel-mapper "U-mapper;Rotate:90" --led-no-drop-privs -l 1 countdown5.gif -Ocountdown5.stream`
 
 `led-image-viewer  --led-cols=64 --led-chain=2 --led-gpio-mapping=adafruit-hat-pwm --led-pwm-lsb-nanoseconds=400 --led-pixel-mapper "U-mapper;Rotate:90" -l 1 wait6.stream`
+
+
+Generate a lock file on the RPI: `uv sync --no-dev`

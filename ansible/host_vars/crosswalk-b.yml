@@ -1,0 +1,7 @@
+---
+crosswalk_led_angle: 90
+crosswalk_button_pin: 19
+crosswalk_interaction: tcp://192.168.1.110:5556
+crosswalk_controller: tcp://192.168.1.110:5557
+crosswalk_heartbeat: tcp://192.168.1.110:5558
+crosswalk_hostname: crosswalk-b

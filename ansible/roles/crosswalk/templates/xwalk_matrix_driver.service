@@ -1,0 +1,20 @@
+[Unit]
+Description=crosswalk matrix_driver
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/uv run --frozen --no-dev python -m xwalk2.matrix_driver /opt/crosswalk/test/data
+WorkingDirectory=/opt/crosswalk
+Restart=on-failure
+User=crosswalk
+Group=crosswalk
+Environment=PYTHONUNBUFFERED=1
+Environment=XWALK_LED_ANGLE={{crosswalk_led_angle}}
+Environment=XWALK_CONTROLLER={{crosswalk_controller}}
+Environment=XWALK_INTERACTION={{crosswalk_interaction}}
+Environment=XWALK_HEARTBEAT={{crosswalk_heartbeat}}
+Environment=XWALK_HOSTNAME={{crosswalk_hostname}}
+
+[Install]
+WantedBy=multi-user.target
