@@ -361,7 +361,10 @@ dependencies = [
     { name = "fastapi" },
     { name = "gpiozero" },
     { name = "lgpio", marker = "sys_platform == 'linux'" },
+    { name = "mutagen" },
+    { name = "numpy" },
     { name = "pydantic" },
+    { name = "pyyaml" },
     { name = "pyzmq" },
     { name = "transitions" },
     { name = "uvicorn" },
@@ -373,10 +376,7 @@ dev = [
     { name = "ansible" },
     { name = "ansible-dev-tools" },
     { name = "ipython" },
-    { name = "mutagen" },
-    { name = "numpy" },
     { name = "pillow" },
-    { name = "pyyaml" },
 ]
 
 [package.metadata]
@@ -384,7 +384,10 @@ requires-dist = [
     { name = "fastapi", specifier = ">=0.104.0" },
     { name = "gpiozero", specifier = ">=2.0.1" },
     { name = "lgpio", marker = "sys_platform == 'linux'", specifier = ">=0.2.2.0" },
+    { name = "mutagen", specifier = ">=1.47.0" },
+    { name = "numpy", specifier = ">=1.24.0" },
     { name = "pydantic", specifier = ">=2.0.0" },
+    { name = "pyyaml", specifier = ">=6.0.0" },
     { name = "pyzmq", specifier = ">=26.4.0" },
     { name = "transitions", specifier = ">=0.9.2" },
     { name = "uvicorn", specifier = ">=0.24.0" },
@@ -396,10 +399,7 @@ dev = [
     { name = "ansible", specifier = ">=11.7.0" },
     { name = "ansible-dev-tools", specifier = ">=25.5.2" },
     { name = "ipython", specifier = ">=9.3.0" },
-    { name = "mutagen", specifier = ">=1.47.0" },
-    { name = "numpy", specifier = ">=1.24.0" },
     { name = "pillow", specifier = ">=10.0.0" },
-    { name = "pyyaml", specifier = ">=6.0.0" },
 ]
 
 [[package]]
