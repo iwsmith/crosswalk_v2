@@ -99,6 +99,6 @@ if __name__ == "__main__":
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
     timer = SceneTimer(
-        "timer", args.hostname, args.interactaction, args.controller, args.heartbeat
+        "timer", args.hostname, args.interaction, args.controller, args.heartbeat
     )
     timer.run()
