@@ -64,6 +64,18 @@
     state: present
     update_cache: yes
 
+- name: Add GitHub SSH keys for Ian
+  ansible.posix.authorized_key:
+    user: crosswalk
+    state: present
+    key: https://github.com/iwsmith.keys
+
+- name: Add GitHub SSH keys for Colin
+  ansible.posix.authorized_key:
+    user: crosswalk
+    state: present
+    key: https://github.com/colinjroberts.keys
+
 - name: Reboot the machine and wait for it to come back
   ansible.builtin.reboot:
     reboot_timeout: 300   # seconds to wait for reboot (adjust as needed)
