@@ -13,6 +13,7 @@ class Heatbeat(BaseModel):
     host: str
     component: str
     sent_at: datetime
+    initial: bool
 
 
 class ButtonPress(BaseModel):

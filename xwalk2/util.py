@@ -32,12 +32,14 @@ class Heartbeat:
         context = zmq.Context.instance()
         socket = context.socket(zmq.PUB)
         socket.connect(self.heartbeat_address)
+        initial = True
 
         try:
             while not self.stop_event.is_set():
                 msg = Heatbeat(
-                    host=self.host, component=self.component, sent_at=datetime.now()
+                    host=self.host, component=self.component, sent_at=datetime.now(), initial=initial
                 ).model_dump_json()
+                initial = False
                 socket.send_string(msg)
                 time.sleep(self.every_s)
         finally:

@@ -100,7 +100,7 @@ def main():
             if heartbeats in socks:
                 beat = Heatbeat.model_validate_json(heartbeats.recv_string())
                 component_name = f"{beat.component}/{beat.host}"
-                if component_name not in components:
+                if component_name not in components or beat.initial:
                     new_component = True
                 components[component_name] = beat.sent_at
 
