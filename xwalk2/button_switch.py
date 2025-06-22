@@ -4,6 +4,7 @@ import time
 from datetime import datetime
 from signal import pause
 
+import lgpio
 from gpiozero import Button
 
 from xwalk2.models import ButtonPress
@@ -23,34 +24,35 @@ class PhysicalButton(InteractComponent):
     ) -> None:
         super().__init__(component_name, host_name, interact_address, heartbeat_address)
         self.button_pin = int(os.getenv("XWALK_BUTTON_PIN", 25))
-        self.button = Button(self.button_pin, pull_up=True, bounce_time=0.05)
+        self._h = lgpio.gpiochip_open(0)  # assumes default chip 0
         self._press_time = None
 
-        self.button.when_pressed = self._handle_press
-        self.button.when_released = self._handle_release
+        # Request falling and rising edge detection (press and release)
+        lgpio.gpio_claim_input(self._h, self.button_pin)
+        lgpio.gpio_set_debounce(self._h, self.button_pin, 50)
+        lgpio.gpio_set_alert_func(self._h, self.button_pin, self._callback)
 
-        logger.info(f"Initialized button with pin {self.button_pin}")
+        logger.info(f"Initialized button on pin {self.button_pin} using lgpio")
 
-    def _handle_press(self):
-        self._press_time = time.time()
-
-    def _handle_release(self):
-        if self._press_time is None:
-            return
-        d = int((time.time() - self._press_time) * 1000)  # duration in ms
-        self._press_time = None
-
-        button_press = ButtonPress(
-            host=self.host_name,
-            component=self.component_name,
-            press_duration=d,
-            sent_at=datetime.now(),
-        )
-        self.send_action(button_press)
+    def _callback(self, chip, gpio, level, tick):
+        if level == 0:  # pressed
+            self._press_time = time.time()
+        elif level == 1 and self._press_time is not None:  # released
+            d = int((time.time() - self._press_time) * 1000)
+            self._press_time = None
+            button_press = ButtonPress(
+                host=self.host_name,
+                component=self.component_name,
+                press_duration=d,
+                sent_at=datetime.now(),
+            )
+            self.send_action(button_press)
 
     def loop(self):
-        # Block main thread to keep callbacks active
-        pause()
+        # Wait forever without using CPU
+        while True:
+            time.sleep(3600)
+
 
 
 # class PhysicalButton(InteractComponent):
