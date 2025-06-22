@@ -94,6 +94,7 @@ class MatrixViewer(SubscribeComponent):
         elif isinstance(message, EndScene):
             self.play("stop")
         elif isinstance(message, CurrentState):
+            logger.info("Got CurrentState")
             if message.state == "ready" and self._playing != ['stop']:
                 self.play("stop")
 

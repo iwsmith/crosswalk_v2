@@ -106,6 +106,7 @@ def main():
 
             # If there is a new component it will need our current state
             if new_component:
+                logger.info("Sending initial state")
                 current_state = CurrentState(state=state.state)
                 send_command(current_state)
 
