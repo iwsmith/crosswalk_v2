@@ -29,6 +29,7 @@ Some useful commands:
 - `journalctl -f --unit  xwalk_button_switch.service`
 - `systemctl stop xwalk_*` stop all xwalk services
 - `systemctl status xwalk_*` get xwalk status
+- `systemctl restart xwalk_*` restart all xwalk services
 
 ### The Normal Way
 
@@ -251,5 +252,6 @@ The project uses modern Python tooling:
 
 `led-image-viewer  --led-cols=64 --led-chain=2 --led-gpio-mapping=adafruit-hat-pwm --led-pwm-lsb-nanoseconds=400 --led-pixel-mapper "U-mapper;Rotate:90" -l 1 wait6.stream`
 
+`led-image-viewer --led-cols=64 --led-chain=2 --led-gpio-mapping=adafruit-hat-pwm --led-slowdown-gpio=2 --led-pixel-mapper "U-mapper;Rotate:90" --led-show-refresh /opt/crosswalk/test/data/img/stop.gif`
 
 Generate a lock file on the RPI: `uv sync --no-dev`

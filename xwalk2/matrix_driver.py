@@ -15,6 +15,7 @@ VIEWER_COMMAND = [
     "--led-chain=2",
     "--led-gpio-mapping=adafruit-hat-pwm",
     "--led-slowdown-gpio=2",
+    "--led-limit-refresh=140",
     "--led-drop-priv-user=crosswalk",
 ]
 
