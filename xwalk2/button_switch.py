@@ -29,7 +29,7 @@ class PhysicalButton(InteractComponent):
 
         # Request falling and rising edge detection (press and release)
         lgpio.gpio_claim_input(self._h, self.button_pin)
-        lgpio.gpio_set_debounce(self._h, self.button_pin, 50)
+        lgpio.gpio_set_debounce_micros(self._h, self.button_pin, 50)
         lgpio.gpio_set_alert_func(self._h, self.button_pin, self._callback)
 
         logger.info(f"Initialized button on pin {self.button_pin} using lgpio")
