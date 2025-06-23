@@ -29,13 +29,14 @@ class PhysicalButton(InteractComponent):
             self.button.wait_for_press()
             s = time.time()
             self.button.wait_for_release()
-            d = int(time.time() - s) * 1000  # convert S -> MS
+            d = round(time.time() - s * 1000)  # convert S -> MS
             button_press = ButtonPress(
                 host=self.host_name,
                 component=self.component_name,
                 press_duration=d,
                 sent_at=datetime.now(),
             )
+            logger.info("button press duration={d}")
             self.send_action(button_press)
 
 
