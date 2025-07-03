@@ -37,7 +37,7 @@ class Heartbeat:
         try:
             while not self.stop_event.is_set():
                 msg = Heatbeat(
-                    host=self.host, component=self.component, sent_at=datetime.now(), initial=(initial >= 2)
+                    host=self.host, component=self.component, sent_at=datetime.now(), initial=(initial <= 2)
                 ).model_dump_json()
                 initial += 1
                 socket.send_string(msg)
