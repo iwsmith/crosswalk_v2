@@ -101,6 +101,7 @@ def main():
                 beat = Heatbeat.model_validate_json(heartbeats.recv_string())
                 component_name = f"{beat.component}/{beat.host}"
                 if component_name not in components or beat.initial:
+                    logger.info(f"{component_name} sent {beat.initial} or {component_name in components}")
                     new_component = True
                 components[component_name] = beat.sent_at
 
@@ -200,4 +201,20 @@ def main():
 
 
 if __name__ == "__main__":
+
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--log-level",
+        default="INFO",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+        help="Set the logging level",
+    )
+    args = parser.parse_args()
+    logging.basicConfig(
+        level=getattr(logging, args.log_level),
+        format="%(asctime)s - %(levelname)s - %(message)s",
+    )
+
     main()
