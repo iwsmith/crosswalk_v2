@@ -1,19 +1,301 @@
 ---
 intros:
-  - wait4
-  - wait6
-  - wait8
+  - wait-4
+  - wait-6
+  - wait-8
 
 outros:
-  - countdown3
-  - countdown4
-  - countdown5
+  - countdown-3
+  - countdown-4
+  - countdown-5
 
 # Note that walks should not have loops anymore.
 # I will remake or remove all of the walks that had loops.
 # (Or I will change my mind later if we want to keep gifs)
 walks:
+  aircello:
+    category: normalish
+  airdrum:
+    category: normalish
+  airguitar:
+    category: normalish
+  airsax:
+    category: normalish
+  airtrombone:
+    category: normalish
+  applaud:
+    category: normalish
+  appreciate:
+    category: normalish
+  baseball:
+    category: normalish
+  basketball-dunk:
+    category: normalish
+  bike:
+    category: normalish
+  bird:
+    category: normalish
+  bowl:
+    category: normalish
+  brush-teeth:
+    category: normalish
+  burp:
+    category: normalish
+  carry-heavy:
+    category: normalish
+  cartwheel:
+    category: normalish
+  cat:
+    category: normalish
+  chestbump:
+    category: normalish
+  click-heels:
+    category: normalish
+  conga:
+    category: normalish
+  converse:
+    category: normalish
+  cow:
+    category: normalish
+  cowboy:
+    category: normalish
+  crab:
+    category: normalish
+  crawl:
+    category: normalish
+  cry:
+    category: normalish
+  dance-hokey-pokey:
+    category: normalish
+  dance-hustle:
+    category: normalish
+  dance-macarena:
+    category: normalish
+  dance-twerk:
+    category: normalish
+  dance-twist:
+    category: normalish
+  dog:
+    category: normalish
+  duck:
+    category: normalish
+  fall:
+    category: normalish
+  fishing-big:
+    category: normalish
+  fishing-none:
+    category: normalish
+  fishing-small:
+    category: normalish
+  flying:
+    category: normalish
+  ghost:
+    category: normalish
+  golf:
+    category: normalish
+  growl:
+    category: normalish
+  hammer-time:
+    category: normalish
+  handshake:
+    category: normalish
+  handstand:
+    category: normalish
+  highfive:
+    category: normalish
+  home:
+    category: normalish
+  hop:
+    category: normalish
+  hopscotch:
+    category: normalish
+  horseback-riding:
+    category: normalish
+  hug-3-people:
+    category: normalish
+  hug-4-people:
+    category: normalish
+  hug-5-people:
+    category: normalish
+  hurdle:
+    category: normalish
+  hydrate:
+    category: normalish
+  invisible-car:
+    category: normalish
+  jumping-jacks:
+    category: normalish
+  jumprope:
+    category: normalish
+  kangaroo:
+    category: normalish
+  karaoke-all-star:
+    category: normalish
+  karaoke-bad-romance:
+    category: normalish
+  karaoke-believe:
+    category: normalish
+  karaoke-hot-to-go:
+    category: normalish
+  karaoke-living-on-a-prayer:
+    category: normalish
+  karaoke-morning-train:
+    category: normalish
+  karaoke-rolling-in-the-deep:
+    category: normalish
+  karaoke-sandstorm:
+    category: normalish
+  karaoke-somebody-to-love:
+    category: normalish
+  laugh:
+    category: normalish
+  leapfrog:
+    category: normalish
+  longjump:
+    category: normalish
+  mime:
+    category: normalish
+  monkey:
+    category: normalish
+  mystery-box-bees:
+    category: normalish
+  mystery-box-cake:
+    category: normalish
+  mystery-box-carrots:
+    category: normalish
+  mystery-box-stinky:
+    category: normalish
+  order-by-height:
+    category: normalish
+  penguin:
+    category: normalish
+  pick-up-moop:
+    category: normalish
+  piggyback:
+    category: normalish
+  poetry-dreams-langston-hughes:
+    category: normalish
+  poetry-insomniac-maya-angelou:
+    category: normalish
+  poetry-separation-w-s-merwin:
+    category: normalish
+  poetry-thank-you-ross-gay:
+    category: normalish
+  poetry-we-never-know-emily-dickinson:
+    category: normalish
+  point-at-black:
+    category: normalish
+  point-at-blue:
+    category: normalish
+  point-at-green:
+    category: normalish
+  point-at-orange:
+    category: normalish
+  point-at-purple:
+    category: normalish
+  point-at-red:
+    category: normalish
+  point-at-white:
+    category: normalish
+  point-at-yellow:
+    category: normalish
+  propose:
+    category: normalish
+  pushup:
+    category: normalish
+  race:
+    category: normalish
+  raptor:
+    category: normalish
+  rowboat:
+    category: normalish
+  ski:
+    category: normalish
+  sleep:
+    category: normalish
+  sloth:
+    category: normalish
+  smile:
+    category: normalish
+  snake:
+    category: normalish
+  snap:
+    category: normalish
+  sneeze:
+    category: normalish
+  somersault:
+    category: normalish
+  spin:
+    category: normalish
+  staring-contest:
+    category: normalish
+  stop:
+    category: normalish
+  surf:
+    category: normalish
+  swashbuckle:
+    category: normalish
+  sweep:
+    category: normalish
+  swim:
+    category: normalish
+  tag:
+    category: normalish
+  tap-dance:
+    category: normalish
+  team-cheer:
+    category: normalish
+  teleport-a:
+    category: normalish
+  teleport-b:
+    category: normalish
+  tennis:
+    category: normalish
+  thank-rangers:
+    category: normalish
+  tightrope:
+    category: normalish
+  turtle:
+    category: normalish
+  unicycle:
+    category: normalish
+  vacuum:
+    category: normalish
+  walk-arabic:
+    category: normalish
   walk-backwards:
+    category: normalish
+  walk-danish:
+    category: normalish
+  walk-german:
+    category: normalish
+  walk-japanese:
+    category: normalish
+  walk-mandarin-taiwan:
+    category: normalish
+  walk:
+    category: normalish
+  walkdress:
+    category: normalish
+  walking-lunge:
+    category: normalish
+  walkpants:
+    category: normalish
+  werewolf:
+    category: normalish
+  wheelbarrow:
+    category: normalish
+  whistle:
+    category: normalish
+  witch:
+    category: normalish
+  wizard:
+    category: normalish
+  wok:
+    category: normalish
+  worm:
+    category: normalish
+  zombie:
     category: normalish
 
 
