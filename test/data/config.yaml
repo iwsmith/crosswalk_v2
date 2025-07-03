@@ -1,13 +1,13 @@
 ---
 intros:
-  - wait-4
-  - wait-6
-  - wait-8
+  - wait-4s
+  - wait-6s
+  - wait-8s
 
 outros:
-  - countdown-3
-  - countdown-4
-  - countdown-5
+  - countdown-3s
+  - countdown-4s
+  - countdown-5s
 
 # Note that walks should not have loops anymore.
 # I will remake or remove all of the walks that had loops.
