@@ -84,7 +84,7 @@ class AnimationLibrary:
         # Extract walk names and their weights based on categories
         weights = self.get_current_weights()
         categories = list(weights.keys())
-        cat_weights = np.array(weights.values())
+        cat_weights = np.array(list(weights.values()), dtype=np.float32)
         cat_weights /= cat_weights.sum()  # Normalize weights
         category = np.random.choice(categories, p=cat_weights)
 

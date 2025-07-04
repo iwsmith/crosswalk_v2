@@ -300,7 +300,7 @@ walks:
 
 
 weights:
-  all:
+  default:
     _: 1
   language_test:
     language: 1
