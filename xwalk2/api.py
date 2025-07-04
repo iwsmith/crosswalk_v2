@@ -5,6 +5,7 @@ from typing import Dict
 import zmq
 from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
 from xwalk2.models import APIRequest, APIResponse, Animations
@@ -107,6 +108,7 @@ app = FastAPI(
     version="0.2.0",
     lifespan=lifespan,
 )
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 def render_status_html(status: SystemStatus) -> str:
@@ -166,7 +168,7 @@ async def root():
     <html>
     <head>
         <title>Crosswalk V2 Control Panel</title>
-        <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+        <script src="/static/htmx.min.js"></script>
         <style>
             body {{ font-family: Arial, sans-serif; margin: 40px; }}
             button {{ padding: 10px 20px; margin: 10px; font-size: 16px; }}
