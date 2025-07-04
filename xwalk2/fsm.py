@@ -1,4 +1,5 @@
-from typing import Callable
+import logging
+from typing import Callable, List
 
 from pydantic import BaseModel
 from transitions import Machine
@@ -6,6 +7,7 @@ from transitions import Machine
 from xwalk2.animation_library import AnimationLibrary
 from xwalk2.models import EndScene, PlayScene
 
+logger = logging.getLogger(__name__)
 
 class Controller:
     states = ["ready", "walk"]
@@ -22,6 +24,7 @@ class Controller:
         self.machine.add_transition("reset", source="*", dest="ready")
         self.animations = AnimationLibrary()
         self.send_message = send_message_fn
+        self.walk_queue: List[str] = []
 
     def on_enter_walk(self):
         # We would choose a walk here

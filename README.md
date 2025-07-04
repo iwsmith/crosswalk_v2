@@ -103,10 +103,10 @@ Listening on ports:
 Controller is running. Press Ctrl+C to exit.
 ```
 
-#### Terminal 2: Start the Button Switch (Console Mode)
+#### Terminal 2: Start the Virtual Button Switch
 
 ```bash
-uv run xwalk2/button_switch.py -m console
+uv run xwalk2/button_switch_virtual.py
 ```
 
 This allows you to simulate button presses by pressing Enter twice (once for press, once for release).

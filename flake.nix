@@ -26,6 +26,8 @@
             mutagen
             pillow
             tkinter
+          ] ++ pkgs.lib.optionals pkgs.stdenv.isLinux [
+            lgpio
           ] ++ [
             pkgs.uv
             pkgs.tk
@@ -44,6 +46,10 @@
             echo "  - mutagen"
             echo "  - pillow"
             echo "  - tkinter"
+            echo "  - gpiozero"
+            echo "  - transitions"
+            echo "  - lgpio (Linux only)"
+            echo "  - ipython"
             echo "  - uv (package manager)"
             
             # Install package in development mode using uv
