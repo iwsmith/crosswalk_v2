@@ -23,10 +23,6 @@ logger = logging.getLogger(__name__)
 
 def main():
     print("Starting Crosswalk V2 Controller with FSM...")
-    print("Initializing animation library...")
-
-    # Initialize animation library (crash early if not available)
-    print("Animation library loaded successfully")
     print("Initializing ZMQ sockets...")
 
     context = zmq.Context()
