@@ -1,5 +1,5 @@
 import logging
-from typing import Callable
+from typing import Callable, List
 
 from pydantic import BaseModel
 from transitions import Machine
@@ -24,6 +24,7 @@ class Controller:
         self.machine.add_transition("reset", source="*", dest="ready")
         self.animations = AnimationLibrary()
         self.send_message = send_message_fn
+        self.walk_queue: List[str] = []
 
     def on_enter_walk(self):
         # We would choose a walk here

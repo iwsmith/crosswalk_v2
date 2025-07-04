@@ -7,8 +7,9 @@ from fastapi import FastAPI, HTTPException, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from datetime import datetime
 
-from xwalk2.models import APIRequest, APIResponse, Animations
+from xwalk2.models import APIResponse, APIStatusRequest, APITimerExpired, APIQueueWalk, Animations, APIButtonPress, APIRequests, parse_api
 
 
 class ActionRequest(BaseModel):
@@ -46,50 +47,35 @@ class APIController:
         if self.context:
             self.context.term()
 
-    def _send_request(self, request: APIRequest) -> APIResponse:
+    def _send_request(self, request: APIRequests) -> APIResponse:
         if not self.api_socket:
             raise RuntimeError("API Controller not initialized")
         try:
             self.api_socket.send_string(request.model_dump_json())
             if self.api_socket.poll(timeout=5000):
                 response_data = self.api_socket.recv_string()
-                response = APIResponse.model_validate_json(response_data)
-                if not response.success:
-                    raise RuntimeError(response.message or "Request failed")
-                return response
+                return APIResponse.model_validate_json(response_data)
             else:
                 raise TimeoutError("Controller did not respond within timeout")
         except zmq.ZMQError as e:
             print(f"ZMQ communication error: {e}")
             raise ConnectionError("Failed to communicate with controller")
 
-    def send_action(self, action: str) -> str:
-        request = APIRequest(request_type="action", action=action)
-        response = self._send_request(request)
-        print(f"Action '{action}' result: {response.message}")
-        return response.message or "Action completed"
+    def timer_expired(self) -> APIResponse:
+        """Send timer expired event"""
+        return self._send_request(APITimerExpired())
 
-    def send_reset(self) -> str:
-        request = APIRequest(request_type="reset")
-        response = self._send_request(request)
-        return response.message or "Reset completed"
+    def press_button(self) -> APIResponse:
+        return self._send_request(APIButtonPress())
 
-    def get_status(self) -> SystemStatus:
-        request = APIRequest(request_type="status")
-        response = self._send_request(request)
-        components_timestamps = {}
-        if response.components:
-            for component, dt in response.components.items():
-                if hasattr(dt, "timestamp"):
-                    components_timestamps[component] = dt.timestamp()
-                else:
-                    components_timestamps[component] = time.time()
-        return SystemStatus(
-            playing=response.playing or False,
-            components=components_timestamps,
-            uptime=time.time() - self.start_time,
-            animations=response.animations
-        )
+    def queue_walk(self, walk: str) -> APIResponse:
+        """Queue a walk animation"""
+        request = APIQueueWalk(type="queue_walk", walk=walk)
+        return self._send_request(request)
+
+    def get_status(self) -> APIResponse:
+        request = APIStatusRequest()
+        return self._send_request(request)
 
 
 api_controller = APIController()
@@ -111,9 +97,9 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
-def render_status_html(status: SystemStatus) -> str:
+def render_status_html(status: APIResponse) -> str:
     components_html = "".join(
-        f"<li><strong>{name}</strong>: Last seen {int(time.time() - timestamp)}s ago</li>"
+        f"<li><strong>{name}</strong>: Last seen { round((datetime.now() - timestamp).total_seconds())}s ago</li>"
         for name, timestamp in status.components.items()
     )
 
@@ -127,7 +113,15 @@ def render_status_html(status: SystemStatus) -> str:
 
         items_html = ""
         for walk, info in status.animations.walks.items():
-            items_html += f"<li>{walk} - {info.category}</li>\n"
+            items_html += (
+                f"<li>{walk} - {info.category} "
+                f"<button hx-post='/queue/{walk}' "
+                f"style='font-size:1em;padding:0 0.5em;height:1.5em;vertical-align:middle;line-height:1.2;' "
+                f"hx-target='#status' "
+                f"hx-swap='innerHTML' "
+                f">"
+                f"+</button></li>\n"
+            )
         animations_html += f"<div><strong>Walks</strong><ul>{items_html}</ul></div>"
 
         items_html = ""
@@ -137,10 +131,14 @@ def render_status_html(status: SystemStatus) -> str:
     else:
         animations_html = "<em>No animations</em>"
 
+    status_message = status.message or ""
+
     return f"""
         <h3>System Status</h3>
+        {status_message}
         <p><strong>Playing:</strong> {'🟢 Yes' if status.playing else '🔴 No'}</p>
-        <p><strong>Uptime:</strong> {int(status.uptime)} seconds</p>
+        <p><strong>Controller time:</strong> {status.timestamp.strftime("%d/%m/%Y %H:%M:%S")} (as of last status request) </p>
+        <p><strong>Walk queue:</strong> {[w for w in status.walk_queue]} </p>
         <p><strong>Components:</strong></p>
         <ul>
             {components_html}
@@ -169,10 +167,11 @@ async def root():
     <head>
         <title>Crosswalk V2 Control Panel</title>
         <script src="/static/htmx.min.js"></script>
+
         <style>
             body {{ font-family: Arial, sans-serif; margin: 40px; }}
             button {{ padding: 10px 20px; margin: 10px; font-size: 16px; }}
-            .status {{ background: #f0f0f0; padding: 20px; margin: 20px 0; }}
+            #status {{ background: #f0f0f0; padding: 20px; margin: 20px 0; }}
             .button-group {{ margin: 20px 0; }}
         </style>
     </head>
@@ -185,115 +184,58 @@ async def root():
             <h3>Actions</h3>
             <button 
                 hx-post="/button" 
-                hx-target="#alert-area"
-                hx-swap="beforeend"
-                hx-on="htmx:afterRequest: document.getElementById('status').dispatchEvent(new Event('refresh'))"
+                hx-target="#status" 
+                hx-swap="innerHTML"
             >🔘 Press Button</button>
             <button 
                 hx-post="/timer" 
-                hx-target="#alert-area"
-                hx-swap="beforeend"
-                hx-on="htmx:afterRequest: document.getElementById('status').dispatchEvent(new Event('refresh'))"
+                hx-target="#status" 
+                hx-swap="innerHTML"
             >⏰ Timer Expired</button>
-            <button 
-                hx-post="/reset" 
-                hx-target="#alert-area"
-                hx-swap="beforeend"
-                hx-on="htmx:afterRequest: document.getElementById('status').dispatchEvent(new Event('refresh'))"
-            >🔄 Reset</button>
         </div>
         
         <div class="button-group">
-            <button 
-                hx-get="/status_html" 
-                hx-target="#status"
-                hx-swap="outerHTML"
-            >📊 Refresh Status</button>
-            <button 
-                hx-post="/reset"
-                hx-target="#alert-area"
-                hx-swap="beforeend"
-                hx-on="htmx:afterRequest: document.getElementById('status').dispatchEvent(new Event('refresh'))"
-            >🔄 Reset System</button>
+            <button type="button" 
+                hx-get="/status" 
+                hx-target="#status" 
+                hx-swap="innerHTML"
+                >📊 Refresh Status</button>
         </div>
         
-        <div class="status" id="status">
+        <div id="status">
             {render_status_html(status)}
         </div>
         
-        <script>
-            document.getElementById('status').addEventListener('refresh', function() {{
-                htmx.ajax('GET', '/status_html', '#status');
-            }});
-        </script>
     </body>
     </html>
     """
 
 
-@app.get("/status_html", response_class=HTMLResponse)
-async def status_html():
+@app.get("/status", response_class=HTMLResponse)
+async def status():
     """Return status as HTML fragment for htmx"""
-    try:
-        status = api_controller.get_status()
-        return f'<div class="status" id="status">{render_status_html(status)}</div>'
-    except Exception as e:
-        return f'<div class="status" id="status"><span style="color:red;">Failed to get status: {e}</span></div>'
-
-
-@app.get("/status", response_model=SystemStatus)
-async def get_status():
-    """Get system status from controller (JSON, for API use)"""
-    try:
-        return api_controller.get_status()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to get status: {e}")
+    status = api_controller.get_status()
+    return render_status_html(status)
 
 
 @app.post("/button", response_class=HTMLResponse)
 async def press_button():
     """Handle button press action (htmx or API)"""
-    try:
-        result = api_controller.send_action("button_pressed")
-        return render_alert_html(f"Button pressed: {result}", success=True)
-    except Exception as e:
-        return render_alert_html(f"Button press failed: {e}", success=False)
+    status = api_controller.press_button()
+    return render_status_html(status)
 
+@app.post("/queue/{walk}", response_class=HTMLResponse)
+async def queue(walk: str):
+    """Handle button press action (htmx or API)"""
+    result = api_controller.queue_walk(walk)
+    return render_status_html(result)
 
 @app.post("/timer", response_class=HTMLResponse)
 async def fire_timer():
     """Handle timer expired action (htmx or API)"""
-    try:
-        result = api_controller.send_action("timer_expired")
-        return render_alert_html(f"Timer expired: {result}", success=True)
-    except Exception as e:
-        return render_alert_html(f"Timer action failed: {e}", success=False)
+    result = api_controller.timer_expired()
+    return render_status_html(result)
 
-
-@app.post("/reset", response_class=HTMLResponse)
-async def reset_system():
-    """System reset action (htmx or API)"""
-    try:
-        result = api_controller.send_reset()
-        return render_alert_html(f"Reset result: {result}", success=True)
-    except Exception as e:
-        return render_alert_html(f"Reset failed: {e}", success=False)
-
-
-@app.post("/trigger", response_class=HTMLResponse)
-async def trigger_action(request: Request):
-    """Trigger an action through the controller (API use only)"""
-    if request.headers.get("content-type", "").startswith("application/json"):
-        data = await request.json()
-        action = data.get("action")
-    else:
-        form = await request.form()
-        action = form.get("action")
-    try:
-        result = api_controller.send_action(action)
-        return render_alert_html(f"Action result: {result}", success=True)
-    except Exception as e:
-        return render_alert_html(f"Action failed: {e}", success=False)
 
 
 if __name__ == "__main__":

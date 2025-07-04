@@ -6,13 +6,17 @@ from pydantic import BaseModel
 
 from xwalk2.fsm import Controller
 from xwalk2.models import (
-    APIRequest,
     APIResponse,
+    APIQueueWalk,
+    APIStatusRequest,
+    APIButtonPress,
+    APITimerExpired,
     ButtonPress,
     CurrentState,
     Heatbeat,
     TimerExpired,
     parse_message,
+    parse_api
 )
 
 logger = logging.getLogger(__name__)
@@ -67,17 +71,38 @@ def main():
     playing = False
     components = {}
 
-    def handle_api_action(action: str) -> tuple[bool, str]:
-        """Handle API actions - now calls consolidated handlers"""
-        if action == "button_pressed":
+    def make_response(message: str = "", success: bool = True) -> APIResponse:
+        """Create a standard API response"""
+        return  APIResponse(
+            success=success,
+            message=message,
+            playing=playing,
+            components=components,
+            timestamp=datetime.now(),
+            state=state.state,
+            animations=state.animations.config,
+            walk_queue=state.walk_queue
+        )
+
+    def handle_api_request(request: BaseModel) -> APIResponse:
+        """Handle API requests and return a response"""
+        if isinstance(request, APIQueueWalk):
+            state.walk_queue.append(request.walk)
+            return make_response(message=f"Walk '{request.walk}' queued. {len(state.walk_queue)} total queued.")
+        elif isinstance(request, APIButtonPress):
+            # Handle button press action
             state.button_press()
-        elif action == "timer_expired":
+            return make_response(message="Button pressed")
+        elif isinstance(request, APITimerExpired):
+            # Handle timer expired event
             state.timer_expired()
-        elif action == "reset":
-            state.reset()()
+            return make_response(message="Timer expired event sent")
+        elif isinstance(request, APIStatusRequest):
+            # Handle status request
+            return make_response()
         else:
-            return False, f"Unknown action: {action}"
-        return True, "Whatever"
+            logger.warning(f"Received unknown API request type: {type(request)}")
+            return make_response(message=f"Invalid request type {type(request)}", success=False)
 
     # Main control loop, wrapped in try for graceful shutdown
     last_state = state.state
@@ -115,53 +140,15 @@ def main():
                 try:
                     # Receive API request
                     request_data = api_socket.recv_string()
-                    api_request = APIRequest.model_validate_json(request_data)
-
-                    if api_request.request_type == "status":
-                        # Handle status request
-                        response = APIResponse(
-                            success=True,
-                            message="Status retrieved successfully",
-                            playing=playing,
-                            components=components,
-                            timestamp=datetime.now(),
-                            state=state.state,
-                            animations=state.animations.config
-                        )
-
-                    elif api_request.request_type == "action":
-                        # Handle action request
-                        if api_request.action:
-                            success, message = handle_api_action(api_request.action)
-                            response = APIResponse(
-                                success=success,
-                                message=message,
-                            )
-                            print(
-                                f"🎮 Processed action '{api_request.action}': {message}"
-                            )
-                        else:
-                            response = APIResponse(
-                                success=False,
-                                message="Action request missing action field",
-                            )
-                    elif api_request.request_type == "reset":
-                        # Handle reset using consolidated handler
-                        success, message = handle_api_action(api_request.action)
-                        response = APIResponse(success=success, message=message)
-                    else:
-                        response = APIResponse(
-                            success=False,
-                            message=f"Unknown request type: {api_request.request_type}",
-                        )
-
+                    api_request = parse_api(request_data)
+                    response = handle_api_request(api_request)
                     # Send response
                     api_socket.send_string(response.model_dump_json())
 
                 except Exception as e:
                     print(f"💥 Error handling API request: {e}")
                     # Send error response
-                    error_response = APIResponse(
+                    error_response = make_response(
                         success=False,
                         message=f"Server error: {str(e)}",
                     )
