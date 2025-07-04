@@ -4,6 +4,7 @@ from typing import Dict
 
 import zmq
 from fastapi import FastAPI, HTTPException, Request, Form
+from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -96,6 +97,7 @@ app = FastAPI(
 )
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+templates = Jinja2Templates(directory="templates")
 
 def render_status_html(status: APIResponse) -> str:
     components_html = "".join(
@@ -161,6 +163,7 @@ def render_alert_html(message: str, success: bool = True) -> str:
 @app.get("/", response_class=HTMLResponse)
 async def root():
     status = api_controller.get_status()
+    return templates.TemplateResponse("index.html", {"request": request})
     return f"""
     <!DOCTYPE html>
     <html>
