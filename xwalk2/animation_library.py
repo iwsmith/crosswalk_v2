@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Tuple
 import os
 import wave
 import mutagen
-
+import re
 
 class AnimationLibrary:
     """Manages animation selection based on weighted schedules from config.yaml"""
@@ -30,14 +30,44 @@ class AnimationLibrary:
             raise RuntimeError(f"Failed to load config from {self.config_path}: {e}")
     
     def get_current_weights(self) -> Dict[str, int]:
-        """Determine which weight set to use based on current time and schedule"""
-        # For now, use 'demo' as default
-        # TODO: Implement proper schedule-based weight selection
+        """Determine which weight set to use based on the current time and schedule."""
+        now = datetime.now()
+        menu = self.config.get('menu', [])
+
+        active_schedule = None
+        latest_start_time = None
+
+        for schedule in menu:
+            try:
+                start_time = datetime.fromisoformat(schedule['start'])
+                if start_time <= now:
+                    if latest_start_time is None or start_time > latest_start_time:
+                        latest_start_time = start_time
+                        active_schedule = schedule
+            except (ValueError, KeyError, TypeError):
+                # Ignore entries with missing keys or bad date format
+                continue
+        
         weights = self.config.get('weights', {})
-        return weights.get('demo', weights.get('all', {'_': 1}))
+        
+        if active_schedule:
+            print(f"Active schedule: {active_schedule}")
+            weights_name = active_schedule.get('weights')
+            # If a schedule is active, use its weights exclusively.
+            # A missing weight set name results in an empty dict, leading to
+            # even distribution in select_walk.
+            print(f"weights_name: {weights_name}")
+            return weights.get(weights_name, {})
+
+        # No active schedule; fallback to demo or default.
+        return weights.get('demo', {'_': 1})
     
-    def select_intro(self) -> str:
-        """Select a random intro animation with even distribution"""
+    def select_intro(self, walk: Optional[str] = None) -> str:
+        """
+        Select a random* intro animation with even distribution
+        
+        * Not random, if we are selecting the intro based on a given walk.
+        """
         intros = self.config.get('intros', [])
         if not intros:
             # Fallback to available files
@@ -47,10 +77,19 @@ class AnimationLibrary:
         
         if not intros:
             raise RuntimeError("No intro animations available")
-            
-        # Random selection with even distribution
-        return np.random.choice(intros)
-    
+
+        # If the walk starts with "walk-" then we need to select an intro that
+        # matches the walk name except instead of "walk" it says "wait" e.g.
+        # "walk-danish" -> "wait-danish"
+        if walk and walk.startswith("walk-"):
+            # Matching intros should have the same name as the walk except
+            # instead of "walk" it says "wait" e.g. "walk-danish" -> "wait-danish"
+            # replace with regex
+            return re.sub(r'^walk-', 'wait-', walk)
+        else: 
+            # Random selection with even distribution
+            return np.random.choice(intros)
+
     def select_walk(self) -> str:
         """Select a random walk animation based on current weights"""
         walks = self.config.get('walks', {})
@@ -69,7 +108,7 @@ class AnimationLibrary:
         for walk_name, walk_info in walks.items():
             walk_names.append(walk_name)
             category = walk_info.get('category', 'normal')
-            weight = weights.get(category, 1)
+            weight = weights.get(category, 0)
             walk_weights.append(weight)
         
         if not walk_names:
@@ -144,9 +183,14 @@ class AnimationLibrary:
         return intro_duration + walk_duration + outro_duration
     
     def select_animation_sequence(self) -> Tuple[str, str, str]:
-        """Select a complete animation sequence: intro, walk, outro"""
-        intro = self.select_intro()
+        """
+        Select a complete animation sequence: intro, walk, outro
+
+        Walk needs to come first so we can handle language-specific walks
+        which have specific intros.
+        """
         walk = self.select_walk()
+        intro = self.select_intro(walk)
         outro = self.select_outro()
         
         # Get durations for logging
