@@ -34,7 +34,7 @@ walks:
   bike:
     category: normalish
   bird:
-    category: normalish
+    category: animal
   bowl:
     category: normalish
   brush-teeth:
@@ -46,7 +46,7 @@ walks:
   cartwheel:
     category: normalish
   cat:
-    category: normalish
+    category: animal
   chestbump:
     category: normalish
   click-heels:
@@ -56,11 +56,11 @@ walks:
   converse:
     category: normalish
   cow:
-    category: normalish
+    category: animal
   cowboy:
     category: normalish
   crab:
-    category: normalish
+    category: animal
   crawl:
     category: normalish
   cry:
@@ -76,9 +76,9 @@ walks:
   dance-twist:
     category: normalish
   dog:
-    category: normalish
+    category: animal
   duck:
-    category: normalish
+    category: animal
   fall:
     category: normalish
   fishing-big:
@@ -128,7 +128,7 @@ walks:
   jumprope:
     category: normalish
   kangaroo:
-    category: normalish
+    category: animal
   karaoke-all-star:
     category: normalish
   karaoke-bad-romance:
@@ -156,7 +156,7 @@ walks:
   mime:
     category: normalish
   monkey:
-    category: normalish
+    category: animal
   mystery-box-bees:
     category: normalish
   mystery-box-cake:
@@ -168,11 +168,11 @@ walks:
   order-by-height:
     category: normalish
   penguin:
-    category: normalish
+    category: animal
   pick-up-moop:
     category: normalish
   piggyback:
-    category: normalish
+    category: action
   poetry-dreams-langston-hughes:
     category: normalish
   poetry-insomniac-maya-angelou:
@@ -206,7 +206,7 @@ walks:
   race:
     category: normalish
   raptor:
-    category: normalish
+    category: animal
   rowboat:
     category: normalish
   ski:
@@ -214,11 +214,11 @@ walks:
   sleep:
     category: normalish
   sloth:
-    category: normalish
+    category: animal
   smile:
     category: normalish
   snake:
-    category: normalish
+    category: animal
   snap:
     category: normalish
   sneeze:
@@ -256,23 +256,23 @@ walks:
   tightrope:
     category: normalish
   turtle:
-    category: normalish
+    category: animal
   unicycle:
     category: normalish
   vacuum:
     category: normalish
   walk-arabic:
-    category: normalish
+    category: language
   walk-backwards:
     category: normalish
   walk-danish:
-    category: normalish
+    category: language
   walk-german:
-    category: normalish
+    category: language
   walk-japanese:
-    category: normalish
+    category: language
   walk-mandarin-taiwan:
-    category: normalish
+    category: language
   walk:
     category: normalish
   walkdress:
@@ -294,21 +294,25 @@ walks:
   wok:
     category: normalish
   worm:
-    category: normalish
+    category: animal
   zombie:
     category: normalish
 
 
 weights:
-  all:
+  default:
     _: 1
+  language_test:
+    language: 1
+    animal: 1
   sunday:
     normalish: 1
 
-
 menu:
   - start: '2025-06-05T01:45:00'
-    weights: demo
+    weights: language_test
+  - start: '2025-06-03T01:45:00'
+    weights: language_test
 
 schedule: []
   #- time: '2019-07-06T21:00:00'
