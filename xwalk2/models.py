@@ -1,11 +1,24 @@
 import json
 from datetime import datetime
-from typing import Dict, Literal, Optional
+from typing import Dict, Literal, Optional, List, Union
 
 from pydantic import BaseModel
 
 # Models represent things we send over the wire for easy
 # jsonification with pydantic.
+
+WalkCategory = Literal["normalish"]
+
+WeightSchedule = Dict[WalkCategory | Literal["_"], int]
+
+class WalkInfo(BaseModel):
+    category: WalkCategory 
+
+class Animations(BaseModel):
+    intros: List[str]
+    outros: List[str]
+    walks: Dict[str, WalkInfo]
+    weights: Dict[str, WeightSchedule]
 
 
 class Heatbeat(BaseModel):
@@ -37,6 +50,7 @@ class APIResponse(BaseModel):
     components: Optional[Dict[str, datetime]] = None
     timestamp: Optional[datetime] = None
     state: Optional[str] = None
+    animations: Optional[Animations] = None
 
 
 class ResetCommand(BaseModel):

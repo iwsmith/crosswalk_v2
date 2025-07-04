@@ -126,6 +126,7 @@ def main():
                             components=components,
                             timestamp=datetime.now(),
                             state=state.state,
+                            animations=state.animations.config
                         )
 
                     elif api_request.request_type == "action":

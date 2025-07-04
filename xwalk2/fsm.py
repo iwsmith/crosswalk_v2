@@ -1,3 +1,4 @@
+import logging
 from typing import Callable
 
 from pydantic import BaseModel
@@ -6,6 +7,7 @@ from transitions import Machine
 from xwalk2.animation_library import AnimationLibrary
 from xwalk2.models import EndScene, PlayScene
 
+logger = logging.getLogger(__name__)
 
 class Controller:
     states = ["ready", "walk"]
