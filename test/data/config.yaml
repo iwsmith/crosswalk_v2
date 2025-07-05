@@ -30,7 +30,9 @@ walks:
   baseball:
     category: normalish
   basketball-dunk:
-    category: normalish
+    category: actions
+  bee:
+    category: animals
   bike:
     category: normalish
   bird:
@@ -42,19 +44,23 @@ walks:
   burp:
     category: normalish
   carry-heavy:
-    category: normalish
+    category: actions
+  canoe:
+    category: actionsplus
   cartwheel:
     category: normalish
   cat:
-    category: animal
-  chestbump:
-    category: normalish
+    category: animals
+  chest-bump:
+    category: actions
   click-heels:
     category: normalish
   conga:
     category: normalish
   converse:
-    category: normalish
+    category: actions
+  cover-your-ears:
+    category: actions
   cow:
     category: animal
   cowboy:
@@ -62,7 +68,9 @@ walks:
   crab:
     category: animal
   crawl:
-    category: normalish
+    category: actions
+  cross-arms:
+    category: actions
   cry:
     category: normalish
   dance-hokey-pokey:
@@ -78,9 +86,13 @@ walks:
   dog:
     category: animal
   duck:
-    category: animal
+    category: animals
+  eat-ice-cream:
+    category: actions
   fall:
-    category: normalish
+    category: silly
+  finger-wiggle:
+    category: actions
   fishing-big:
     category: normalish
   fishing-none:
@@ -88,21 +100,33 @@ walks:
   fishing-small:
     category: normalish
   flying:
-    category: normalish
+    category: silly
+  football:
+    category: actions
+  frankensteins-monster-walk:
+    category: silly
   ghost:
-    category: normalish
+    category: silly
+  goose:
+    category: animals
   golf:
     category: normalish
   growl:
-    category: normalish
+    category: animals
+  hammer:
+    category: actionsplus
   hammer-time:
     category: normalish
   handshake:
     category: normalish
   handstand:
-    category: normalish
+    category: silly
+  head-pat-belly-rub:
+    category: actionsplus
   highfive:
-    category: normalish
+    category: actionsplus
+  hold-hands:
+    category: actions
   home:
     category: normalish
   hop:
@@ -110,7 +134,9 @@ walks:
   hopscotch:
     category: normalish
   horseback-riding:
-    category: normalish
+    category: actionsplus
+  hula-hoop:
+    category: actions
   hug-3-people:
     category: normalish
   hug-4-people:
@@ -120,11 +146,17 @@ walks:
   hurdle:
     category: normalish
   hydrate:
-    category: normalish
+    category: actionsplus
+  inflate-balloon:
+    category: actionsplus
   invisible-car:
     category: normalish
   jumping-jacks:
-    category: normalish
+    category: actions
+  jello:
+    category: silly
+  juggle:
+    category: actionsplus
   jumprope:
     category: normalish
   kangaroo:
@@ -156,7 +188,9 @@ walks:
   mime:
     category: normalish
   monkey:
-    category: animal
+    category: animals
+  moonwalk:
+    category: silly
   mystery-box-bees:
     category: normalish
   mystery-box-cake:
@@ -200,15 +234,23 @@ walks:
   point-at-yellow:
     category: normalish
   propose:
-    category: normalish
+    category: actions
+  puff-cheeks:
+    category: silly
   pushup:
     category: normalish
   race:
-    category: normalish
+    category: game
+  raise-eyebrow:
+    category: actions
   raptor:
     category: animal
   rowboat:
-    category: normalish
+    category: actionsplus
+  sit:
+    category: actions
+  sit-up:
+    category: actions
   ski:
     category: normalish
   sleep:
@@ -248,13 +290,19 @@ walks:
   teleport-a:
     category: normalish
   teleport-b:
-    category: normalish
+    category: silly
+  tell-a-joke:
+    category: silly
   tennis:
     category: normalish
   thank-rangers:
     category: normalish
   tightrope:
-    category: normalish
+    category: actionsplus
+  tip-toe:
+    category: actions
+  tree:
+    category: silly
   turtle:
     category: animal
   unicycle:
@@ -286,7 +334,9 @@ walks:
   wheelbarrow:
     category: normalish
   whistle:
-    category: normalish
+    category: actions
+  windy-walk:
+    category: actionsplus
   witch:
     category: normalish
   wizard:
@@ -294,7 +344,9 @@ walks:
   wok:
     category: normalish
   worm:
-    category: animal
+    category: animals
+  yawn:
+    category: actions
   zombie:
     category: normalish
 
@@ -302,11 +354,254 @@ walks:
 weights:
   default:
     _: 1
-  language_test:
-    language: 1
-    animal: 1
+  demo:
+    actions: 18
+    actionsplus: 20
+    airguitar: 2
+    animals: 11
+    animalsplus: 8
+    dance: 5
+    fin: 0
+    game: 1
+    karaoke: 5
+    language: 2
+    normal: 7
+    normalish: 7
+    silly: 11
+    sleep: 0
+  seacompression2019day:
+    actions: 19
+    actionscharade: 7
+    actionsplus: 20
+    ad: 0
+    airguitar: 24
+    animals: 11
+    animalsplus: 8
+    dance: 10
+    fin: 0
+    game: 0
+    karaoke: 13
+    language: 10
+    normal: 10
+    normalish: 7
+    rare: 5
+    rps: 2
+    silly: 10
+    sleep: 0
+    social: 10
+    trip: 0
+  seacompression2019night:
+    actions: 15
+    actionscharade: 7
+    actionsplus: 15
+    ad: 0
+    airguitar: 10
+    animals: 11
+    animalsplus: 8
+    dance: 10
+    fin: 0
+    game: 0
+    karaoke: 13
+    language: 7
+    normal: 3
+    normalish: 7
+    rare: 5
+    rps: 2
+    silly: 10
+    sleep: 1
+    social: 10
+    trip: 15
   sunday:
-    normalish: 1
+    actions: 0
+    actionsplus: 0
+    airguitar: 0
+    animals: 0
+    animalsplus: 0
+    dance: 0
+    fin: 0
+    game: 0
+    karaoke: 0
+    language: 25
+    normal: 75
+    normalish: 0
+    silly: 0
+    sleep: 0
+  monday:
+    actions: 0
+    actionsplus: 0
+    airguitar: 0
+    animals: 0
+    animalsplus: 0
+    dance: 0
+    fin: 0
+    game: 0
+    karaoke: 0
+    language: 25
+    normal: 75
+    normalish: 0
+    silly: 0
+    sleep: 0
+  tuesday:
+    actions: 5
+    actionsplus: 0
+    airguitar: 0
+    animals: 25
+    animalsplus: 0
+    dance: 0
+    fin: 0
+    game: 0
+    karaoke: 0
+    language: 25
+    normal: 25
+    normalish: 20
+    silly: 0
+    sleep: 0
+  wednesday_day:
+    actions: 15
+    actionsplus: 0
+    airguitar: 5
+    animals: 20
+    animalsplus: 0
+    dance: 5
+    fin: 0
+    game: 0
+    karaoke: 0
+    language: 25
+    normal: 20
+    normalish: 10
+    silly: 0
+    sleep: 0
+  wednesday_night:
+    actions: 15
+    actionsplus: 0
+    airguitar: 5
+    animals: 20
+    animalsplus: 0
+    dance: 5
+    fin: 0
+    game: 0
+    karaoke: 5
+    language: 20
+    normal: 25
+    normalish: 10
+    silly: 0
+    sleep: 5
+  thursday:
+    actions: 15
+    actionsplus: 10
+    airguitar: 5
+    animals: 10
+    animalsplus: 5
+    dance: 5
+    fin: 0
+    game: 5
+    karaoke: 0
+    language: 15
+    normal: 20
+    normalish: 5
+    silly: 5
+    sleep: 0
+  thursday_night:
+    actions: 15
+    actionsplus: 5
+    airguitar: 5
+    animals: 20
+    animalsplus: 5
+    dance: 5
+    fin: 0
+    game: 0
+    karaoke: 10
+    language: 5
+    normal: 15
+    normalish: 10
+    silly: 5
+    sleep: 5
+  friday:
+    actions: 15
+    actionsplus: 10
+    airguitar: 5
+    animals: 10
+    animalsplus: 5
+    dance: 5
+    fin: 0
+    game: 5
+    karaoke: 0
+    language: 15
+    normal: 20
+    normalish: 5
+    silly: 5
+    sleep: 0
+  friday_night:
+    actions: 15
+    actionsplus: 5
+    airguitar: 5
+    animals: 20
+    animalsplus: 5
+    dance: 5
+    fin: 0
+    game: 0
+    karaoke: 10
+    language: 5
+    normal: 15
+    normalish: 10
+    silly: 5
+    sleep: 5
+  saturday:
+    actions: 15
+    actionsplus: 10
+    airguitar: 5
+    animals: 10
+    animalsplus: 5
+    dance: 5
+    fin: 0
+    game: 5
+    karaoke: 0
+    language: 15
+    normal: 20
+    normalish: 5
+    silly: 5
+    sleep: 0
+  saturday_night:
+    actions: 15
+    actionsplus: 5
+    airguitar: 5
+    animals: 20
+    animalsplus: 5
+    dance: 5
+    fin: 0
+    game: 0
+    karaoke: 10
+    language: 5
+    normal: 15
+    normalish: 10
+    silly: 5
+    sleep: 5
+  quiet_hours:
+    sleep: 1
+  go_home:
+    fin: 1
+  luminata2024:
+    actions: 19
+    actionscharade: 7
+    actionsplus: 20
+    ad: 0
+    airguitar: 24
+    animals: 11
+    animalsplus: 8
+    dance: 10
+    fin: 0
+    game: 0
+    karaoke: 13
+    language: 10
+    normal: 10
+    normalish: 7
+    rare: 5
+    rps: 2
+    silly: 10
+    sleep: 0
+    social: 10
+    trip: 0
+
 
 menu:
   - start: '2025-06-05T01:45:00'
