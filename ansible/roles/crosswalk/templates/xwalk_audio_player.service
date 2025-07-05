@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/uv run --frozen --no-dev python -m xwalk2.audio_player /opt/crosswalk/test/data
+ExecStart=/usr/local/bin/uv run --frozen --no-dev python -m xwalk2.audio_player /opt/crosswalk/static/data
 WorkingDirectory=/opt/crosswalk
 Restart=on-failure
 User=crosswalk
