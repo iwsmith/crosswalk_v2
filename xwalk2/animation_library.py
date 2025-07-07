@@ -1,13 +1,13 @@
 import logging
+import random
 import wave
+from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-import random
 import mutagen
 import numpy as np
 import yaml
-from datetime import datetime
 
 from xwalk2.models import Animations, WeightSchedule
 
@@ -37,7 +37,7 @@ class AnimationLibrary:
                 return Animations(**yaml.safe_load(f))
         except Exception as e:
             raise RuntimeError(f"Failed to load config from {self.config_path}: {e}")
-    
+
     def get_current_weights(self) -> WeightSchedule:
         """Determine which weight set to use based on the current time and schedule."""
         now = datetime.now()
@@ -51,9 +51,9 @@ class AnimationLibrary:
                 if latest_start_time is None or schedule.start > latest_start_time:
                     latest_start_time = schedule.start
                     active_schedule = schedule
-        
-        weights = self.config.weights['default']
-        
+
+        weights = self.config.weights["default"]
+
         if active_schedule:
             logger.info(f"Active schedule: {active_schedule}")
             weights_name = active_schedule.weights
@@ -61,11 +61,11 @@ class AnimationLibrary:
 
         # No active schedule; fallback to demo or default.
         return weights
-    
+
     def select_intro(self, walk: Optional[str] = None) -> str:
         """
         Select a random* intro animation with even distribution
-        
+
         * Not random, if we are selecting the intro based on a given walk.
         """
         # If the walk starts with "walk-" then we need to select an intro that
@@ -75,7 +75,7 @@ class AnimationLibrary:
             # Matching intros should have the same name as the walk except
             # instead of "walk" it says "wait" e.g. "walk-danish" -> "wait-danish"
             return walk.replace("walk-", "wait-")
-        else: 
+        else:
             # Random selection with even distribution
             return np.random.choice(self.config.intros)
 
@@ -88,8 +88,14 @@ class AnimationLibrary:
         cat_weights /= cat_weights.sum()  # Normalize weights
         category = np.random.choice(categories, p=cat_weights)
 
-        walk_names = [name for name, info in self.config.walks.items() if info.category == category]
-        logger.info(f"Selected walk category: {category}, found {len(walk_names)} walks")
+        walk_names = [
+            name
+            for name, info in self.config.walks.items()
+            if info.category == category
+        ]
+        logger.info(
+            f"Selected walk category: {category}, found {len(walk_names)} walks"
+        )
 
         if not walk_names:
             raise RuntimeError("No walk animations available")
@@ -157,13 +163,17 @@ class AnimationLibrary:
         )
         return intro_duration + walk_duration + outro_duration
 
-    def select_animation_sequence(self) -> Tuple[str, str, str]:
+    def select_animation_sequence(
+        self, walk: Optional[str] = None
+    ) -> Tuple[str, str, str]:
         """
         Select a complete animation sequence: intro, walk, outro
 
         Walk needs to come first so we can handle language-specific walks
         which have specific intros.
         """
+        if not walk:
+            walk = self.select_walk()
         walk = self.select_walk()
         intro = self.select_intro(walk)
         outro = self.select_outro()

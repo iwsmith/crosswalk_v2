@@ -1,0 +1,64 @@
+<h3>System Status</h3>
+
+{{ status.message or "" }}
+
+<p><strong>Playing:</strong> {{ "🟢 Yes" if status.playing else "🔴 No" }}</p>
+
+<p><strong>Controller time:</strong> 
+    {{ status.timestamp.strftime("%d/%m/%Y %H:%M:%S") }} (as of last status request)
+</p>
+
+<p><strong>Walk queue:</strong> {{ status.walk_queue }}</p>
+
+<p><strong>Components:</strong></p>
+<ul>
+  {% for name, timestamp in status.components.items() %}
+    <li>
+      <strong>{{ name }}</strong>:
+      Last seen {{ (now - timestamp).total_seconds() | round }}s ago
+    </li>
+  {% endfor %}
+</ul>
+
+<p><strong>Animations:</strong></p>
+
+{% if status.animations %}
+  <div>
+    <strong>Intros</strong>
+    <ul>
+      {% for walk in status.animations.intros %}
+        <li>{{ walk }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div>
+    <strong>Walks</strong>
+    <ul>
+      {% for walk, info in status.animations.walks.items() %}
+        <li>
+          {{ walk }} - {{ info.category }}
+          <button 
+            hx-post="/queue/{{ walk }}" 
+            style="font-size:1em;padding:0 0.5em;height:1.5em;vertical-align:middle;line-height:1.2;" 
+            hx-target="#status" 
+            hx-swap="innerHTML"
+          >
+            +
+          </button>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div>
+    <strong>Outros</strong>
+    <ul>
+      {% for walk in status.animations.outros %}
+        <li>{{ walk }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% else %}
+  <em>No animations</em>
+{% endif %}

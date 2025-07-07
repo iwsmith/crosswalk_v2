@@ -28,7 +28,8 @@ class Controller:
 
     def on_enter_walk(self):
         # We would choose a walk here
-        intro, walk, outro = self.animations.select_animation_sequence()
+        queued_walk = self.walk_queue.pop(0) if self.walk_queue else None
+        intro, walk, outro = self.animations.select_animation_sequence(walk=queued_walk)
 
         # Get durations for timing
         intro_duration, walk_duration, outro_duration = (
