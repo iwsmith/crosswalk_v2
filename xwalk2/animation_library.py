@@ -133,10 +133,11 @@ class AnimationLibrary:
         )
         return intro_duration + walk_duration + outro_duration
 
-    def select_animation_sequence(self) -> Tuple[str, str, str]:
+    def select_animation_sequence(self, walk:Optional[str] = None) -> Tuple[str, str, str]:
         """Select a complete animation sequence: intro, walk, outro"""
         intro = self.select_intro()
-        walk = self.select_walk()
+        if not walk:
+            walk = self.select_walk()
         outro = self.select_outro()
 
         # Get durations for logging
