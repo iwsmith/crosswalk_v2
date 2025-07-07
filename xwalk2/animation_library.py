@@ -17,15 +17,15 @@ logger = logging.getLogger(__name__)
 class AnimationLibrary:
     """Manages animation selection based on weighted schedules from config.yaml"""
 
-    def __init__(self, config_path: str = "test/data/config.yaml"):
+    def __init__(self, config_path: str = "static/data/config.yaml"):
         """Initialize library by loading config file"""
         self.config_path = Path(config_path)
         self.config = self._load_config()
         logger.info(
             f"Loaded {len(self.config.intros)} intros, {len(self.config.walks)} walks, {len(self.config.outros)} outros from {self.config_path}"
         )
-        self.img_base_path = Path("test/data/img")
-        self.snd_base_path = Path("test/data/snd")
+        self.img_base_path = Path("static/data/img")
+        self.snd_base_path = Path("static/data/snd")
 
         # Cache for audio durations
         self._duration_cache: Dict[str, float] = {}

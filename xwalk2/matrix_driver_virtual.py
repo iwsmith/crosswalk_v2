@@ -19,7 +19,7 @@ from xwalk2.models import CurrentState, EndScene, PlayScene, ResetCommand, parse
 # Constants
 MATRIX_SIZE = 64
 GUI_SIZE = 512  # 8x scaling for visibility
-IMG_BASE_PATH = Path("test/data/img")
+IMG_BASE_PATH = Path("static/data/img")
 IMG_SUBDIRS = ["intros", "walks", "outros"]
 
 
@@ -422,7 +422,7 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     add_default_args(parser)
-    parser.add_argument("--image-root", type=str, default="test/data/img")
+    parser.add_argument("--image-root", type=str, default="static/data/img")
     args = parser.parse_args()
 
     logging.basicConfig(
