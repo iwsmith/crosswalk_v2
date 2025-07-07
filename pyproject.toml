@@ -1,3 +1,7 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "crosswalk-v2"
 version = "0.1.0"
@@ -19,6 +23,8 @@ dependencies = [
     "jinja2>=3.1.6",
 ]
 
+[tool.setuptools]
+packages = ["xwalk2"]
 
 [dependency-groups]
 dev = [

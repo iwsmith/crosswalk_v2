@@ -9,15 +9,17 @@ from typing import Optional, List, Tuple
 from PIL import Image, ImageTk
 import tkinter as tk
 from tkinter import Canvas
+import argparse
+import logging
 
-from xwalk2.util import Heartbeat
-from xwalk2.models import EndScene, PlayScene, ResetCommand, parse_message
+from xwalk2.util import Heartbeat, add_default_args
+from xwalk2.models import CurrentState, EndScene, PlayScene, ResetCommand, parse_message
 
 
 # Constants
 MATRIX_SIZE = 64
 GUI_SIZE = 512  # 8x scaling for visibility
-IMG_BASE_PATH = Path("test/data/img")
+IMG_BASE_PATH = Path("static/data/img")
 IMG_SUBDIRS = ["intros", "walks", "outros"]
 
 
@@ -38,10 +40,10 @@ class GIFPlayer:
             try:
                 result = self._extract_frames(gif_path)
                 self._cache[filename] = result
-                print(f"📁 Loaded {gif_path.name}: {len(result[0])} frames")
+                logging.info(f"📁 Loaded {gif_path.name}: {len(result[0])} frames")
                 return result
             except Exception as e:
-                print(f"Error loading GIF {gif_path}: {e}")
+                logging.error(f"Error loading GIF {gif_path}: {e}")
         
         # Return default black frame
         return self._default_frame(filename)
@@ -80,7 +82,7 @@ class GIFPlayer:
         default_frame = Image.new('RGB', (MATRIX_SIZE, MATRIX_SIZE), color='black')
         result = ([default_frame], [0.1])
         self._cache[filename] = result
-        print(f"GIF not found for {filename}, using black frame")
+        logging.info(f"GIF not found for {filename}, using black frame")
         return result
 
 
@@ -134,14 +136,14 @@ class MatrixDisplay:
     
     def show_idle(self):
         """Show idle/wait state"""
-        print("🚏 WAIT")
+        logging.info("🚏 WAIT")
         if self.console_mode and self.status_label:
             self.status_label.config(text="WAIT", fg='white')
-        self.display_static("stop")
+        self.display_gif("stop")
     
     def show_walk(self):
         """Show walk state"""
-        print("🚶 WALK SIGN IS ON")
+        logging.info("🚶 WALK SIGN IS ON")
         if self.console_mode and self.status_label:
             self.status_label.config(text="WALK SIGN IS ON", fg='green')
     
@@ -181,7 +183,7 @@ class MatrixDisplay:
     
     def play_scene_sequence(self, intro: str, walk: str, outro: str):
         """Play a complete animation sequence"""
-        print(f"🎬 Playing sequence: {intro} -> {walk} -> {outro}")
+        logging.info(f"🎬 Playing sequence: {intro} -> {walk} -> {outro}")
         
         if self.animation_thread and self.animation_thread.is_alive():
             self.stop_event.set()
@@ -312,28 +314,31 @@ class MatrixDisplay:
             self.root.quit()
 
 
-def main():
-    """Matrix driver main function with command parsing"""
-    print("Starting Matrix Driver...")
-    
+def main(args):
+    """Matrix driver main function."""
+    logging.info("Starting Matrix Driver...")
+
     # Initialize display (use console mode for testing)
     display = MatrixDisplay(console_mode=True)
-    
+    display.gif_player.img_base_path = Path(args.image_root)
+
     # Socket to receive commands
     context = zmq.Context()
     socket = context.socket(zmq.SUB)
-    socket.connect("tcp://127.0.0.1:5557")
+    socket.connect(args.controller)
     socket.setsockopt_string(zmq.SUBSCRIBE, "")  # Subscribe to all messages
-    
-    heartbeat_thread = Heartbeat("matrix_display_virtual", "crosswalk-a")
+
+    heartbeat_thread = Heartbeat(
+        "matrix_display_virtual", args.hostname, args.heartbeat
+    )
     heartbeat_thread.start()
-    
-    print("Matrix driver ready. Listening for commands...")
-    
+
+    logging.info("Matrix driver ready. Listening for commands...")
+
     # Setup GUI close handler
     if display.root:
         def on_closing():
-            print("🔒 GUI closing...")
+            logging.info("🔒 GUI closing...")
             display.close()
             try:
                 heartbeat_thread.stop()
@@ -351,38 +356,43 @@ def main():
             while True:
                 try:
                     command = socket.recv_string(zmq.NOBLOCK)
-                    print(f"📨 Received: {command}")
+                    logging.info(f"📨 Received: {command}")
                     
                     try:
                         command_obj = parse_message(command)
                         
                         if isinstance(command_obj, PlayScene):
-                            print(f"🎬 Play scene command: {command_obj.intro} -> {command_obj.walk} -> {command_obj.outro}")
+                            logging.info(f"🎬 Play scene command: {command_obj.intro} -> {command_obj.walk} -> {command_obj.outro}")
                             display.show_walk()
                             display.play_scene_sequence(command_obj.intro, command_obj.walk, command_obj.outro)
                         
+                        elif isinstance(command_obj, CurrentState):
+                            logging.info(f"Got CurrentState: {command_obj.state}")
+                            if command_obj.state == "ready" and display.current_sequence != ["stop"]:
+                                display.show_idle()
+
                         elif isinstance(command_obj, ResetCommand):
-                            print("🔄 Reset command")
+                            logging.info("🔄 Reset command")
                             display.show_idle()
 
                         elif isinstance(command_obj, EndScene):
-                            print("🔚 EndScene command")
+                            logging.info("🔚 EndScene command")
                             display.show_idle()
 
                         else:
-                            print(f"📋 Other command: {type(command_obj).__name__}")
+                            logging.info(f"📋 Other command: {type(command_obj).__name__}")
                             
                     except (json.JSONDecodeError, ValueError) as e:
-                        print(f"❓ Invalid command format: {command} (Error: {e})")
+                        logging.warning(f"❓ Invalid command format: {command} (Error: {e})")
                         
                 except zmq.Again:
                     time.sleep(0.1)  # No message available
                 except zmq.ZMQError as e:
-                    print(f"ZMQ error: {e}")
+                    logging.error(f"ZMQ error: {e}")
                     break
                     
         except Exception as e:
-            print(f"Command worker error: {e}")
+            logging.error(f"Command worker error: {e}")
     
     # Start command processing thread
     command_thread = threading.Thread(target=command_worker, daemon=True)
@@ -397,7 +407,7 @@ def main():
             while True:
                 time.sleep(1)
     except KeyboardInterrupt:
-        print("\nShutting down matrix driver...")
+        logging.info("\nShutting down matrix driver...")
     finally:
         display.close()
         try:
@@ -406,8 +416,17 @@ def main():
             context.term()
         except:
             pass
-        print("✅ Matrix driver shutdown complete")
+        logging.info("✅ Matrix driver shutdown complete")
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    add_default_args(parser)
+    parser.add_argument("--image-root", type=str, default="static/data/img")
+    args = parser.parse_args()
+
+    logging.basicConfig(
+        level=getattr(logging, args.log_level),
+        format="%(asctime)s - %(levelname)s - %(message)s",
+    )
+    main(args)

@@ -7,18 +7,26 @@ from pydantic import BaseModel, Field
 # Models represent things we send over the wire for easy
 # jsonification with pydantic.
 
-WalkCategory = Literal["normalish"]
+WalkCategory = Literal["actions", "actionsplus", "airguitar", "animals", "animalsplus", "dance", "fin", "game", "karaoke", "language", "normal", "normalish", "silly", "sleep"]
 
 WeightSchedule = Dict[WalkCategory | Literal["_"], int]
 
 class WalkInfo(BaseModel):
     category: WalkCategory 
 
+class MenuItem(BaseModel):
+    start: datetime  # ISO format datetime string
+    weights: str
+
 class Animations(BaseModel):
     intros: List[str]
     outros: List[str]
     walks: Dict[str, WalkInfo]
     weights: Dict[str, WeightSchedule]
+    menu: List[MenuItem] = Field(
+        default_factory=list,
+        description="List of menu items with start times and weight schedules"
+    )
 
 
 class Heatbeat(BaseModel):
