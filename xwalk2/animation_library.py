@@ -181,7 +181,6 @@ class AnimationLibrary:
         """
         if not walk:
             walk = self.select_walk()
-        walk = self.select_walk()
         intro = self.select_intro(walk)
         outro = self.select_outro()
 

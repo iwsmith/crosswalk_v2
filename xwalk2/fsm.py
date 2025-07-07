@@ -1,8 +1,9 @@
 import logging
-from typing import Callable, List
+from typing import Callable, List, Tuple
 
 from pydantic import BaseModel
 from transitions import Machine
+from datetime import datetime
 
 from xwalk2.animation_library import AnimationLibrary
 from xwalk2.models import EndScene, PlayScene
@@ -25,6 +26,7 @@ class Controller:
         self.animations = AnimationLibrary()
         self.send_message = send_message_fn
         self.walk_queue: List[str] = []
+        self.walk_history: List[Tuple[datetime, str]] = []
 
     def on_enter_walk(self):
         # We would choose a walk here
@@ -48,6 +50,7 @@ class Controller:
             total_duration=total_duration,
         )
         self.send_message(play_command)
+        self.walk_history.append((datetime.now(), walk))
 
     def on_enter_ready(self):
         self.send_message(EndScene())

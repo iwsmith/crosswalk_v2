@@ -77,7 +77,8 @@ def main():
             timestamp=datetime.now(),
             state=state.state,
             animations=state.animations.config,
-            walk_queue=state.walk_queue
+            walk_queue=state.walk_queue,
+            walk_history=state.walk_history,
         )
 
     def handle_api_request(request: BaseModel) -> APIResponse:

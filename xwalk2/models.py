@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import Dict, Literal, Optional, List, Union
+from typing import Dict, Literal, Optional, List, Union, Tuple
 
 from pydantic import BaseModel, Field
 
@@ -78,6 +78,10 @@ class APIResponse(BaseModel):
     state: str
     animations: Animations
     walk_queue: List[str] = Field(default_factory=list, description="List of queued walk animations")
+    walk_history: List[Tuple[datetime, str]] = Field(
+        default_factory=list,
+        description="History of walks with timestamps"
+    )
 
 
 class ResetCommand(BaseModel):
