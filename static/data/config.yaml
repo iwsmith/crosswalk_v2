@@ -36,7 +36,7 @@ walks:
   bike:
     category: normalish
   bird:
-    category: animal
+    category: animals
   bowl:
     category: normalish
   brush-teeth:
@@ -62,11 +62,11 @@ walks:
   cover-your-ears:
     category: actions
   cow:
-    category: animal
+    category: animals
   cowboy:
     category: normalish
   crab:
-    category: animal
+    category: animals
   crawl:
     category: actions
   cross-arms:
@@ -84,7 +84,7 @@ walks:
   dance-twist:
     category: normalish
   dog:
-    category: animal
+    category: animals
   duck:
     category: animals
   eat-ice-cream:
@@ -160,7 +160,7 @@ walks:
   jumprope:
     category: normalish
   kangaroo:
-    category: animal
+    category: animals
   karaoke-all-star:
     category: normalish
   karaoke-bad-romance:
@@ -202,11 +202,11 @@ walks:
   order-by-height:
     category: normalish
   penguin:
-    category: animal
+    category: animals
   pick-up-moop:
     category: normalish
   piggyback:
-    category: action
+    category: actions
   poetry-dreams-langston-hughes:
     category: normalish
   poetry-insomniac-maya-angelou:
@@ -244,7 +244,7 @@ walks:
   raise-eyebrow:
     category: actions
   raptor:
-    category: animal
+    category: animals
   rowboat:
     category: actionsplus
   sit:
@@ -256,11 +256,11 @@ walks:
   sleep:
     category: normalish
   sloth:
-    category: animal
+    category: animals
   smile:
     category: normalish
   snake:
-    category: animal
+    category: animals
   snap:
     category: normalish
   sneeze:
@@ -304,7 +304,7 @@ walks:
   tree:
     category: silly
   turtle:
-    category: animal
+    category: animals
   unicycle:
     category: normalish
   vacuum:
