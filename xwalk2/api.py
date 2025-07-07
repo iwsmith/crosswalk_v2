@@ -1,16 +1,24 @@
 import time
 from contextlib import asynccontextmanager
+from datetime import datetime
 from typing import Dict
 
 import zmq
-from fastapi import FastAPI, HTTPException, Request, Form
-from fastapi.templating import Jinja2Templates
+from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from datetime import datetime
 
-from xwalk2.models import APIResponse, APIStatusRequest, APITimerExpired, APIQueueWalk, Animations, APIButtonPress, APIRequests, parse_api
+from xwalk2.models import (
+    Animations,
+    APIButtonPress,
+    APIQueueWalk,
+    APIRequests,
+    APIResponse,
+    APIStatusRequest,
+    APITimerExpired,
+)
 
 
 class ActionRequest(BaseModel):
@@ -99,149 +107,56 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
 
-def render_status_html(status: APIResponse) -> str:
-    components_html = "".join(
-        f"<li><strong>{name}</strong>: Last seen { round((datetime.now() - timestamp).total_seconds())}s ago</li>"
-        for name, timestamp in status.components.items()
-    )
-
-    if status.animations:
-        animations_html = ""
-
-        items_html = ""
-        for walk in status.animations.intros:
-            items_html += f"<li>{walk}</li>\n"
-        animations_html += f"<div><strong>Intros</strong><ul>{items_html}</ul></div>"
-
-        items_html = ""
-        for walk, info in status.animations.walks.items():
-            items_html += (
-                f"<li>{walk} - {info.category} "
-                f"<button hx-post='/queue/{walk}' "
-                f"style='font-size:1em;padding:0 0.5em;height:1.5em;vertical-align:middle;line-height:1.2;' "
-                f"hx-target='#status' "
-                f"hx-swap='innerHTML' "
-                f">"
-                f"+</button></li>\n"
-            )
-        animations_html += f"<div><strong>Walks</strong><ul>{items_html}</ul></div>"
-
-        items_html = ""
-        for walk in status.animations.outros:
-            items_html += f"<li>{walk}</li>\n"
-        animations_html += f"<div><strong>Outros</strong><ul>{items_html}</ul></div>"
-    else:
-        animations_html = "<em>No animations</em>"
-
-    status_message = status.message or ""
-
-    return f"""
-        <h3>System Status</h3>
-        {status_message}
-        <p><strong>Playing:</strong> {'🟢 Yes' if status.playing else '🔴 No'}</p>
-        <p><strong>Controller time:</strong> {status.timestamp.strftime("%d/%m/%Y %H:%M:%S")} (as of last status request) </p>
-        <p><strong>Walk queue:</strong> {[w for w in status.walk_queue]} </p>
-        <p><strong>Components:</strong></p>
-        <ul>
-            {components_html}
-        </ul>
-        <p><strong>Animations:</strong></p>
-        {animations_html}
-    """
-
-
-def render_alert_html(message: str, success: bool = True) -> str:
-    color = "#d4edda" if success else "#f8d7da"
-    border = "#155724" if success else "#721c24"
-    return f"""
-        <div style="background:{color};border:1px solid {border};padding:10px;margin-bottom:10px;">
-            {message}
-        </div>
-    """
-
 
 @app.get("/", response_class=HTMLResponse)
-async def root():
+async def root(request: Request):
     status = api_controller.get_status()
-    return templates.TemplateResponse("index.html", {"request": request})
-    return f"""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Crosswalk V2 Control Panel</title>
-        <script src="/static/htmx.min.js"></script>
-
-        <style>
-            body {{ font-family: Arial, sans-serif; margin: 40px; }}
-            button {{ padding: 10px 20px; margin: 10px; font-size: 16px; }}
-            #status {{ background: #f0f0f0; padding: 20px; margin: 20px 0; }}
-            .button-group {{ margin: 20px 0; }}
-        </style>
-    </head>
-    <body>
-        <h1>🚦 Crosswalk V2 Control Panel</h1>
-        
-        <div id="alert-area"></div>
-        
-        <div class="button-group">
-            <h3>Actions</h3>
-            <button 
-                hx-post="/button" 
-                hx-target="#status" 
-                hx-swap="innerHTML"
-            >🔘 Press Button</button>
-            <button 
-                hx-post="/timer" 
-                hx-target="#status" 
-                hx-swap="innerHTML"
-            >⏰ Timer Expired</button>
-        </div>
-        
-        <div class="button-group">
-            <button type="button" 
-                hx-get="/status" 
-                hx-target="#status" 
-                hx-swap="innerHTML"
-                >📊 Refresh Status</button>
-        </div>
-        
-        <div id="status">
-            {render_status_html(status)}
-        </div>
-        
-    </body>
-    </html>
-    """
+    return templates.TemplateResponse(
+        "index.html", {"request": request, "status": status, "now": datetime.now()}
+    )
 
 
 @app.get("/status", response_class=HTMLResponse)
-async def status():
-    """Return status as HTML fragment for htmx"""
+async def status_view(request: Request):
     status = api_controller.get_status()
-    return render_status_html(status)
+    return templates.TemplateResponse(
+        "components/status.html",
+        {"request": request, "status": status, "now": datetime.now()},
+    )
 
 
 @app.post("/button", response_class=HTMLResponse)
-async def press_button():
+async def press_button(request: Request):
     """Handle button press action (htmx or API)"""
     status = api_controller.press_button()
-    return render_status_html(status)
+    return templates.TemplateResponse(
+        "components/status.html",
+        {"request": request, "status": status, "now": datetime.now()},
+    )
+
 
 @app.post("/queue/{walk}", response_class=HTMLResponse)
-async def queue(walk: str):
+async def queue(walk: str, request: Request):
     """Handle button press action (htmx or API)"""
-    result = api_controller.queue_walk(walk)
-    return render_status_html(result)
+    status = api_controller.queue_walk(walk)
+    return templates.TemplateResponse(
+        "components/status.html",
+        {"request": request, "status": status, "now": datetime.now()},
+    )
+
 
 @app.post("/timer", response_class=HTMLResponse)
-async def fire_timer():
+async def fire_timer(request: Request):
     """Handle timer expired action (htmx or API)"""
-    result = api_controller.timer_expired()
-    return render_status_html(result)
-
+    status = api_controller.timer_expired()
+    return templates.TemplateResponse(
+        "components/status.html",
+        {"request": request, "status": status, "now": datetime.now()},
+    )
 
 
 if __name__ == "__main__":
     import uvicorn
+
     print("🚀 Starting Crosswalk V2 API server...")
     uvicorn.run(app, host="0.0.0.0", port=8000)

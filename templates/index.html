@@ -3,21 +3,33 @@
 {% block title %}Home{% endblock %}
 
 {% block content %}
-<h1>HTMX + FastAPI</h1>
-
-<!-- Status block -->
-<div 
-    id="status" 
-    hx-get="/status" 
-    hx-trigger="refresh from:body" 
-    hx-swap="outerHTML">
-    Loading status...
-</div>
-
-<!-- Refresh button -->
-<button 
-    type="button" 
-    hx-on="click: document.body.dispatchEvent(new Event('refresh'))">
-    🔄 Refresh Status
-</button>
+    <h1>🚦 Crosswalk V2 Control Panel</h1>
+    
+    <div id="alert-area"></div>
+    
+    <div class="button-group">
+        <h3>Actions</h3>
+        <button 
+            hx-post="/button" 
+            hx-target="#status" 
+            hx-swap="innerHTML"
+        >🔘 Press Button</button>
+        <button 
+            hx-post="/timer" 
+            hx-target="#status" 
+            hx-swap="innerHTML"
+        >⏰ Timer Expired</button>
+    </div>
+    
+    <div class="button-group">
+        <button type="button" 
+            hx-get="/status" 
+            hx-target="#status" 
+            hx-swap="innerHTML"
+            >📊 Refresh Status</button>
+    </div>
+    
+    <div id="status">
+    {% include "components/status.html" %}
+    </div>
 {% endblock %}
