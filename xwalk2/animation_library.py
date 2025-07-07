@@ -84,15 +84,22 @@ class AnimationLibrary:
         # Extract walk names and their weights based on categories
         weights = self.get_current_weights()
         categories = list(weights.keys())
-        cat_weights = np.array(list(weights.values()), dtype=np.float32)
-        cat_weights /= cat_weights.sum()  # Normalize weights
-        category = np.random.choice(categories, p=cat_weights)
+        if len(categories) == 1:
+            walk_names = [
+                name
+                for name, info in self.config.walks.items()
+            ]
+            category = "all (_)"
+        else:
+            cat_weights = np.array(list(weights.values()), dtype=np.float32)
+            cat_weights /= cat_weights.sum()  # Normalize weights
+            category = np.random.choice(categories, p=cat_weights)
 
-        walk_names = [
-            name
-            for name, info in self.config.walks.items()
-            if info.category == category
-        ]
+            walk_names = [
+                name
+                for name, info in self.config.walks.items()
+                if info.category == category
+            ]
         logger.info(
             f"Selected walk category: {category}, found {len(walk_names)} walks"
         )

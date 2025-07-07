@@ -18,6 +18,12 @@ class MenuItem(BaseModel):
     start: datetime  # ISO format datetime string
     weights: str
 
+    def __str__(self) -> str:
+        return f"{self.start.strftime("%d/%m/%Y %H:%M:%s")} - {self.weights}"
+
+    def __repr__(self) -> str:
+        return f"MenuItem(start={self.start.isoformat()}, weights={self.weights})"
+
 class Animations(BaseModel):
     intros: List[str]
     outros: List[str]
