@@ -304,7 +304,7 @@ weights:
     _: 1
   language_test:
     language: 1
-    animal: 1
+    animals: 1
   demo:
     actions: 18
     actionsplus: 20
@@ -320,48 +320,6 @@ weights:
     normalish: 7
     silly: 11
     sleep: 0
-  seacompression2019day:
-    actions: 19
-    actionscharade: 7
-    actionsplus: 20
-    ad: 0
-    airguitar: 24
-    animals: 11
-    animalsplus: 8
-    dance: 10
-    fin: 0
-    game: 0
-    karaoke: 13
-    language: 10
-    normal: 10
-    normalish: 7
-    rare: 5
-    rps: 2
-    silly: 10
-    sleep: 0
-    social: 10
-    trip: 0
-  seacompression2019night:
-    actions: 15
-    actionscharade: 7
-    actionsplus: 15
-    ad: 0
-    airguitar: 10
-    animals: 11
-    animalsplus: 8
-    dance: 10
-    fin: 0
-    game: 0
-    karaoke: 13
-    language: 7
-    normal: 3
-    normalish: 7
-    rare: 5
-    rps: 2
-    silly: 10
-    sleep: 1
-    social: 10
-    trip: 15
   sunday:
     actions: 0
     actionsplus: 0
@@ -531,27 +489,6 @@ weights:
     sleep: 1
   go_home:
     fin: 1
-  luminata2024:
-    actions: 19
-    actionscharade: 7
-    actionsplus: 20
-    ad: 0
-    airguitar: 24
-    animals: 11
-    animalsplus: 8
-    dance: 10
-    fin: 0
-    game: 0
-    karaoke: 13
-    language: 10
-    normal: 10
-    normalish: 7
-    rare: 5
-    rps: 2
-    silly: 10
-    sleep: 0
-    social: 10
-    trip: 0
 
 menu:
   - start: '2025-06-05T01:45:00'

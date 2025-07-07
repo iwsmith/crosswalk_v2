@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 # Models represent things we send over the wire for easy
 # jsonification with pydantic.
 
-WalkCategory = Literal["normalish","animal","language", "action"]
+WalkCategory = Literal["actions", "actionsplus", "airguitar", "animals", "animalsplus", "dance", "fin", "game", "karaoke", "language", "normal", "normalish", "silly", "sleep"]
 
 WeightSchedule = Dict[WalkCategory | Literal["_"], int]
 
