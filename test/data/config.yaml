@@ -300,12 +300,11 @@ walks:
 
 
 weights:
-  all:
+  default:
     _: 1
-<<<<<<< Updated upstream
-  sunday:
-    normalish: 1
-=======
+  language_test:
+    language: 1
+    animal: 1
   demo:
     actions: 18
     actionsplus: 20
@@ -553,8 +552,6 @@ weights:
     sleep: 0
     social: 10
     trip: 0
->>>>>>> Stashed changes
-
 
 menu:
   - start: '2025-06-05T01:45:00'
@@ -571,7 +568,7 @@ menu:
     weights: quiet_hours
   - start: '2025-07-16T08:00:00'
     weights: wednesday_day
-   - start: '2025-07-16T21:00:00'
+  - start: '2025-07-16T21:00:00'
     weights: wednesday_night
   - start: '2025-07-16T01:01:00'
     weights: quiet_hours
