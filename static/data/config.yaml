@@ -162,23 +162,23 @@ walks:
   kangaroo:
     category: animals
   karaoke-all-star:
-    category: normalish
+    category: karaoke
   karaoke-bad-romance:
-    category: normalish
+    category: karaoke
   karaoke-believe:
-    category: normalish
+    category: karaoke
   karaoke-hot-to-go:
-    category: normalish
+    category: karaoke
   karaoke-living-on-a-prayer:
-    category: normalish
+    category: karaoke
   karaoke-morning-train:
-    category: normalish
+    category: karaoke
   karaoke-rolling-in-the-deep:
-    category: normalish
+    category: karaoke
   karaoke-sandstorm:
-    category: normalish
+    category: karaoke
   karaoke-somebody-to-love:
-    category: normalish
+    category: karaoke
   laugh:
     category: normalish
   leapfrog:
@@ -354,6 +354,19 @@ walks:
 weights:
   default:
     _: 1
+  demo:
+    actions: 18
+    actionsplus: 20
+    animals: 11
+    dance: 5
+    fin: 0
+    game: 1
+    karaoke: 5
+    language: 2
+    normal: 7
+    normalish: 7
+    silly: 11
+    sleep: 0
   sunday:
     actions: 0
     actionsplus: 0
@@ -526,6 +539,8 @@ weights:
 
 
 menu:
+  - start: '2025-06-05T01:45:00'
+    weights: demo
   - start: '2025-07-13T08:00:00'
     weights: sunday
   - start: '2025-07-14T08:00:00'

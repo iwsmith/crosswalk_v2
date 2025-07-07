@@ -79,6 +79,8 @@ def main():
             animations=state.animations.config,
             walk_queue=state.walk_queue,
             walk_history=state.walk_history,
+            active_schedule=state.animations.get_active_schedule(),
+            menu=state.animations.config.menu,
         )
 
     def handle_api_request(request: BaseModel) -> APIResponse:
@@ -143,7 +145,7 @@ def main():
                     api_socket.send_string(response.model_dump_json())
 
                 except Exception as e:
-                    print(f"💥 Error handling API request: {e}")
+                    logger.error("Error handling API request", exc_info=True)
                     # Send error response
                     error_response = make_response(
                         success=False,
@@ -166,7 +168,7 @@ def main():
                         state.timer_expired()
                     
                 except Exception as e:
-                    print(f"💥 Error parsing interaction: {e}")
+                    logger.error("💥 Error handling interaction", exc_info=True)
 
     except KeyboardInterrupt:
         print("\nController interrupted")
@@ -182,7 +184,7 @@ def main():
             context.term()
             print("Controller cleanup complete")
         except Exception as e:
-            print(f"⚠️  Error during cleanup: {e}")
+            logger.error("⚠️  Error during cleanup", exc_info=True)
 
 
 if __name__ == "__main__":

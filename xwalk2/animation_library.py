@@ -9,7 +9,7 @@ import mutagen
 import numpy as np
 import yaml
 
-from xwalk2.models import Animations, WeightSchedule
+from xwalk2.models import Animations, WeightSchedule, MenuItem
 
 logger = logging.getLogger(__name__)
 
@@ -38,19 +38,24 @@ class AnimationLibrary:
         except Exception as e:
             raise RuntimeError(f"Failed to load config from {self.config_path}: {e}")
 
-    def get_current_weights(self) -> WeightSchedule:
-        """Determine which weight set to use based on the current time and schedule."""
+    def get_active_schedule(self) -> Optional[MenuItem]:
         now = datetime.now()
-        menu = self.config.menu
 
         active_schedule = None
         latest_start_time = None
 
-        for schedule in menu:
+        for schedule in self.config.menu:
             if schedule.start <= now:
                 if latest_start_time is None or schedule.start > latest_start_time:
                     latest_start_time = schedule.start
                     active_schedule = schedule
+
+        return active_schedule
+
+    def get_current_weights(self) -> WeightSchedule:
+        """Determine which weight set to use based on the current time and schedule."""
+
+        active_schedule = self.get_active_schedule()
 
         weights = self.config.weights["default"]
 

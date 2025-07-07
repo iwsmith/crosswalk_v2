@@ -10,6 +10,15 @@
 
 <p><strong>Walk queue:</strong> {{ status.walk_queue }}</p>
 
+<p><strong>Active schedule:</strong> {{ status.active_schedule }}</p>
+
+<p><strong>All schedule</strong></p>
+<ul>
+  {% for item in status.menu %}
+    <li>{{ item }}</li>
+  {% endfor %}
+</ul>
+
 <p><strong>Components:</strong></p>
 <ul>
   {% for name, timestamp in status.components.items() %}
@@ -17,6 +26,13 @@
       <strong>{{ name }}</strong>:
       Last seen {{ (now - timestamp).total_seconds() | round }}s ago
     </li>
+  {% endfor %}
+</ul>
+
+<p><strong>Walk History:</strong></p>
+<ul>
+  {% for happened_at, walk in status.walk_history %}
+    <li> {{happened_at.strftime("%d/%m/%Y %H:%M:%S")}} - <strong>{{ walk }}</strong></li>
   {% endfor %}
 </ul>
 

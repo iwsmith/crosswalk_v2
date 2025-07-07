@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import Dict, Literal, Optional, List, Union, Tuple
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 # Models represent things we send over the wire for easy
 # jsonification with pydantic.
@@ -19,7 +19,7 @@ class MenuItem(BaseModel):
     weights: str
 
     def __str__(self) -> str:
-        return f"{self.start.strftime("%d/%m/%Y %H:%M:%s")} - {self.weights}"
+        return f"{self.start.strftime("%m/%d/%Y %H:%M:%S")} - {self.weights}"
 
     def __repr__(self) -> str:
         return f"MenuItem(start={self.start.isoformat()}, weights={self.weights})"
@@ -33,6 +33,12 @@ class Animations(BaseModel):
         default_factory=list,
         description="List of menu items with start times and weight schedules"
     )
+
+    @model_validator(mode="after")
+    def validate_menu_order(self) -> "Animations":
+        """Ensure menu items are sorted by start time"""
+        self.menu.sort(key=lambda item: item.start)
+        return self
 
 
 class Heatbeat(BaseModel):
@@ -81,6 +87,11 @@ class APIResponse(BaseModel):
     walk_history: List[Tuple[datetime, str]] = Field(
         default_factory=list,
         description="History of walks with timestamps"
+    )
+    active_schedule: Optional[MenuItem] = None
+    menu: List[MenuItem] = Field(
+        default_factory=list,
+        description="List of menu items with start times and weight schedules"
     )
 
 
