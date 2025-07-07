@@ -14,77 +14,79 @@ outros:
 # (Or I will change my mind later if we want to keep gifs)
 walks:
   aircello:
-    category: normalish
+    category: airguitar
   airdrum:
-    category: normalish
+    category: airguitar
   airguitar:
-    category: normalish
+    category: airguitar
   airsax:
-    category: normalish
+    category: airguitar
   airtrombone:
-    category: normalish
+    category: airguitar
   applaud:
-    category: normalish
+    category: actions
   appreciate:
+    category: actions
+  backwards-walk:
     category: normalish
   baseball:
-    category: normalish
+    category: actions
   basketball-dunk:
     category: actions
   bee:
     category: animals
   bike:
-    category: normalish
+    category: actions
   bird:
-    category: animal
+    category: animals
   bowl:
-    category: normalish
+    category: actions
   brush-teeth:
-    category: normalish
+    category: actions
   burp:
-    category: normalish
+    category: actions
   carry-heavy:
     category: actions
   canoe:
     category: actionsplus
   cartwheel:
-    category: normalish
+    category: actions
   cat:
     category: animals
   chest-bump:
     category: actions
   click-heels:
-    category: normalish
+    category: actions
   conga:
-    category: normalish
+    category: silly
   converse:
     category: actions
   cover-your-ears:
     category: actions
   cow:
-    category: animal
+    category: animals
   cowboy:
-    category: normalish
+    category: silly
   crab:
-    category: animal
+    category: animals
   crawl:
     category: actions
   cross-arms:
     category: actions
   cry:
-    category: normalish
+    category: actions
   dance-hokey-pokey:
-    category: normalish
+    category: dance
   dance-hustle:
-    category: normalish
+    category: dance
   dance-macarena:
-    category: normalish
+    category: dance
   dance-twerk:
-    category: normalish
+    category: dance
   dance-twist:
-    category: normalish
+    category: dance
   dog:
-    category: animal
+    category: animals
   duck:
     category: animals
   eat-ice-cream:
@@ -94,11 +96,11 @@ walks:
   finger-wiggle:
     category: actions
   fishing-big:
-    category: normalish
+    category: actions
   fishing-none:
-    category: normalish
+    category: actions
   fishing-small:
-    category: normalish
+    category: actions
   flying:
     category: silly
   football:
@@ -110,7 +112,7 @@ walks:
   goose:
     category: animals
   golf:
-    category: normalish
+    category: actions
   growl:
     category: animals
   hammer:
@@ -118,7 +120,7 @@ walks:
   hammer-time:
     category: normalish
   handshake:
-    category: normalish
+    category: actions
   handstand:
     category: silly
   head-pat-belly-rub:
@@ -128,29 +130,29 @@ walks:
   hold-hands:
     category: actions
   home:
-    category: normalish
+    category: fin
   hop:
-    category: normalish
+    category: actions
   hopscotch:
-    category: normalish
+    category: actions
   horseback-riding:
     category: actionsplus
   hula-hoop:
     category: actions
   hug-3-people:
-    category: normalish
+    category: actionsplus
   hug-4-people:
-    category: normalish
+    category: actionsplus
   hug-5-people:
-    category: normalish
+    category: actionsplus
   hurdle:
-    category: normalish
+    category: actions
   hydrate:
     category: actionsplus
   inflate-balloon:
     category: actionsplus
   invisible-car:
-    category: normalish
+    category: silly
   jumping-jacks:
     category: actions
   jello:
@@ -158,93 +160,93 @@ walks:
   juggle:
     category: actionsplus
   jumprope:
-    category: normalish
+    category: actions
   kangaroo:
-    category: animal
+    category: animals
   karaoke-all-star:
-    category: normalish
+    category: karaoke
   karaoke-bad-romance:
-    category: normalish
+    category: karaoke
   karaoke-believe:
-    category: normalish
+    category: karaoke
   karaoke-hot-to-go:
-    category: normalish
+    category: karaoke
   karaoke-living-on-a-prayer:
-    category: normalish
+    category: karaoke
   karaoke-morning-train:
-    category: normalish
+    category: karaoke
   karaoke-rolling-in-the-deep:
-    category: normalish
+    category: karaoke
   karaoke-sandstorm:
-    category: normalish
+    category: karaoke
   karaoke-somebody-to-love:
-    category: normalish
+    category: karaoke
   laugh:
-    category: normalish
+    category: actions
   leapfrog:
-    category: normalish
+    category: actions
   longjump:
-    category: normalish
+    category: actions
   mime:
-    category: normalish
+    category: actions
   monkey:
     category: animals
   moonwalk:
     category: silly
   mystery-box-bees:
-    category: normalish
+    category: silly
   mystery-box-cake:
-    category: normalish
+    category: silly
   mystery-box-carrots:
-    category: normalish
+    category: silly
   mystery-box-stinky:
-    category: normalish
+    category: silly
   order-by-height:
-    category: normalish
+    category: game
   penguin:
-    category: animal
+    category: animals
   pick-up-moop:
-    category: normalish
+    category: actionsplus
   piggyback:
-    category: action
+    category: actions
   poetry-dreams-langston-hughes:
-    category: normalish
+    category: karaoke
   poetry-insomniac-maya-angelou:
-    category: normalish
+    category: karaoke
   poetry-separation-w-s-merwin:
-    category: normalish
+    category: karaoke
   poetry-thank-you-ross-gay:
-    category: normalish
+    category: karaoke
   poetry-we-never-know-emily-dickinson:
-    category: normalish
+    category: karaoke
   point-at-black:
-    category: normalish
+    category: game
   point-at-blue:
-    category: normalish
+    category: game
   point-at-green:
-    category: normalish
+    category: game
   point-at-orange:
-    category: normalish
+    category: game
   point-at-purple:
-    category: normalish
+    category: game
   point-at-red:
-    category: normalish
+    category: game
   point-at-white:
-    category: normalish
+    category: game
   point-at-yellow:
-    category: normalish
+    category: game
   propose:
     category: actions
   puff-cheeks:
     category: silly
   pushup:
-    category: normalish
+    category: actions
   race:
     category: game
   raise-eyebrow:
     category: actions
   raptor:
-    category: animal
+    category: animals
   rowboat:
     category: actionsplus
   sit:
@@ -252,51 +254,51 @@ walks:
   sit-up:
     category: actions
   ski:
-    category: normalish
+    category: actions
   sleep:
-    category: normalish
+    category: sleep
   sloth:
-    category: animal
+    category: animals
   smile:
-    category: normalish
+    category: actions
   snake:
-    category: animal
+    category: animals
   snap:
-    category: normalish
+    category: actions
   sneeze:
-    category: normalish
+    category: actions
   somersault:
-    category: normalish
+    category: actions
   spin:
-    category: normalish
+    category: actionsplus
   staring-contest:
-    category: normalish
+    category: game
   stop:
-    category: normalish
+    category: silly
   surf:
-    category: normalish
+    category: actionsplus
   swashbuckle:
-    category: normalish
+    category: actionsplus
   sweep:
-    category: normalish
+    category: actionsplus
   swim:
-    category: normalish
+    category: actions
   tag:
-    category: normalish
+    category: game
   tap-dance:
-    category: normalish
+    category: actionsplus
   team-cheer:
-    category: normalish
+    category: actionsplus
   teleport-a:
-    category: normalish
+    category: silly
   teleport-b:
     category: silly
   tell-a-joke:
     category: silly
   tennis:
-    category: normalish
+    category: actions
   thank-rangers:
-    category: normalish
+    category: actionsplus
   tightrope:
     category: actionsplus
   tip-toe:
@@ -304,15 +306,13 @@ walks:
   tree:
     category: silly
   turtle:
-    category: animal
+    category: animals
   unicycle:
-    category: normalish
+    category: actionsplus
   vacuum:
-    category: normalish
+    category: actionsplus
   walk-arabic:
     category: language
-  walk-backwards:
-    category: normalish
   walk-danish:
     category: language
   walk-german:
@@ -322,25 +322,25 @@ walks:
   walk-mandarin-taiwan:
     category: language
   walk:
-    category: normalish
+    category: normal
   walkdress:
     category: normalish
   walking-lunge:
-    category: normalish
+    category: actions
   walkpants:
     category: normalish
   werewolf:
-    category: normalish
+    category: silly
   wheelbarrow:
-    category: normalish
+    category: animalsplus
   whistle:
     category: actions
   windy-walk:
     category: actionsplus
   witch:
-    category: normalish
+    category: silly
   wizard:
-    category: normalish
+    category: silly
   wok:
     category: normalish
   worm:
@@ -348,7 +348,7 @@ walks:
   yawn:
     category: actions
   zombie:
-    category: normalish
+    category: silly
 
 
 weights:
@@ -369,48 +369,6 @@ weights:
     normalish: 7
     silly: 11
     sleep: 0
-  seacompression2019day:
-    actions: 19
-    actionscharade: 7
-    actionsplus: 20
-    ad: 0
-    airguitar: 24
-    animals: 11
-    animalsplus: 8
-    dance: 10
-    fin: 0
-    game: 0
-    karaoke: 13
-    language: 10
-    normal: 10
-    normalish: 7
-    rare: 5
-    rps: 2
-    silly: 10
-    sleep: 0
-    social: 10
-    trip: 0
-  seacompression2019night:
-    actions: 15
-    actionscharade: 7
-    actionsplus: 15
-    ad: 0
-    airguitar: 10
-    animals: 11
-    animalsplus: 8
-    dance: 10
-    fin: 0
-    game: 0
-    karaoke: 13
-    language: 7
-    normal: 3
-    normalish: 7
-    rare: 5
-    rps: 2
-    silly: 10
-    sleep: 1
-    social: 10
-    trip: 15
   sunday:
     actions: 0
     actionsplus: 0
@@ -580,34 +538,46 @@ weights:
     sleep: 1
   go_home:
     fin: 1
-  luminata2024:
-    actions: 19
-    actionscharade: 7
-    actionsplus: 20
-    ad: 0
-    airguitar: 24
-    animals: 11
-    animalsplus: 8
-    dance: 10
-    fin: 0
-    game: 0
-    karaoke: 13
-    language: 10
-    normal: 10
-    normalish: 7
-    rare: 5
-    rps: 2
-    silly: 10
-    sleep: 0
-    social: 10
-    trip: 0
-
 
 menu:
   - start: '2025-06-05T01:45:00'
-    weights: language_test
-  - start: '2025-06-03T01:45:00'
-    weights: language_test
+    weights: demo
+  - start: '2025-07-13T08:00:00'
+    weights: sunday
+  - start: '2025-07-14T08:00:00'
+    weights: monday
+  - start: '2025-07-15T12:01:00'
+    weights: quiet_hours
+  - start: '2025-07-15T08:00:00'
+    weights: tuesday
+  - start: '2025-07-15T12:01:00'
+    weights: quiet_hours
+  - start: '2025-07-16T08:00:00'
+    weights: wednesday_day
+  - start: '2025-07-16T21:00:00'
+    weights: wednesday_night
+  - start: '2025-07-16T01:01:00'
+    weights: quiet_hours
+  - start: '2025-07-17T08:00:00'
+    weights: thursday
+  - start: '2025-07-17T21:00:00'
+    weights: thursday_night
+  - start: '2025-07-17T01:01:00'
+    weights: quiet_hours
+  - start: '2025-07-18T08:00:00'
+    weights: friday
+  - start: '2025-07-18T21:00:00'
+    weights: friday_night
+  - start: '2025-07-18T01:01:00'
+    weights: quiet_hours
+  - start: '2025-07-19T08:00:00'
+    weights: saturday
+  - start: '2025-07-19T21:00:00'
+    weights: saturday_night
+  - start: '2025-07-19T01:01:00'
+    weights: quiet_hours
+  - start: '2025-07-20T08:00:00'
+    weights: go_home
 
 schedule: []
   #- time: '2019-07-06T21:00:00'
