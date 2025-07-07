@@ -33,6 +33,8 @@ walks:
     category: actions
   basketball-dunk:
     category: actions
+  bee:
+    category: animals
   bike:
     category: actions
   bird:
@@ -45,17 +47,21 @@ walks:
     category: actions
   carry-heavy:
     category: actions
+  canoe:
+    category: actionsplus
   cartwheel:
     category: actions
   cat:
     category: animals
-  chestbump:
+  chest-bump:
     category: actions
   click-heels:
     category: actions
   conga:
     category: silly
   converse:
+    category: actions
+  cover-your-ears:
     category: actions
   cow:
     category: animals
@@ -64,6 +70,8 @@ walks:
   crab:
     category: animals
   crawl:
+    category: actions
+  cross-arms:
     category: actions
   cry:
     category: actions
@@ -81,8 +89,12 @@ walks:
     category: animals
   duck:
     category: animals
+  eat-ice-cream:
+    category: actions
   fall:
     category: silly
+  finger-wiggle:
+    category: actions
   fishing-big:
     category: actions
   fishing-none:
@@ -91,20 +103,32 @@ walks:
     category: actions
   flying:
     category: silly
+  football:
+    category: actions
+  frankensteins-monster-walk:
+    category: silly
   ghost:
     category: silly
+  goose:
+    category: animals
   golf:
     category: actions
   growl:
     category: animals
+  hammer:
+    category: actionsplus
   hammer-time:
     category: normalish
   handshake:
     category: actions
   handstand:
     category: silly
+  head-pat-belly-rub:
+    category: actionsplus
   highfive:
     category: actionsplus
+  hold-hands:
+    category: actions
   home:
     category: fin
   hop:
@@ -113,6 +137,8 @@ walks:
     category: actions
   horseback-riding:
     category: actionsplus
+  hula-hoop:
+    category: actions
   hug-3-people:
     category: actionsplus
   hug-4-people:
@@ -123,10 +149,16 @@ walks:
     category: actions
   hydrate:
     category: actionsplus
+  inflate-balloon:
+    category: actionsplus
   invisible-car:
     category: silly
   jumping-jacks:
     category: actions
+  jello:
+    category: silly
+  juggle:
+    category: actionsplus
   jumprope:
     category: actions
   kangaroo:
@@ -159,6 +191,8 @@ walks:
     category: actions
   monkey:
     category: animals
+  moonwalk:
+    category: silly
   mystery-box-bees:
     category: silly
   mystery-box-cake:
@@ -203,14 +237,22 @@ walks:
     category: game
   propose:
     category: actions
+  puff-cheeks:
+    category: silly
   pushup:
     category: actions
   race:
     category: game
+  raise-eyebrow:
+    category: actions
   raptor:
     category: animals
   rowboat:
     category: actionsplus
+  sit:
+    category: actions
+  sit-up:
+    category: actions
   ski:
     category: actions
   sleep:
@@ -251,12 +293,18 @@ walks:
     category: silly
   teleport-b:
     category: silly
+  tell-a-joke:
+    category: silly
   tennis:
     category: actions
   thank-rangers:
     category: actionsplus
   tightrope:
     category: actionsplus
+  tip-toe:
+    category: actions
+  tree:
+    category: silly
   turtle:
     category: animals
   unicycle:
@@ -287,6 +335,8 @@ walks:
     category: animalsplus
   whistle:
     category: actions
+  windy-walk:
+    category: actionsplus
   witch:
     category: silly
   wizard:
@@ -295,6 +345,8 @@ walks:
     category: normalish
   worm:
     category: animals
+  yawn:
+    category: actions
   zombie:
     category: silly
 
@@ -302,9 +354,6 @@ walks:
 weights:
   default:
     _: 1
-  language_test:
-    language: 1
-    animals: 1
   demo:
     actions: 18
     actionsplus: 20
