@@ -16,7 +16,9 @@ class WalkItem(BaseModel):
 
 class WalkInfo(BaseModel):
     category: WalkCategory
+    ignore_reselection: bool = False
     audio: Optional[str] = None
+
 
 class MenuItem(BaseModel):
     start: datetime  # ISO format datetime string
@@ -28,6 +30,13 @@ class MenuItem(BaseModel):
     def __repr__(self) -> str:
         return f"MenuItem(start={self.start.isoformat()}, weights={self.weights})"
 
+
+class ReselectionConfig(BaseModel):
+    walk_cooldown: int = 10
+    category_cooldown: int = 3
+    cooldown_categories: List[str] = Field(default_factory=list)
+
+
 class Animations(BaseModel):
     intros: List[str]
     outros: List[str]
@@ -37,6 +46,23 @@ class Animations(BaseModel):
         default_factory=list,
         description="List of menu items with start times and weight schedules"
     )
+    reselection: ReselectionConfig = Field(default_factory=ReselectionConfig)
+
+    @model_validator(mode="before")
+    @classmethod
+    def restructure_walks(cls, data: any) -> any:
+        """Restructures the 'walks' field from a nested to a flat structure."""
+        if isinstance(data, dict) and "walks" in data and isinstance(data["walks"], dict):
+            restructured_walks = {}
+            for category, walks_dict in data["walks"].items():
+                if not walks_dict:
+                    continue
+                for walk_name, walk_props in walks_dict.items():
+                    props = walk_props or {}
+                    props["category"] = category
+                    restructured_walks[walk_name] = props
+            data["walks"] = restructured_walks
+        return data
 
     # This is silly. It translates the restructured config.yaml into a flat
     # dictionary of walk names to walk info which is kind of how we had the 

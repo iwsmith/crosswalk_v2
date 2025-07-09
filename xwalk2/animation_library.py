@@ -1,6 +1,7 @@
 import logging
 import random
 import wave
+from collections import deque
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -29,6 +30,10 @@ class AnimationLibrary:
 
         # Cache for audio durations
         self._duration_cache: Dict[str, float] = {}
+
+        # History for reselection cooldowns
+        self.walk_history = deque(maxlen=self.config.reselection.walk_cooldown)
+        self.category_history = deque(maxlen=self.config.reselection.category_cooldown)
 
     def _load_config(self) -> Animations:
         """Load and parse the config.yaml file"""
@@ -67,6 +72,63 @@ class AnimationLibrary:
         # No active schedule; fallback to demo or default.
         return weights
 
+    def _get_eligible_items(
+        self,
+        items: List[str],
+        history: deque,
+        is_exempt_fn: callable,
+        item_type: str,
+    ) -> List[str]:
+        """Filters items to exclude those on cooldown, unless exempt."""
+        eligible = [
+            item for item in items if is_exempt_fn(item) or item not in history
+        ]
+        if not eligible and items:
+            logger.warning(
+                f"All {item_type}s are on cooldown; ignoring cooldown for this selection."
+            )
+            return items
+        return eligible
+
+    def _get_eligible_walks(self, walks: List[str]) -> List[str]:
+        """Filter walks based on reselection cooldown."""
+        return self._get_eligible_items(
+            walks,
+            self.walk_history,
+            lambda walk: self.config.walks[walk].ignore_reselection,
+            "walk",
+        )
+
+    def _get_eligible_categories(self, categories: List[str]) -> List[str]:
+        """Filter categories based on reselection cooldown."""
+        cooldown_cats = self.config.reselection.cooldown_categories
+        return self._get_eligible_items(
+            categories,
+            self.category_history,
+            lambda cat: cat not in cooldown_cats,
+            "category",
+        )
+
+    def _select_weighted_category(
+        self, categories: List[str], weights: WeightSchedule
+    ) -> str:
+        """Selects a category based on the provided weights."""
+        eligible_weights = np.array(
+            [weights[cat] for cat in categories], dtype=np.float32
+        )
+        eligible_weights /= eligible_weights.sum()  # Normalize to sum to 1
+        return np.random.choice(categories, p=eligible_weights)
+
+    def _update_histories(self, walk: str):
+        """Update walk and category histories for cooldown tracking."""
+        self.walk_history.append(walk)
+        walk_info = self.config.walks.get(walk)
+        if (
+            walk_info
+            and walk_info.category in self.config.reselection.cooldown_categories
+        ):
+            self.category_history.append(walk_info.category)
+
     def select_intro(self, walk: Optional[str] = None) -> str:
         """
         Select a random* intro animation with even distribution
@@ -84,36 +146,80 @@ class AnimationLibrary:
             # Random selection with even distribution
             return np.random.choice(self.config.intros)
 
-    def select_walk(self) -> str:
-        """Select a random walk animation based on current weights"""
-        # Extract walk names and their weights based on categories
-        weights = self.get_current_weights()
-        categories = list(weights.keys())
-        if len(categories) == 1:
-            walk_names = [
-                name
-                for name, info in self.config.walks.items()
-            ]
-            category = "all (_)"
-        else:
-            cat_weights = np.array(list(weights.values()), dtype=np.float32)
-            cat_weights /= cat_weights.sum()  # Normalize weights
-            category = np.random.choice(categories, p=cat_weights)
+    def select_walk(self, max_retries: int = 5) -> str:
+        """
+        Select a random walk, retrying if a valid selection isn't made.
+        """
+        for attempt in range(max_retries):
+            weights = self.get_current_weights()
+            categories = list(weights.keys())
 
-            walk_names = [
-                name
-                for name, info in self.config.walks.items()
-                if info.category == category
+            # Case 1: Default weights are used ("_"), select from all walks.
+            if len(categories) == 1 and categories[0] == "_":
+                all_walks = list(self.config.walks.keys())
+                if not all_walks:
+                    raise RuntimeError("No walks are defined in config.yaml.")
+                
+                eligible_walks = self._get_eligible_walks(all_walks)
+                
+                # This state should not be reachable due to _get_eligible_walks logic
+                if not eligible_walks:
+                    raise RuntimeError("No eligible walks available even after ignoring cooldowns.")
+
+                selected_walk = random.choice(eligible_walks)
+                self._update_histories(selected_walk)
+                logger.info(f"Selected from all walks: {selected_walk}")
+                return selected_walk
+
+            # Case 2: Category-based selection.
+            # Filter for categories that are actually defined in the walks section.
+            categories_with_walks = {info.category for info in self.config.walks.values()}
+            valid_categories = [cat for cat in categories if cat in categories_with_walks]
+
+            if not valid_categories:
+                raise RuntimeError("No walks found for any categories in the current schedule.")
+
+            eligible_categories = self._get_eligible_categories(valid_categories)
+            selected_category = self._select_weighted_category(eligible_categories, weights)
+            
+            walks_in_category = [
+                name for name, info in self.config.walks.items() 
+                if info.category == selected_category
             ]
-        logger.info(
-            f"Selected walk category: {category}, found {len(walk_names)} walks"
+            
+            # This check is technically redundant now, but good for safety.
+            if not walks_in_category:
+                logger.warning(
+                    f"Attempt {attempt + 1}/{max_retries}: "
+                    f"Selected category '{selected_category}' has no walks. Retrying."
+                )
+                continue
+
+            eligible_walks = self._get_eligible_walks(walks_in_category)
+            if not eligible_walks:
+                logger.warning(
+                    f"Attempt {attempt + 1}/{max_retries}: "
+                    f"No eligible walks in '{selected_category}' due to cooldowns. Retrying."
+                )
+                continue
+
+            selected_walk = random.choice(eligible_walks)
+            self._update_histories(selected_walk)
+            logger.info(f"Selected walk '{selected_walk}' from category '{selected_category}'")
+            return selected_walk
+
+        logger.warning(
+            f"Failed to select a walk after {max_retries} attempts. "
+            "Falling back to standard walk."
         )
+        fallback_walk = "walk"
+        if fallback_walk not in self.config.walks:
+            raise RuntimeError(
+                f"Fallback walk '{fallback_walk}' not found in configuration."
+            )
 
-        if not walk_names:
-            raise RuntimeError("No walk animations available")
-
-        # Normalize weights
-        return random.choice(walk_names)
+        self._update_histories(fallback_walk)
+        return fallback_walk
 
     def select_outro(self) -> str:
         """Select a random outro animation with even distribution"""
