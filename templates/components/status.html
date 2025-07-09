@@ -50,10 +50,12 @@
 
   <div>
     <strong>Walks</strong>
-    <ul>
-      {% for walk, info in status.animations.walks.items() %}
+      {% for category, walks in status.animations.walks.items() %}
+      <h4>{{category}}</h4>
+      <ul>
+      {% for walk, info in walks.items() %}
         <li>
-          {{ walk }} - {{ info.category }}
+          {{ walk }}
           <button 
             hx-post="/queue/{{ walk }}" 
             style="font-size:1em;padding:0 0.5em;height:1.5em;vertical-align:middle;line-height:1.2;" 
@@ -65,6 +67,7 @@
         </li>
       {% endfor %}
     </ul>
+    {% endfor %}
   </div>
 
   <div>

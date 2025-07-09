@@ -89,22 +89,18 @@ class AnimationLibrary:
         # Extract walk names and their weights based on categories
         weights = self.get_current_weights()
         categories = list(weights.keys())
+        walk_names: list[str] = []
         if len(categories) == 1:
-            walk_names = [
-                name
-                for name, info in self.config.walks.items()
-            ]
+            for walks in self.config.walks.values():
+                walk_names.extend(walks.keys())
+
             category = "all (_)"
         else:
             cat_weights = np.array(list(weights.values()), dtype=np.float32)
             cat_weights /= cat_weights.sum()  # Normalize weights
             category = np.random.choice(categories, p=cat_weights)
+            walk_names = list(self.config.walks[category].keys())
 
-            walk_names = [
-                name
-                for name, info in self.config.walks.items()
-                if info.category == category
-            ]
         logger.info(
             f"Selected walk category: {category}, found {len(walk_names)} walks"
         )
@@ -131,7 +127,8 @@ class AnimationLibrary:
         Otherwise, use the animation name itself as the filename.
         """
         # Check if the animation is a walk and has a custom audio file
-        walk_info = self.config.walks.get(animation_name)
+        walk_info = self.config.get_walk(animation_name)
+
         if walk_info and walk_info.audio:
             filename = walk_info.audio
         else:

@@ -11,12 +11,10 @@ WalkCategory = Literal["actions", "actionsplus", "airguitar", "animals", "animal
 
 WeightSchedule = Dict[WalkCategory | Literal["_"], int]
 
-class WalkItem(BaseModel):
+class WalkInfo(BaseModel):
     audio: Optional[str] = None
 
-class WalkInfo(BaseModel):
-    category: WalkCategory
-    audio: Optional[str] = None
+Walk = Dict[str, Union[None, WalkInfo]]
 
 class MenuItem(BaseModel):
     start: datetime  # ISO format datetime string
@@ -31,44 +29,25 @@ class MenuItem(BaseModel):
 class Animations(BaseModel):
     intros: List[str]
     outros: List[str]
-    walks: Dict[str, WalkInfo]
+    walks: Dict[WalkCategory, Walk]
     weights: Dict[str, WeightSchedule]
     menu: List[MenuItem] = Field(
         default_factory=list,
         description="List of menu items with start times and weight schedules"
     )
 
-    # This is silly. It translates the restructured config.yaml into a flat
-    # dictionary of walk names to walk info which is kind of how we had the 
-    # config.yaml before. Really, I should just use the new format. But we
-    # are a little short on time.
-    @field_validator("walks", mode="before")
-    @classmethod
-    def flatten_walks(cls, data: Dict) -> Dict:
-        if not isinstance(data, dict):
-            # This case can happen if the data is already processed
-            return data
-
-        flattened_walks = {}
-        for category, walks in data.items():
-            if not isinstance(walks, dict):
-                continue
-            for walk_name, walk_attrs in walks.items():
-                audio = None
-                if walk_attrs and "audio" in walk_attrs:
-                    audio = walk_attrs["audio"]
-
-                flattened_walks[walk_name] = {
-                    "category": category,
-                    "audio": audio,
-                }
-        return flattened_walks
-
     @model_validator(mode="after")
     def validate_menu_order(self) -> "Animations":
         """Ensure menu items are sorted by start time"""
         self.menu.sort(key=lambda item: item.start)
         return self
+
+    def get_walk(self, walk_name: str) -> Optional[WalkInfo]:
+        """Get walk information by name"""
+        for category, walks in self.walks.items():
+            if walk_name in walks:
+                return walks[walk_name]
+        return None
 
 
 class Heatbeat(BaseModel):
