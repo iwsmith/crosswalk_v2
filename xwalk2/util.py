@@ -223,7 +223,7 @@ class FileLibrary:
 class ImageLibrary(FileLibrary):
     def __init__(self, root_dir: str, extensions: List[str] | None = None):
         if not extensions:
-            extensions = [".gif"]
+            extensions = [".gif", ".stream"]
         super().__init__(root_dir, extensions)
 
 
