@@ -49,7 +49,7 @@ class SceneTimer(SubscribeInteractComponent):
         """Start timer for scene duration"""
         # Keep this buffer around just in case things need tweaking
         base_duration = play_cmd.total_duration
-        buffer_duration = base_duration + 0.1
+        buffer_duration = base_duration + 0.01
 
         with self.timer_lock:
             # Cancel any existing timer
