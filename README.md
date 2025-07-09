@@ -255,3 +255,10 @@ The project uses modern Python tooling:
 `led-image-viewer --led-cols=64 --led-chain=2 --led-gpio-mapping=adafruit-hat-pwm --led-slowdown-gpio=2 --led-pixel-mapper "U-mapper;Rotate:90" --led-show-refresh /opt/crosswalk/test/data/img/stop.gif`
 
 Generate a lock file on the RPI: `uv sync --no-dev`
+
+If you add new gifs you must convert them to streams:
+`bin/make_stream.sh /opt/crosswalk/static/data /opt/crosswalk_stream/ 270`
+
+Note the final argument is the LED image angle. For crosswalk-a its 270, for crosswalk-b its 90.
+
+This command must be run on *both* crosswalks!
