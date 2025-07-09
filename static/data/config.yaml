@@ -9,348 +9,187 @@ outros:
   - countdown-4s
   - countdown-5s
 
-# Note that walks should not have loops anymore.
-# I will remake or remove all of the walks that had loops.
-# (Or I will change my mind later if we want to keep gifs)
 walks:
-  aircello:
-    category: normalish
-  airdrum:
-    category: normalish
+  actions:
+    basketball-dunk:
+    carry-heavy:
+    chest-bump:
+    converse:
+    cover-your-ears:
+    crawl:
+    cross-arms:
+    eat-ice-cream:
+    finger-wiggle:
+    football:
+    hold-hands:
+    hula-hoop:
+    jumping-jacks:
+    piggyback:
+    propose:
+    raise-eyebrow:
+    sit:
+    sit-up:
+    tip-toe:
+    whistle:
+    yawn:
+    applaud:
+    appreciate:
+    baseball:
+    bike:
+    bowl:
+    brush-teeth:
+    burp:
+    cartwheel:
+    click-heels:
+    conga:
+    cowboy:
+    cry:
+    dance-hokey-pokey:
+    dance-hustle:
+    dance-macarena:
+    dance-twerk:
+    dance-twist:
+    fishing-big:
+    fishing-none:
+    fishing-small:
+    golf:
+    hammer-time:
+    handshake:
+    home:
+    hop:
+    hopscotch:
+    hug-3-people:
+    hug-4-people:
+    hug-5-people:
+    hurdle:
+    invisible-car:
+    jumprope:
+    laugh:
+    leapfrog:
+    longjump:
+    mime:
+    mystery-box-bees:
+    mystery-box-cake:
+    mystery-box-carrots:
+    mystery-box-stinky:
+    order-by-height:
+    pick-up-moop:
+    poetry-dreams-langston-hughes:
+    poetry-insomniac-maya-angelou:
+    poetry-separation-w-s-merwin:
+    poetry-thank-you-ross-gay:
+    poetry-we-never-know-emily-dickinson:
+    pushup:
+    ski:
+    sleep:
+    smile:
+    snap:
+    sneeze:
+    somersault:
+    spin:
+    staring-contest:
+    stop:
+    surf:
+    swashbuckle:
+    sweep:
+    swim:
+    tag:
+    tap-dance:
+    team-cheer:
+    teleport-a:
+    tennis:
+    thank-rangers:
+    unicycle:
+    vacuum:
+    walking-lunge:
+    werewolf:
+    wheelbarrow:
+    witch:
+    wizard:
+    zombie:
+  actionsplus:
+    canoe:
+    hammer:
+    head-pat-belly-rub:
+    highfive:
+    horseback-riding:
+    hydrate:
+    inflate-balloon:
+    juggle:
+    rowboat:
+    tightrope:
+    windy-walk:
   airguitar:
-    category: normalish
-  airsax:
-    category: normalish
-  airtrombone:
-    category: normalish
-  applaud:
-    category: normalish
-  appreciate:
-    category: normalish
-  baseball:
-    category: normalish
-  basketball-dunk:
-    category: actions
-  bee:
-    category: animals
-  bike:
-    category: normalish
-  bird:
-    category: animals
-  bowl:
-    category: normalish
-  brush-teeth:
-    category: normalish
-  burp:
-    category: normalish
-  carry-heavy:
-    category: actions
-  canoe:
-    category: actionsplus
-  cartwheel:
-    category: normalish
-  cat:
-    category: animals
-  chest-bump:
-    category: actions
-  click-heels:
-    category: normalish
-  conga:
-    category: normalish
-  converse:
-    category: actions
-  cover-your-ears:
-    category: actions
-  cow:
-    category: animals
-  cowboy:
-    category: normalish
-  crab:
-    category: animals
-  crawl:
-    category: actions
-  cross-arms:
-    category: actions
-  cry:
-    category: normalish
-  dance-hokey-pokey:
-    category: normalish
-  dance-hustle:
-    category: normalish
-  dance-macarena:
-    category: normalish
-  dance-twerk:
-    category: normalish
-  dance-twist:
-    category: normalish
-  dog:
-    category: animals
-  duck:
-    category: animals
-  eat-ice-cream:
-    category: actions
-  fall:
-    category: silly
-  finger-wiggle:
-    category: actions
-  fishing-big:
-    category: normalish
-  fishing-none:
-    category: normalish
-  fishing-small:
-    category: normalish
-  flying:
-    category: silly
-  football:
-    category: actions
-  frankensteins-monster-walk:
-    category: silly
-  ghost:
-    category: silly
-  goose:
-    category: animals
-  golf:
-    category: normalish
-  growl:
-    category: animals
-  hammer:
-    category: actionsplus
-  hammer-time:
-    category: normalish
-  handshake:
-    category: normalish
-  handstand:
-    category: silly
-  head-pat-belly-rub:
-    category: actionsplus
-  highfive:
-    category: actionsplus
-  hold-hands:
-    category: actions
-  home:
-    category: normalish
-  hop:
-    category: normalish
-  hopscotch:
-    category: normalish
-  horseback-riding:
-    category: actionsplus
-  hula-hoop:
-    category: actions
-  hug-3-people:
-    category: normalish
-  hug-4-people:
-    category: normalish
-  hug-5-people:
-    category: normalish
-  hurdle:
-    category: normalish
-  hydrate:
-    category: actionsplus
-  inflate-balloon:
-    category: actionsplus
-  invisible-car:
-    category: normalish
-  jumping-jacks:
-    category: actions
-  jello:
-    category: silly
-  juggle:
-    category: actionsplus
-  jumprope:
-    category: normalish
-  kangaroo:
-    category: animals
-  karaoke-all-star:
-    category: karaoke
-  karaoke-bad-romance:
-    category: karaoke
-  karaoke-believe:
-    category: karaoke
-  karaoke-hot-to-go:
-    category: karaoke
-  karaoke-living-on-a-prayer:
-    category: karaoke
-  karaoke-morning-train:
-    category: karaoke
-  karaoke-rolling-in-the-deep:
-    category: karaoke
-  karaoke-sandstorm:
-    category: karaoke
-  karaoke-somebody-to-love:
-    category: karaoke
-  laugh:
-    category: normalish
-  leapfrog:
-    category: normalish
-  longjump:
-    category: normalish
-  mime:
-    category: normalish
-  monkey:
-    category: animals
-  moonwalk:
-    category: silly
-  mystery-box-bees:
-    category: normalish
-  mystery-box-cake:
-    category: normalish
-  mystery-box-carrots:
-    category: normalish
-  mystery-box-stinky:
-    category: normalish
-  order-by-height:
-    category: normalish
-  penguin:
-    category: animals
-  pick-up-moop:
-    category: normalish
-  piggyback:
-    category: actions
-  poetry-dreams-langston-hughes:
-    category: normalish
-  poetry-insomniac-maya-angelou:
-    category: normalish
-  poetry-separation-w-s-merwin:
-    category: normalish
-  poetry-thank-you-ross-gay:
-    category: normalish
-  poetry-we-never-know-emily-dickinson:
-    category: normalish
-  point-at-black:
-    category: normalish
-  point-at-blue:
-    category: normalish
-  point-at-green:
-    category: normalish
-  point-at-orange:
-    category: normalish
-  point-at-purple:
-    category: normalish
-  point-at-red:
-    category: normalish
-  point-at-white:
-    category: normalish
-  point-at-yellow:
-    category: normalish
-  propose:
-    category: actions
-  puff-cheeks:
-    category: silly
-  pushup:
-    category: normalish
-  race:
-    category: game
-  raise-eyebrow:
-    category: actions
-  raptor:
-    category: animals
-  rowboat:
-    category: actionsplus
-  sit:
-    category: actions
-  sit-up:
-    category: actions
-  ski:
-    category: normalish
-  sleep:
-    category: normalish
-  sloth:
-    category: animals
-  smile:
-    category: normalish
-  snake:
-    category: animals
-  snap:
-    category: normalish
-  sneeze:
-    category: normalish
-  somersault:
-    category: normalish
-  spin:
-    category: normalish
-  staring-contest:
-    category: normalish
-  stop:
-    category: normalish
-  surf:
-    category: normalish
-  swashbuckle:
-    category: normalish
-  sweep:
-    category: normalish
-  swim:
-    category: normalish
-  tag:
-    category: normalish
-  tap-dance:
-    category: normalish
-  team-cheer:
-    category: normalish
-  teleport-a:
-    category: normalish
-  teleport-b:
-    category: silly
-  tell-a-joke:
-    category: silly
-  tennis:
-    category: normalish
-  thank-rangers:
-    category: normalish
-  tightrope:
-    category: actionsplus
-  tip-toe:
-    category: actions
-  tree:
-    category: silly
-  turtle:
-    category: animals
-  unicycle:
-    category: normalish
-  vacuum:
-    category: normalish
-  walk-arabic:
-    category: language
-  walk-backwards:
-    category: normalish
-  walk-danish:
-    category: language
-  walk-german:
-    category: language
-  walk-japanese:
-    category: language
-  walk-mandarin-taiwan:
-    category: language
-  walk:
-    category: normalish
-  walkdress:
-    category: normalish
-  walking-lunge:
-    category: normalish
-  walkpants:
-    category: normalish
-  werewolf:
-    category: normalish
-  wheelbarrow:
-    category: normalish
-  whistle:
-    category: actions
-  windy-walk:
-    category: actionsplus
-  witch:
-    category: normalish
-  wizard:
-    category: normalish
-  wok:
-    category: normalish
-  worm:
-    category: animals
-  yawn:
-    category: actions
-  zombie:
-    category: normalish
-
-
+    aircello:
+    airdrum:
+    airsax:
+    airtrombone:
+  animals:
+    bee:
+    bird:
+    cat:
+    cow:
+    crab:
+    dog:
+    duck:
+    goose:
+    growl:
+    kangaroo:
+    monkey:
+    penguin:
+    raptor:
+    sloth:
+    snake:
+    turtle:
+    worm:
+  game:
+    race:
+    point-at-black:
+    point-at-blue:
+    point-at-green:
+    point-at-orange:
+    point-at-purple:
+    point-at-red:
+    point-at-white:
+    point-at-yellow:
+  karaoke:
+    karaoke-all-star:
+    karaoke-bad-romance:
+    karaoke-believe:
+    karaoke-hot-to-go:
+    karaoke-living-on-a-prayer:
+    karaoke-morning-train:
+    karaoke-rolling-in-the-deep:
+    karaoke-sandstorm:
+    karaoke-somebody-to-love:
+  language:
+    walk-arabic:
+    walk-danish:
+    walk-german:
+    walk-japanese:
+    walk-mandarin-taiwan:
+  normal:
+    walk:
+  normalish:
+    walk-backwards:
+    walkdress:
+      audio: walk
+    walkpants:
+      audio: walk
+    wok:
+      audio: walk
+  silly:
+    fall:
+    flying:
+    frankensteins-monster-walk:
+    ghost:
+    handstand:
+    jello:
+    moonwalk:
+    puff-cheeks:
+    teleport-b:
+    tell-a-joke:
+    tree:
 weights:
   default:
     _: 1

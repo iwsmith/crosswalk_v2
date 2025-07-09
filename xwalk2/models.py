@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from typing import Dict, Literal, Optional, List, Union, Tuple
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, field_validator
 
 # Models represent things we send over the wire for easy
 # jsonification with pydantic.
@@ -11,8 +11,12 @@ WalkCategory = Literal["actions", "actionsplus", "airguitar", "animals", "animal
 
 WeightSchedule = Dict[WalkCategory | Literal["_"], int]
 
+class WalkItem(BaseModel):
+    audio: Optional[str] = None
+
 class WalkInfo(BaseModel):
-    category: WalkCategory 
+    category: WalkCategory
+    audio: Optional[str] = None
 
 class MenuItem(BaseModel):
     start: datetime  # ISO format datetime string
@@ -33,6 +37,32 @@ class Animations(BaseModel):
         default_factory=list,
         description="List of menu items with start times and weight schedules"
     )
+
+    # This is silly. It translates the restructured config.yaml into a flat
+    # dictionary of walk names to walk info which is kind of how we had the 
+    # config.yaml before. Really, I should just use the new format. But we
+    # are a little short on time.
+    @field_validator("walks", mode="before")
+    @classmethod
+    def flatten_walks(cls, data: Dict) -> Dict:
+        if not isinstance(data, dict):
+            # This case can happen if the data is already processed
+            return data
+
+        flattened_walks = {}
+        for category, walks in data.items():
+            if not isinstance(walks, dict):
+                continue
+            for walk_name, walk_attrs in walks.items():
+                audio = None
+                if walk_attrs and "audio" in walk_attrs:
+                    audio = walk_attrs["audio"]
+
+                flattened_walks[walk_name] = {
+                    "category": category,
+                    "audio": audio,
+                }
+        return flattened_walks
 
     @model_validator(mode="after")
     def validate_menu_order(self) -> "Animations":
