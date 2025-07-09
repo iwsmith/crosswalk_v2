@@ -124,8 +124,19 @@ class AnimationLibrary:
         # Random selection with even distribution
         return np.random.choice(self.config.outros)
 
-    def get_audio_duration(self, filename: str) -> float:
-        """Get duration of audio file in seconds"""
+    def get_audio_duration(self, animation_name: str) -> float:
+        """
+        Get duration of an audio file in seconds.
+        If the animation has a custom audio name, use it.
+        Otherwise, use the animation name itself as the filename.
+        """
+        # Check if the animation is a walk and has a custom audio file
+        walk_info = self.config.walks.get(animation_name)
+        if walk_info and walk_info.audio:
+            filename = walk_info.audio
+        else:
+            filename = animation_name
+
         if filename in self._duration_cache:
             return self._duration_cache[filename]
 
