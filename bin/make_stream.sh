@@ -25,7 +25,7 @@ INPUT_DIR="$1"
 OUTPUT_DIR="$2"
 EXT=".gif"
 CMD="led-image-viewer"
-COMMON_ARGS=(--led-cols=64 --led-chain=2 --led-gpio-mapping=adafruit-hat-pwm --led-pixel-mapper "U-mapper;Rotate:90" --led-no-drop-privs -l 1)
+COMMON_ARGS=(--led-cols=64 --led-chain=2 --led-gpio-mapping=adafruit-hat-pwm --led-pixel-mapper "U-mapper" --led-no-drop-privs)
 
 # Ensure input directory is absolute and exists
 INPUT_DIR=$(realpath "$INPUT_DIR")
