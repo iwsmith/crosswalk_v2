@@ -1,4 +1,3 @@
----
 intros:
   - wait-4s
   - wait-6s
@@ -11,75 +10,55 @@ outros:
 
 walks:
   actions:
-    basketball-dunk:
-    carry-heavy:
-    chest-bump:
-    converse:
-    cover-your-ears:
-    crawl:
-    cross-arms:
-    eat-ice-cream:
-    finger-wiggle:
-    football:
-    hold-hands:
-    hula-hoop:
-    jumping-jacks:
-    piggyback:
-    propose:
-    raise-eyebrow:
-    sit:
-    sit-up:
-    tip-toe:
-    whistle:
-    yawn:
     applaud:
     appreciate:
     baseball:
+    basketball-dunk:
     bike:
     bowl:
     brush-teeth:
     burp:
+    carry-heavy:
     cartwheel:
+    chest-bump:
     click-heels:
     conga:
+    converse:
+    cover-your-ears:
     cowboy:
+    crawl:
+    cross-arms:
     cry:
-    dance-hokey-pokey:
-    dance-hustle:
-    dance-macarena:
-    dance-twerk:
-    dance-twist:
+    finger-wiggle:
     fishing-big:
     fishing-none:
     fishing-small:
+    football:
     golf:
     hammer-time:
     handshake:
+    hold-hands:
     home:
     hop:
     hopscotch:
     hug-3-people:
     hug-4-people:
     hug-5-people:
+    hula-hoop:
     hurdle:
-    invisible-car:
+    jumping-jacks:
     jumprope:
     laugh:
     leapfrog:
     longjump:
     mime:
-    mystery-box-bees:
-    mystery-box-cake:
-    mystery-box-carrots:
-    mystery-box-stinky:
-    order-by-height:
     pick-up-moop:
-    poetry-dreams-langston-hughes:
-    poetry-insomniac-maya-angelou:
-    poetry-separation-w-s-merwin:
-    poetry-thank-you-ross-gay:
-    poetry-we-never-know-emily-dickinson:
+    piggyback:
+    propose:
     pushup:
+    raise-eyebrow:
+    sit:
+    sit-up:
     ski:
     sleep:
     smile:
@@ -87,28 +66,27 @@ walks:
     sneeze:
     somersault:
     spin:
-    staring-contest:
-    stop:
     surf:
     swashbuckle:
     sweep:
     swim:
     tag:
     tap-dance:
-    team-cheer:
-    teleport-a:
     tennis:
-    thank-rangers:
-    unicycle:
+    tip-toe:
     vacuum:
     walking-lunge:
-    werewolf:
     wheelbarrow:
-    witch:
-    wizard:
-    zombie:
+    whistle:
+    yawn:
   actionsplus:
     canoe:
+    dance-hokey-pokey:
+    dance-hustle:
+    dance-macarena:
+    dance-twerk:
+    dance-twist:
+    eat-ice-cream:
     hammer:
     head-pat-belly-rub:
     highfive:
@@ -116,7 +94,14 @@ walks:
     hydrate:
     inflate-balloon:
     juggle:
+    mystery-box-bees:
+    mystery-box-cake:
+    mystery-box-carrots:
+    mystery-box-stinky:
+    order-by-height:
     rowboat:
+    team-cheer:
+    thank-rangers:
     tightrope:
     windy-walk:
   airguitar:
@@ -143,7 +128,6 @@ walks:
     turtle:
     worm:
   game:
-    race:
     point-at-black:
     point-at-blue:
     point-at-green:
@@ -152,7 +136,10 @@ walks:
     point-at-red:
     point-at-white:
     point-at-yellow:
-  karaoke:
+    race:
+    staring-contest:
+
+  spoken-word:
     karaoke-all-star:
     karaoke-bad-romance:
     karaoke-believe:
@@ -162,6 +149,11 @@ walks:
     karaoke-rolling-in-the-deep:
     karaoke-sandstorm:
     karaoke-somebody-to-love:
+    poetry-dreams-langston-hughes:
+    poetry-insomniac-maya-angelou:
+    poetry-separation-w-s-merwin:
+    poetry-thank-you-ross-gay:
+    poetry-we-never-know-emily-dickinson:
   language:
     walk-arabic:
     walk-danish:
@@ -184,12 +176,20 @@ walks:
     frankensteins-monster-walk:
     ghost:
     handstand:
+    invisible-car:
     jello:
     moonwalk:
     puff-cheeks:
-    teleport-b:
+    # teleport-a:
+    # teleport-b:
     tell-a-joke:
     tree:
+    unicycle:
+    werewolf:
+    witch:
+    wizard:
+    zombie:
+
 weights:
   default:
     _: 1
@@ -200,7 +200,7 @@ weights:
     dance: 5
     fin: 0
     game: 1
-    karaoke: 5
+    spoken-word: 5
     language: 2
     normal: 7
     normalish: 7
@@ -215,7 +215,7 @@ weights:
     dance: 0
     fin: 0
     game: 0
-    karaoke: 0
+    spoken-word: 0
     language: 25
     normal: 75
     normalish: 0
@@ -230,7 +230,7 @@ weights:
     dance: 0
     fin: 0
     game: 0
-    karaoke: 0
+    spoken-word: 0
     language: 25
     normal: 75
     normalish: 0
@@ -245,7 +245,7 @@ weights:
     dance: 0
     fin: 0
     game: 0
-    karaoke: 0
+    spoken-word: 0
     language: 25
     normal: 25
     normalish: 20
@@ -260,7 +260,7 @@ weights:
     dance: 5
     fin: 0
     game: 0
-    karaoke: 0
+    spoken-word: 0
     language: 25
     normal: 20
     normalish: 10
@@ -275,7 +275,7 @@ weights:
     dance: 5
     fin: 0
     game: 0
-    karaoke: 5
+    spoken-word: 5
     language: 20
     normal: 25
     normalish: 10
@@ -290,7 +290,7 @@ weights:
     dance: 5
     fin: 0
     game: 5
-    karaoke: 0
+    spoken-word: 0
     language: 15
     normal: 20
     normalish: 5
@@ -305,7 +305,7 @@ weights:
     dance: 5
     fin: 0
     game: 0
-    karaoke: 10
+    spoken-word: 10
     language: 5
     normal: 15
     normalish: 10
@@ -320,7 +320,7 @@ weights:
     dance: 5
     fin: 0
     game: 5
-    karaoke: 0
+    spoken-word: 0
     language: 15
     normal: 20
     normalish: 5
@@ -335,7 +335,7 @@ weights:
     dance: 5
     fin: 0
     game: 0
-    karaoke: 10
+    spoken-word: 10
     language: 5
     normal: 15
     normalish: 10
@@ -350,7 +350,7 @@ weights:
     dance: 5
     fin: 0
     game: 5
-    karaoke: 0
+    spoken-word: 0
     language: 15
     normal: 20
     normalish: 5
@@ -365,7 +365,7 @@ weights:
     dance: 5
     fin: 0
     game: 0
-    karaoke: 10
+    spoken-word: 10
     language: 5
     normal: 15
     normalish: 10
