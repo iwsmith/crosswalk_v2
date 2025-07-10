@@ -78,6 +78,10 @@ class APIQueueWalk(BaseModel):
     type: Literal["queue_walk"] = "queue_walk"
     walk: str  # Name of the walk animation to queue
 
+class APIQueueClear(BaseModel):
+    """Request to queue a walk animation"""
+    type: Literal["queue_clear"] = "queue_clear"
+
 class APIButtonPress(BaseModel):
     """Request to queue a walk animation"""
     type: Literal["press_button"] = "press_button"
@@ -161,12 +165,13 @@ message_registry = {
 
 api_registry = {
     "queue_walk": APIQueueWalk,
+    "queue_clear": APIQueueClear,
     "press_button": APIButtonPress,
     "timer_expired": APITimerExpired,
     "status": APIStatusRequest,
 }
 
-APIRequests = APIQueueWalk | APIButtonPress | APITimerExpired | APIStatusRequest
+APIRequests = APIQueueWalk | APIButtonPress | APITimerExpired | APIStatusRequest | APIQueueClear
 
 def parse_api(request: str) -> BaseModel:
     data = json.loads(request)

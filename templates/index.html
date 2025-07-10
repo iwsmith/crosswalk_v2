@@ -9,22 +9,36 @@
     
     <div class="button-group">
         <h3>Actions</h3>
+        <button type="button" 
+            hx-get="/status" 
+            hx-target="#status" 
+            hx-swap="innerHTML"
+            >📊 Refresh Status</button>
+
         <button 
             hx-post="/button" 
             hx-target="#status" 
             hx-swap="innerHTML"
         >🔘 Press Button</button>
+
         <button 
             hx-post="/timer" 
             hx-target="#status" 
             hx-swap="innerHTML"
         >⏰ Timer Expired</button>
 
-        <button type="button" 
-            hx-get="/status" 
+        <button 
+            hx-post="/queue/_" 
             hx-target="#status" 
             hx-swap="innerHTML"
-            >📊 Refresh Status</button>
+            hx-confirm="This will queue all walks. Are you sure?"
+        >➕ Queue All</button>
+
+        <button 
+            hx-delete="/queue/" 
+            hx-target="#status" 
+            hx-swap="innerHTML"
+        >❌ Clear Queue</button>
     </div>
     
     <div id="status">

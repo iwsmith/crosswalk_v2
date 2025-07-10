@@ -12,6 +12,7 @@ from pydantic import BaseModel
 
 from xwalk2.models import (
     Animations,
+    APIQueueClear,
     APIButtonPress,
     APIQueueWalk,
     APIRequests,
@@ -79,7 +80,12 @@ class APIController:
 
     def queue_walk(self, walk: str) -> APIResponse:
         """Queue a walk animation"""
-        request = APIQueueWalk(type="queue_walk", walk=walk)
+        request = APIQueueWalk(walk=walk)
+        return self._send_request(request)
+
+    def queue_clear(self) -> APIResponse:
+        """Queue a walk animation"""
+        request = APIQueueClear()
         return self._send_request(request)
 
     def get_status(self) -> APIResponse:
@@ -139,6 +145,15 @@ async def press_button(request: Request):
 async def queue(walk: str, request: Request):
     """Handle button press action (htmx or API)"""
     status = api_controller.queue_walk(walk)
+    return templates.TemplateResponse(
+        "components/status.html",
+        {"request": request, "status": status, "now": datetime.now()},
+    )
+
+@app.delete("/queue/", response_class=HTMLResponse)
+async def queue_clear(request: Request):
+    """Handle button press action (htmx or API)"""
+    status = api_controller.queue_clear()
     return templates.TemplateResponse(
         "components/status.html",
         {"request": request, "status": status, "now": datetime.now()},

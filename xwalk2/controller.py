@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from xwalk2.fsm import Controller
 from xwalk2.models import (
     APIResponse,
+    APIQueueClear,
     APIQueueWalk,
     APIStatusRequest,
     APIButtonPress,
@@ -86,8 +87,16 @@ def main():
     def handle_api_request(request: BaseModel) -> APIResponse:
         """Handle API requests and return a response"""
         if isinstance(request, APIQueueWalk):
-            state.walk_queue.append(request.walk)
-            return make_response(message=f"Walk '{request.walk}' queued. {len(state.walk_queue)} total queued.")
+            if request.walk == '_':
+                for categories in state.animations.config.walks.values():
+                    state.walk_queue.extend(categories.keys())
+                return make_response(message=f"All walks queued. {len(state.walk_queue)} total queued.")
+            else:
+                state.walk_queue.append(request.walk)
+                return make_response(message=f"Walk '{request.walk}' queued. {len(state.walk_queue)} total queued.")
+        elif isinstance(request, APIQueueClear):
+            state.walk_queue.clear()
+            return make_response(message="Walk queue cleared")
         elif isinstance(request, APIButtonPress):
             # Handle button press action
             state.button_press()
