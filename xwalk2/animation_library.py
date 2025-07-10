@@ -4,6 +4,7 @@ import wave
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+from collections import deque
 
 import mutagen
 import numpy as np
@@ -29,6 +30,8 @@ class AnimationLibrary:
 
         # Cache for audio durations
         self._duration_cache: Dict[str, float] = {}
+        self.walk_history = deque(maxlen=self.config.reselection.walk_cooldown)
+        self.category_history = deque(maxlen=self.config.reselection.category_cooldown)
 
     def _load_config(self) -> Animations:
         """Load and parse the config.yaml file"""
@@ -90,26 +93,64 @@ class AnimationLibrary:
         weights = self.get_current_weights()
         categories = list(weights.keys())
         walk_names: list[str] = []
+
         if len(categories) == 1:
             for walks in self.config.walks.values():
                 walk_names.extend(walks.keys())
 
             category = "all (_)"
         else:
-            cat_weights = np.array(list(weights.values()), dtype=np.float32)
+            valid_categories = []
+            for cat in categories:
+                if cat in self.config.reselection.cooldown_categories:
+                    # Skip categories in cooldown
+                    if cat in self.category_history:
+                        continue
+                    else:
+                        valid_categories.append(cat)
+                else:
+                    # Add to valid categories if not in cooldown
+                    valid_categories.append(cat)
+
+            if not valid_categories:
+                logger.error(
+                    "No valid categories available for walk selection. "
+                    "Check your config for reselection cooldown categories."
+                )
+                valid_categories = categories
+
+            vaild_weights = [weights[cat] for cat in valid_categories]
+
+            cat_weights = np.array(vaild_weights, dtype=np.float32)
             cat_weights /= cat_weights.sum()  # Normalize weights
-            category = np.random.choice(categories, p=cat_weights)
+            category = str(np.random.choice(valid_categories, p=cat_weights))
             walk_names = list(self.config.walks[category].keys())
 
+        valid_walks = []
+        for walk in walk_names:
+            if walk in self.walk_history:
+                walk_info = self.config.get_walk(walk)
+                if walk_info and walk_info.ignore_reselection:
+                    valid_walks.append(walk)
+            else:
+                valid_walks.append(walk)
+
         logger.info(
-            f"Selected walk category: {category}, found {len(walk_names)} walks"
+            f"Selected walk category: {category}, found {len(walk_names)} walks, {len(valid_walks)} valid walks"
         )
 
-        if not walk_names:
-            raise RuntimeError("No walk animations available")
+        if not valid_walks:
+            logger.error(
+                "No valid walks available for selection. "
+                "Check your config for walk definitions and reselection settings."
+            )
+            valid_walks = walk_names
 
         # Normalize weights
-        return random.choice(walk_names)
+        selected_walk = random.choice(valid_walks)
+        self.walk_history.append(selected_walk)
+        self.category_history.append(category)
+        return selected_walk
 
     def select_outro(self) -> str:
         """Select a random outro animation with even distribution"""

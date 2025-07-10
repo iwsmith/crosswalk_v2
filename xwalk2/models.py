@@ -13,6 +13,7 @@ WeightSchedule = Dict[WalkCategory | Literal["_"], int]
 
 class WalkInfo(BaseModel):
     audio: Optional[str] = None
+    ignore_reselection: bool = False
 
 Walk = Dict[str, Union[None, WalkInfo]]
 
@@ -26,6 +27,11 @@ class MenuItem(BaseModel):
     def __repr__(self) -> str:
         return f"MenuItem(start={self.start.isoformat()}, weights={self.weights})"
 
+class ReselectionConfig(BaseModel):
+    walk_cooldown: int = 10
+    category_cooldown: int = 3
+    cooldown_categories: List[str] = Field(default_factory=list)
+
 class Animations(BaseModel):
     intros: List[str]
     outros: List[str]
@@ -35,6 +41,7 @@ class Animations(BaseModel):
         default_factory=list,
         description="List of menu items with start times and weight schedules"
     )
+    reselection: ReselectionConfig = Field(default_factory=ReselectionConfig)
 
     @model_validator(mode="after")
     def validate_menu_order(self) -> "Animations":

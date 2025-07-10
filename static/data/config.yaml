@@ -170,8 +170,9 @@ walks:
     walk-mandarin-taiwan:
   normal:
     walk:
+      ignore_reselection: true
   normalish:
-    walk-backwards:
+    backwards-walk:
     walkdress:
       audio: walk
     walkpants:
@@ -376,6 +377,17 @@ weights:
   go_home:
     fin: 1
 
+reselection:
+  # walk cooldowns are opt-out. Set ignore_reselection: true
+  # on a given walk to disable cooldown for that walk.
+  walk_cooldown: 10
+  # category cooldowns are opt-in. Set cooldown_categories:
+  # on a given category to enable cooldown for that category.
+  category_cooldown: 3
+  cooldown_categories:
+    - airguitar
+    - karaoke
+    - language
 
 menu:
   - start: '2025-06-05T01:45:00'
