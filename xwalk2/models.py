@@ -30,7 +30,7 @@ class MenuItem(BaseModel):
 class ReselectionConfig(BaseModel):
     walk_cooldown: int = 10
     category_cooldown: int = 3
-    cooldown_categories: List[str] = Field(default_factory=list)
+    cooldown_categories: List[WalkCategory] = Field(default_factory=list)
 
 class Animations(BaseModel):
     intros: List[str]
