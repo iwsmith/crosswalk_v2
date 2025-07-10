@@ -36,7 +36,7 @@ class PhysicalButton(InteractComponent):
                 press_duration=d,
                 sent_at=datetime.now(),
             )
-            logger.info("button press duration={d}")
+            logger.info(f"button press duration={d}")
             self.send_action(button_press)
 
 
