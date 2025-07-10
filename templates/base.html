@@ -6,7 +6,33 @@
     <script src="/static/htmx.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; margin: 40px; }
-        button { padding: 10px 20px; margin: 10px; font-size: 16px; }
+        ul.compact-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+ul.compact-list > li {
+  display: flex;
+  align-items: center;
+  padding: 2px 4px;
+  margin: 2px 0;
+}
+
+ul.compact-list button {
+  padding: 4px 8px;
+  font-size: 0.9rem;
+  line-height: 1;
+  border: 1px solid #ccc;
+  background: #f8f8f8;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+ul.compact-list button:hover {
+  background: #e0e0e0;
+}
+
         #status { background: #f0f0f0; padding: 20px; margin: 20px 0; }
         .button-group { margin: 20px 0; }
     </style>

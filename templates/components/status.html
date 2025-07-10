@@ -10,12 +10,14 @@
 
 <p><strong>Walk queue:</strong> {{ status.walk_queue }}</p>
 
-<p><strong>Active schedule:</strong> {{ status.active_schedule }}</p>
-
 <p><strong>All schedule</strong></p>
 <ul>
   {% for item in status.menu %}
+  {% if item == status.active_schedule %}
+    <li><strong>{{ item }} <-- active</strong></li>
+  {% else %}
     <li>{{ item }}</li>
+  {% endif %}
   {% endfor %}
 </ul>
 
@@ -55,15 +57,14 @@
       <ul>
       {% for walk, info in walks.items() %}
         <li>
-          {{ walk }}
           <button 
             hx-post="/queue/{{ walk }}" 
-            style="font-size:1em;padding:0 0.5em;height:1.5em;vertical-align:middle;line-height:1.2;" 
             hx-target="#status" 
             hx-swap="innerHTML"
           >
             +
           </button>
+          {{ walk }}
         </li>
       {% endfor %}
     </ul>
