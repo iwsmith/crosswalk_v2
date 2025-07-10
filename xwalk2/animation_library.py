@@ -30,8 +30,8 @@ class AnimationLibrary:
 
         # Cache for audio durations
         self._duration_cache: Dict[str, float] = {}
-        self.walk_history = deque(maxlen=self.config.reselection.walk_cooldown)
-        self.category_history = deque(maxlen=self.config.reselection.category_cooldown)
+        self.walk_history: deque[str] = deque(maxlen=self.config.reselection.walk_cooldown)
+        self.category_history: deque[str] = deque(maxlen=self.config.reselection.category_cooldown)
 
     def _load_config(self) -> Animations:
         """Load and parse the config.yaml file"""
