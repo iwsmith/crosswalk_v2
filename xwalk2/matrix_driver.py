@@ -110,9 +110,15 @@ class MatrixViewer(SubscribeComponent):
         if not animations:
             return
 
-        commands = [
-            " ".join(self._display_command(image, shell=True)) for image in animations
-        ]
+        commands = []
+        for image in animations:
+            forever = False
+            if image == "stop":
+                forever = True
+                
+            commands.append(
+                " ".join(self._display_command(image, shell=True, forever=forever))
+            )
 
         script = " && ".join(commands)
 
