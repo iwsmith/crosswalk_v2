@@ -48,7 +48,7 @@ class Controller:
             intro_duration=intro_duration,
             walk_duration=walk_duration,
             outro_duration=outro_duration,
-            total_duration=total_duration,
+            total_duration=walk_duration, #TODO: Revert this
         )
         self.send_message(play_command)
         self.walk_history.append((datetime.now(), walk))
