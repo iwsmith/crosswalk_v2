@@ -1,5 +1,5 @@
 ---
-crosswalk_led_angle: -90
+crosswalk_led_angle: 270
 crosswalk_button_pin: 25
 crosswalk_interaction: tcp://localhost:5556
 crosswalk_controller: tcp://localhost:5557
