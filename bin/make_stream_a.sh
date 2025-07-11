@@ -1,0 +1,1 @@
+/opt/crosswalk/bin/make_stream.sh /opt/crosswalk/static/data/ /opt/crosswalk_stream/ 270
