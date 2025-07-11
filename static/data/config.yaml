@@ -60,7 +60,6 @@ walks:
     sit:
     sit-up:
     ski:
-    sleep:
     smile:
     snap:
     sneeze:
@@ -127,6 +126,9 @@ walks:
     snake:
     turtle:
     worm:
+  fin:
+    home:
+
   game:
     point-at-black:
     point-at-blue:
@@ -190,6 +192,8 @@ walks:
     witch:
     wizard:
     zombie:
+  sleep:
+    sleep:
 
 weights:
   default:
@@ -198,7 +202,6 @@ weights:
     actions: 18
     actionsplus: 20
     animals: 11
-    dance: 5
     fin: 0
     game: 1
     spoken-word: 5
@@ -212,8 +215,6 @@ weights:
     actionsplus: 0
     airguitar: 0
     animals: 0
-    animalsplus: 0
-    dance: 0
     fin: 0
     game: 0
     spoken-word: 0
@@ -227,8 +228,6 @@ weights:
     actionsplus: 0
     airguitar: 0
     animals: 0
-    animalsplus: 0
-    dance: 0
     fin: 0
     game: 0
     spoken-word: 0
@@ -242,8 +241,6 @@ weights:
     actionsplus: 0
     airguitar: 0
     animals: 25
-    animalsplus: 0
-    dance: 0
     fin: 0
     game: 0
     spoken-word: 0
@@ -257,8 +254,6 @@ weights:
     actionsplus: 0
     airguitar: 5
     animals: 20
-    animalsplus: 0
-    dance: 5
     fin: 0
     game: 0
     spoken-word: 0
@@ -272,8 +267,6 @@ weights:
     actionsplus: 0
     airguitar: 5
     animals: 20
-    animalsplus: 0
-    dance: 5
     fin: 0
     game: 0
     spoken-word: 5
@@ -287,8 +280,6 @@ weights:
     actionsplus: 10
     airguitar: 5
     animals: 10
-    animalsplus: 5
-    dance: 5
     fin: 0
     game: 5
     spoken-word: 0
@@ -302,8 +293,6 @@ weights:
     actionsplus: 5
     airguitar: 5
     animals: 20
-    animalsplus: 5
-    dance: 5
     fin: 0
     game: 0
     spoken-word: 10
@@ -317,8 +306,6 @@ weights:
     actionsplus: 10
     airguitar: 5
     animals: 10
-    animalsplus: 5
-    dance: 5
     fin: 0
     game: 5
     spoken-word: 0
@@ -332,8 +319,6 @@ weights:
     actionsplus: 5
     airguitar: 5
     animals: 20
-    animalsplus: 5
-    dance: 5
     fin: 0
     game: 0
     spoken-word: 10
@@ -347,8 +332,6 @@ weights:
     actionsplus: 10
     airguitar: 5
     animals: 10
-    animalsplus: 5
-    dance: 5
     fin: 0
     game: 5
     spoken-word: 0
@@ -362,8 +345,6 @@ weights:
     actionsplus: 5
     airguitar: 5
     animals: 20
-    animalsplus: 5
-    dance: 5
     fin: 0
     game: 0
     spoken-word: 10
@@ -386,7 +367,7 @@ reselection:
   category_cooldown: 3
   cooldown_categories:
     - airguitar
-    - karaoke
+    - spoken-word
     - language
 
 menu:
