@@ -135,6 +135,7 @@ class PlayScene(BaseModel):
     intro: str
     walk: str
     outro: str
+    stop: str
     intro_duration: float
     walk_duration: float
     outro_duration: float

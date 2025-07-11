@@ -91,9 +91,10 @@ class MatrixViewer(SubscribeComponent):
 
     def process_message(self, message: BaseModel):
         if isinstance(message, PlayScene):
-            self.play_all([message.intro, message.walk, message.outro])
+            self.play_all([message.intro, message.walk, message.outro, message.stop])
         elif isinstance(message, EndScene):
-            self.play("stop")
+            if self._playing != ['stop']:
+                self.play("stop")
         elif isinstance(message, CurrentState):
             logger.info("Got CurrentState")
             if message.state == "ready" and self._playing != ['stop']:

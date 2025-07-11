@@ -44,6 +44,7 @@ class Controller:
             intro=intro,
             walk=walk,
             outro=outro,
+            stop="stop",  
             intro_duration=intro_duration,
             walk_duration=walk_duration,
             outro_duration=outro_duration,
