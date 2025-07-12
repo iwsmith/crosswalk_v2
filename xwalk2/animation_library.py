@@ -74,22 +74,12 @@ class AnimationLibrary:
         # No active schedule; fallback to demo or default.
         return weights
 
-    def select_intro(self, walk: Optional[str] = None) -> str:
+    def select_intro(self) -> str:
         """
         Select a random* intro animation with even distribution
-
-        * Not random, if we are selecting the intro based on a given walk.
         """
-        # If the walk starts with "walk-" then we need to select an intro that
-        # matches the walk name except instead of "walk" it says "wait" e.g.
-        # "walk-danish" -> "wait-danish"
-        if walk and walk.startswith("walk-"):
-            # Matching intros should have the same name as the walk except
-            # instead of "walk" it says "wait" e.g. "walk-danish" -> "wait-danish"
-            return walk.replace("walk-", "wait-")
-        else:
-            # Random selection with even distribution
-            return str(np.random.choice(self.config.intros))
+        # Random selection with even distribution
+        return str(np.random.choice(self.config.intros))
 
     def select_walk(self, weights: Optional[WeightSchedule] = None) -> Tuple[str, str]:
         """Select a random walk animation based on current weights"""
@@ -234,8 +224,21 @@ class AnimationLibrary:
         category = None
         if not walk:
             walk, category = self.select_walk(weights=weights)
-        intro = self.select_intro(walk)
+       
+        # choose default intro and outro
+        intro = self.select_intro()
         outro = self.select_outro()
+
+        # Check whether we should be using a custom intro and outro
+        # and update if so
+        walk_info = self.config.get_walk(walk)
+        if walk_info:
+            intro = walk_info.intro or self.select_intro()
+            outro = walk_info.outro or self.select_outro()
+            audio_walk = walk_info.audio or walk
+        else:
+            audio_walk = walk
+        
         logger.info(f"selected {intro=} {walk=} {outro=}")
 
         audio_intro = intro

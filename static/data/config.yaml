@@ -160,10 +160,16 @@ walks:
   
   language:
     walk-arabic:
+      intro: wait-arabic
     walk-danish:
+      intro: wait-danish
     walk-german:
+      intro: wait-german
     walk-japanese:
+      intro: wait-japanese
     walk-mandarin-taiwan:
+      intro: wait-mandarin-taiwan
+      outro: countdown-mandarin-taiwan
   
   normal:
     walk:

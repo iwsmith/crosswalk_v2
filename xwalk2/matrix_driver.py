@@ -86,7 +86,7 @@ class MatrixViewer(SubscribeComponent):
         command = self._display_command(animation.image, shell=False, forever=True)
         # command = " ".join(command)
 
-        logger.info("Playing: %s", animation)
+        logger.info("Playing: %s", animation.image)
         self._exec(command)
         self._playing = [animation.image]
 
@@ -124,7 +124,7 @@ class MatrixViewer(SubscribeComponent):
 
         script = " && ".join(commands)
 
-        logger.info("Playing all: %s", animations)
+        logger.info("Playing all: %s", [a.image for a in animations])
         logger.debug("Script: %s", script)
         self._exec(script, shell=True)
         self._playing = [a.image for a in animations]

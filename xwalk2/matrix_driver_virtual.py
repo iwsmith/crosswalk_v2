@@ -13,7 +13,7 @@ import argparse
 import logging
 
 from xwalk2.util import Heartbeat, add_default_args
-from xwalk2.models import CurrentState, EndScene, PlayScene, ResetCommand, parse_message
+from xwalk2.models import CurrentState, EndScene, PlayScene, ResetCommand, parse_message, WalkDefinition
 
 
 # Constants
@@ -181,9 +181,9 @@ class MatrixDisplay:
         )
         self.animation_thread.start()
     
-    def play_scene_sequence(self, intro: str, walk: str, outro: str):
+    def play_scene_sequence(self, intro: WalkDefinition, walk: WalkDefinition, outro: WalkDefinition):
         """Play a complete animation sequence"""
-        logging.info(f"🎬 Playing sequence: {intro} -> {walk} -> {outro}")
+        logging.info(f"🎬 Playing sequence: {intro.image} -> {walk.image} -> {outro.image}")
         
         if self.animation_thread and self.animation_thread.is_alive():
             self.stop_event.set()
@@ -238,19 +238,19 @@ class MatrixDisplay:
                 if self.stop_event.is_set():
                     return
     
-    def _sequence_worker(self, intro: str, walk: str, outro: str):
+    def _sequence_worker(self, intro: WalkDefinition, walk: WalkDefinition, outro: WalkDefinition):
         """Worker thread for animation sequence"""
         sequence = [intro, walk, outro]
-        sequence_names = ["intro", "walk", "outro"]
         
         for anim_name in sequence:
             if self.stop_event.is_set():
                 return
             
             # Load animation just-in-time, not pre-loaded
-            frames, durations = self.gif_player.load_gif(anim_name)
+            frames, durations = self.gif_player.load_gif(anim_name.image)
             
-            for frame_idx, (frame, duration) in enumerate(zip(frames, durations)):
+            # Play each frame of the current animation
+            for frame, duration in zip(frames, durations):
                 if self.stop_event.is_set():
                     return
                 
