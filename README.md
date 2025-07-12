@@ -286,3 +286,5 @@ This command must be run on *both* crosswalks!
 `identify -format "%T\n" img.gif`
 `magick img.gif -coalesce img%02d.png`
 `magick -delay 400 img_00.png -delay 0 img_01.png  img.gif`
+
+You can simulate schedules by using `uv run bin/simulate_schedule.py tuesday`

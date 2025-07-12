@@ -30,8 +30,12 @@ class AnimationLibrary:
 
         # Cache for audio durations
         self._duration_cache: Dict[str, float] = {}
-        self.walk_history: deque[str] = deque(maxlen=self.config.reselection.walk_cooldown)
-        self.category_history: deque[str] = deque(maxlen=self.config.reselection.category_cooldown)
+        self.walk_history: deque[str] = deque(
+            maxlen=self.config.reselection.walk_cooldown
+        )
+        self.category_history: deque[str] = deque(
+            maxlen=self.config.reselection.category_cooldown
+        )
 
     def _load_config(self) -> Animations:
         """Load and parse the config.yaml file"""
@@ -87,10 +91,11 @@ class AnimationLibrary:
             # Random selection with even distribution
             return str(np.random.choice(self.config.intros))
 
-    def select_walk(self) -> str:
+    def select_walk(self, weights: Optional[WeightSchedule] = None) -> Tuple[str, str]:
         """Select a random walk animation based on current weights"""
         # Extract walk names and their weights based on categories
-        weights = self.get_current_weights()
+        if not weights:
+            weights = self.get_current_weights()
         categories = list(weights.keys())
         walk_names: list[str] = []
 
@@ -141,7 +146,7 @@ class AnimationLibrary:
 
         if not valid_walks:
             logger.error(
-                "No valid walks available for selection. "
+                f"No valid walks available for selection. {category=} {len(walk_names)=}, {len(valid_walks)=}\n"
                 "Check your config for walk definitions and reselection settings."
             )
             valid_walks = walk_names
@@ -150,7 +155,7 @@ class AnimationLibrary:
         selected_walk = random.choice(valid_walks)
         self.walk_history.append(selected_walk)
         self.category_history.append(category)
-        return selected_walk
+        return selected_walk, category
 
     def select_outro(self) -> str:
         """Select a random outro animation with even distribution"""
@@ -218,7 +223,7 @@ class AnimationLibrary:
         return intro_duration, walk_duration, outro_duration
 
     def select_animation_sequence(
-        self, walk: Optional[str] = None
+        self, walk: Optional[str] = None, weights: Optional[WeightSchedule] = None, verbose=True
     ) -> Tuple[WalkDefinition, WalkDefinition, WalkDefinition]:
         """
         Select a complete animation sequence: intro, walk, outro
@@ -226,8 +231,9 @@ class AnimationLibrary:
         Walk needs to come first so we can handle language-specific walks
         which have specific intros.
         """
+        category = None
         if not walk:
-            walk = self.select_walk()
+            walk, category = self.select_walk(weights=weights)
         intro = self.select_intro(walk)
         outro = self.select_outro()
         logger.info(f"selected {intro=} {walk=} {outro=}")
@@ -237,7 +243,7 @@ class AnimationLibrary:
             audio_walk = self.config.get_walk(walk).audio or walk
         else:
             audio_walk = walk
-        audio_outro = outro    
+        audio_outro = outro
 
         # Get durations for logging
         intro_duration, walk_duration, outro_duration = self.get_sequence_durations(
@@ -245,17 +251,18 @@ class AnimationLibrary:
         )
         total_duration = intro_duration + walk_duration + outro_duration
 
-        # Log sequence selection in table format
-        print(f"\nAnimation sequence selected:")
-        print(f"┌─────────────┬──────────────────────┬──────────────┐")
-        print(f"│ Phase       │ Animation            │ Duration     │")
-        print(f"├─────────────┼──────────────────────┼──────────────┤")
-        print(f"│ Intro       │ {intro:<20} │ {intro_duration:>7.2f}s     │")
-        print(f"│ Walk        │ {walk:<20} │ {walk_duration:>7.2f}s     │")
-        print(f"│ Outro       │ {outro:<20} │ {outro_duration:>7.2f}s     │")
-        print(f"├─────────────┴──────────────────────┼──────────────┤")
-        print(f"│ Total                              │ {total_duration:>7.2f}s     │")
-        print(f"└────────────────────────────────────┴──────────────┘")
+        if verbose:
+            # Log sequence selection in table format
+            print(f"\nAnimation sequence selected:")
+            print(f"┌─────────────┬──────────────────────┬──────────────┐")
+            print(f"│ Phase       │ Animation            │ Duration     │")
+            print(f"├─────────────┼──────────────────────┼──────────────┤")
+            print(f"│ Intro       │ {intro:<20} │ {intro_duration:>7.2f}s     │")
+            print(f"│ Walk        │ {walk:<20} │ {walk_duration:>7.2f}s     │")
+            print(f"│ Outro       │ {outro:<20} │ {outro_duration:>7.2f}s     │")
+            print(f"├─────────────┴──────────────────────┼──────────────┤")
+            print(f"│ Total                              │ {total_duration:>7.2f}s     │")
+            print(f"└────────────────────────────────────┴──────────────┘")
 
         if any(
             duration is None
@@ -263,22 +270,16 @@ class AnimationLibrary:
         ):
             print(f"⚠️  Some animations missing audio files")
 
-        wintro = WalkDefinition(
-            image=intro,
-            audio=audio_intro,
-            duration=intro_duration
-        )
+        wintro = WalkDefinition(image=intro, audio=audio_intro, duration=intro_duration)
 
         wwalk = WalkDefinition(
-            image=walk,
-            audio=audio_walk,
-            duration=walk_duration
+            image=walk, audio=audio_walk, duration=walk_duration, category=category
         )
 
-        woutro = WalkDefinition(
-            image=outro,
-            audio=audio_outro,
-            duration=outro_duration
-        )
+        woutro = WalkDefinition(image=outro, audio=audio_outro, duration=outro_duration)
 
         return wintro, wwalk, woutro
+
+
+if __name__ == "__main__":
+    al = AnimationLibrary()

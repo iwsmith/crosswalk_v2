@@ -110,6 +110,7 @@ walks:
     cat:
     cow:
     corgi:
+      audio: walk
     crab:
     dog:
     duck:
@@ -243,6 +244,7 @@ weights:
     normalish: 7
     silly: 11
     sleep: 0
+    political: 2
   sunday:
     actions: 0
     actionsplus: 0
@@ -269,6 +271,7 @@ weights:
     normalish: 0
     silly: 0
     sleep: 0
+    political: 2
   tuesday:
     actions: 5
     actionsplus: 0
@@ -282,6 +285,7 @@ weights:
     normalish: 20
     silly: 0
     sleep: 0
+    political: 2
   wednesday_day:
     actions: 15
     actionsplus: 0
@@ -334,6 +338,7 @@ weights:
     normalish: 10
     silly: 5
     sleep: 5
+    trip: 5
   friday:
     actions: 15
     actionsplus: 10
@@ -360,6 +365,7 @@ weights:
     normalish: 10
     silly: 5
     sleep: 5
+    trip: 10
   saturday:
     actions: 15
     actionsplus: 10
@@ -386,6 +392,7 @@ weights:
     normalish: 10
     silly: 5
     sleep: 5
+    trip: 15
   quiet_hours:
     sleep: 1
   go_home:

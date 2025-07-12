@@ -31,6 +31,7 @@ class WalkDefinition(BaseModel):
     image: str
     audio: str
     duration: float
+    category: Optional[str] = None
 
 
 class WalkInfo(BaseModel):
