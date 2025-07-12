@@ -282,3 +282,7 @@ If you add new gifs you must convert them to streams:
 Note the final argument is the LED image angle. For crosswalk-a its 270, for crosswalk-b its 90.
 
 This command must be run on *both* crosswalks!
+
+`identify -format "%T\n" img.gif`
+`magick img.gif -coalesce img%02d.png`
+`magick -delay 400 img_00.png -delay 0 img_01.png  img.gif`
