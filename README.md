@@ -244,6 +244,26 @@ The project uses modern Python tooling:
 - `flake.nix` for Nix development environment
 - `uv.lock` for dependency locking
 
+It might be helpful to normalize the volume of all the audio. A convenient tool is 
+[ffmpeg-normalize](https://github.com/slhck/ffmpeg-normalize). Using a nix shell:
+
+```
+nix-shell -p ffmpeg-normalize
+
+# normalize all the audio, they will become mkvs
+# in a ne normalized directory
+for filename in *.mp3; do
+    echo $filename
+    ffmpeg-normalize $filename
+done
+
+# convert back to mp3s and increase the volume a little
+cd normalized
+for filename in *.mkv; do
+    ffmpeg -i $filename -filter:a "volume=2.0" -codec:a libmp3lame -b:a 192k ${filename%%.*}.mp3 
+done
+```
+
 ## Handy Commands
 
 `identify -format "%n %T\n" /opt/crosswalk/img/walks/walk-backwards.gif`
