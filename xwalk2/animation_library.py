@@ -10,7 +10,7 @@ import mutagen
 import numpy as np
 import yaml
 
-from xwalk2.models import Animations, WeightSchedule, MenuItem
+from xwalk2.models import Animations, WeightSchedule, MenuItem, WalkDefinition
 
 logger = logging.getLogger(__name__)
 
@@ -85,7 +85,7 @@ class AnimationLibrary:
             return walk.replace("walk-", "wait-")
         else:
             # Random selection with even distribution
-            return np.random.choice(self.config.intros)
+            return str(np.random.choice(self.config.intros))
 
     def select_walk(self) -> str:
         """Select a random walk animation based on current weights"""
@@ -159,7 +159,7 @@ class AnimationLibrary:
             raise RuntimeError("No outro animations available")
 
         # Random selection with even distribution
-        return np.random.choice(self.config.outros)
+        return str(np.random.choice(self.config.outros))
 
     def get_audio_duration(self, animation_name: str) -> float:
         """
@@ -217,16 +217,9 @@ class AnimationLibrary:
 
         return intro_duration, walk_duration, outro_duration
 
-    def calculate_total_duration(self, intro: str, walk: str, outro: str) -> float:
-        """Calculate total duration for a complete animation sequence"""
-        intro_duration, walk_duration, outro_duration = self.get_sequence_durations(
-            intro, walk, outro
-        )
-        return intro_duration + walk_duration + outro_duration
-
     def select_animation_sequence(
         self, walk: Optional[str] = None
-    ) -> Tuple[str, str, str]:
+    ) -> Tuple[WalkDefinition, WalkDefinition, WalkDefinition]:
         """
         Select a complete animation sequence: intro, walk, outro
 
@@ -237,10 +230,18 @@ class AnimationLibrary:
             walk = self.select_walk()
         intro = self.select_intro(walk)
         outro = self.select_outro()
+        logger.info(f"selected {intro=} {walk=} {outro=}")
+
+        audio_intro = intro
+        if self.config.get_walk(walk):
+            audio_walk = self.config.get_walk(walk).audio or walk
+        else:
+            audio_walk = walk
+        audio_outro = outro    
 
         # Get durations for logging
         intro_duration, walk_duration, outro_duration = self.get_sequence_durations(
-            intro, walk, outro
+            audio_intro, audio_walk, audio_outro
         )
         total_duration = intro_duration + walk_duration + outro_duration
 
@@ -262,4 +263,22 @@ class AnimationLibrary:
         ):
             print(f"⚠️  Some animations missing audio files")
 
-        return intro, walk, outro
+        wintro = WalkDefinition(
+            image=intro,
+            audio=audio_intro,
+            duration=intro_duration
+        )
+
+        wwalk = WalkDefinition(
+            image=walk,
+            audio=audio_walk,
+            duration=walk_duration
+        )
+
+        woutro = WalkDefinition(
+            image=outro,
+            audio=audio_outro,
+            duration=outro_duration
+        )
+
+        return wintro, wwalk, woutro

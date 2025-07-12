@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from transitions import Machine
 from datetime import datetime
 
-from xwalk2.animation_library import AnimationLibrary
+from xwalk2.animation_library import AnimationLibrary, WalkDefinition
 from xwalk2.models import EndScene, PlayScene
 
 logger = logging.getLogger(__name__)
@@ -34,24 +34,18 @@ class Controller:
         intro, walk, outro = self.animations.select_animation_sequence(walk=queued_walk)
 
         # Get durations for timing
-        intro_duration, walk_duration, outro_duration = (
-            self.animations.get_sequence_durations(intro, walk, outro)
-        )
-        total_duration = intro_duration + walk_duration + outro_duration
+        total_duration = intro.duration + walk.duration + outro.duration
 
         # Create PlayScene
         play_command = PlayScene(
             intro=intro,
             walk=walk,
             outro=outro,
-            stop="stop",  
-            intro_duration=intro_duration,
-            walk_duration=walk_duration,
-            outro_duration=outro_duration,
+            stop=WalkDefinition(image="stop", audio="", duration=-1),  
             total_duration=total_duration,
         )
         self.send_message(play_command)
-        self.walk_history.append((datetime.now(), walk))
+        self.walk_history.append((datetime.now(), walk.image))
 
     def on_enter_ready(self):
         self.send_message(EndScene())

@@ -1,10 +1,11 @@
 import logging
 import os
 import subprocess
+from typing import List
 
 from pydantic import BaseModel
 
-from xwalk2.models import CurrentState, EndScene, PlayScene
+from xwalk2.models import CurrentState, EndScene, PlayScene, WalkDefinition
 from xwalk2.util import ImageLibrary, SubscribeComponent, add_default_args
 
 # ./led-image-viewer --led-cols=64 --led-chain=2 --led-gpio-mapping=adafruit-hat-pwm --led-pwm-lsb-nanoseconds=50 --led-show-refresh --led-pixel-mapper "U-mapper;Rotate:90" -l 1  countdown3.gif
@@ -40,9 +41,9 @@ class MatrixViewer(SubscribeComponent):
         )
         self.animations = ImageLibrary(image_root)
         self._process = None
-        self._playing = None
+        self._playing: List[str] = []
 
-    def _display_command(self, animation, shell=False, forever=False):
+    def _display_command(self, animation: str, shell=False, forever=False):
         """
         Return a list of command line arguments for showing the animated image.
         """
@@ -57,14 +58,14 @@ class MatrixViewer(SubscribeComponent):
         args.append(str(self.animations[animation]))
         return args
 
-    def kill(self):
+    def kill(self) -> None:
         """Kill the currently playing animation, if any."""
         if self._process:
             logger.debug(f"Killing: {self._playing} {self._process.pid}")
             subprocess.call(["/usr/bin/pkill", "-P", str(self._process.pid)])
             self._process.kill()
             self._process = None
-        self._playing = None
+        self._playing = []
 
     def _exec(self, command, shell=False):
         """Execute a new subprocess command."""
@@ -72,7 +73,7 @@ class MatrixViewer(SubscribeComponent):
         logger.debug("Executing: %s", command)
         self._process = subprocess.Popen(command, shell=shell)
 
-    def play(self, animation):
+    def play(self, animation: WalkDefinition):
         """
         Play the given animation. Any currently playing image will be replaced.
         """
@@ -82,12 +83,12 @@ class MatrixViewer(SubscribeComponent):
             logging.info(f"{animation=}")
             return
 
-        command = self._display_command(animation, shell=False, forever=True)
+        command = self._display_command(animation.image, shell=False, forever=True)
         # command = " ".join(command)
 
         logger.info("Playing: %s", animation)
         self._exec(command)
-        self._playing = [animation]
+        self._playing = [animation.image]
 
     def process_message(self, message: BaseModel):
         if isinstance(message, PlayScene):
@@ -95,13 +96,13 @@ class MatrixViewer(SubscribeComponent):
             #self.play(message.walk)
         elif isinstance(message, EndScene):
             if self._playing != ['stop']:
-                self.play("stop")
+                self.play(WalkDefinition(image="stop", audio="", duration=-1))
         elif isinstance(message, CurrentState):
             logger.info("Got CurrentState")
             if message.state == "ready" and self._playing != ['stop']:
-                self.play("stop")
+                self.play(WalkDefinition(image="stop", audio="", duration=-1))
 
-    def play_all(self, animations):
+    def play_all(self, animations: List[WalkDefinition]):
         """
         Play the given animations in sequence. Any currently playing image will
         be replaced.
@@ -112,13 +113,13 @@ class MatrixViewer(SubscribeComponent):
             return
 
         commands = []
-        for image in animations:
+        for walk in animations:
             forever = False
-            if image == "stop":
+            if walk.image == "stop":
                 forever = True
 
             commands.append(
-                " ".join(self._display_command(image, shell=True, forever=forever))
+                " ".join(self._display_command(walk.image, shell=True, forever=forever))
             )
 
         script = " && ".join(commands)
@@ -126,7 +127,7 @@ class MatrixViewer(SubscribeComponent):
         logger.info("Playing all: %s", animations)
         logger.debug("Script: %s", script)
         self._exec(script, shell=True)
-        self._playing = animations
+        self._playing = [a.image for a in animations]
 
 
 if __name__ == "__main__":

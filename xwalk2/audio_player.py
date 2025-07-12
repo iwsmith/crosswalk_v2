@@ -1,9 +1,10 @@
+from typing import List
 import logging
 import subprocess
 
 from pydantic import BaseModel
 
-from xwalk2.models import PlayScene
+from xwalk2.models import PlayScene, WalkDefinition
 from xwalk2.util import AudioLibrary, SubscribeComponent, add_default_args
 
 MPG123_COMMAND = ["mpg123", "-o", "alsa", "-q"]
@@ -25,13 +26,14 @@ class AudioPlayer(SubscribeComponent):
         )
         self.audio = AudioLibrary(audio_root)
         self._process = None
+        self._playing: List[WalkDefinition] = []
 
     def process_message(self, message: BaseModel):
         if isinstance(message, PlayScene):
             self.play_all([message.intro, message.walk, message.outro])
             #self.play(message.walk)
 
-    def _build_command(self, animation, forever=False):
+    def _build_command(self, animation):
         """
         Return a list of command line arguments for showing the animated image.
         """
@@ -52,23 +54,23 @@ class AudioPlayer(SubscribeComponent):
             subprocess.call(["/usr/bin/pkill", "-P", str(self._process.pid)])
             self._process.kill()
             self._process = None
-        self._playing = None
+        self._playing = []
 
-    def play(self, audio):
+    def play(self, audio: WalkDefinition):
         self.kill()
 
         if audio is None:
             return
 
-        command = self._build_command(audio)
+        command = self._build_command(audio.audio)
         logger.info("Playing: %s", audio)
         self._exec(command)
         self._playing = [audio]
 
-    def play_all(self, audios):
+    def play_all(self, audios: List[WalkDefinition]):
         self.kill()
 
-        commands = [" ".join(self._build_command(image)) for image in audios]
+        commands = [" ".join(self._build_command(w.audio)) for w in audios]
 
         script = " && ".join(commands)
 
