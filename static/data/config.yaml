@@ -109,6 +109,7 @@ walks:
     bird:
     cat:
     cow:
+    corgi:
     crab:
     dog:
     duck:
@@ -175,7 +176,8 @@ walks:
       audio: walk
     wok:
       audio: walk
-  
+  political:
+    abolishice:
   silly:
     fall:
     fishing-big:
@@ -204,6 +206,11 @@ walks:
 
   sleep:
     sleep:
+  trip:
+    gif-nyan:
+      audio: trip
+    gif-rainbow-heart:
+      audio: trip
 
 
 reselection:
@@ -218,6 +225,7 @@ reselection:
     - game
     - spoken-word
     - language
+
 
 weights:
   default:
