@@ -36,6 +36,8 @@ class WalkDefinition(BaseModel):
 
 class WalkInfo(BaseModel):
     audio: Optional[str] = None
+    intro: Optional[str] = None
+    outro: Optional[str] = None
     ignore_reselection: bool = False
 
 
