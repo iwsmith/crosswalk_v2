@@ -3,10 +3,12 @@ intros:
   - wait-6s
   - wait-8s
 
+
 outros:
   - countdown-3s
   - countdown-4s
   - countdown-5s
+
 
 walks:
   actions:
@@ -30,15 +32,11 @@ walks:
     cross-arms:
     cry:
     finger-wiggle:
-    fishing-big:
-    fishing-none:
-    fishing-small:
     football:
     golf:
     hammer-time:
     handshake:
     hold-hands:
-    home:
     hop:
     hopscotch:
     hug-3-people:
@@ -69,7 +67,6 @@ walks:
     swashbuckle:
     sweep:
     swim:
-    tag:
     tap-dance:
     tennis:
     tip-toe:
@@ -78,6 +75,7 @@ walks:
     wheelbarrow:
     whistle:
     yawn:
+  
   actionsplus:
     canoe:
     dance-hokey-pokey:
@@ -93,21 +91,19 @@ walks:
     hydrate:
     inflate-balloon:
     juggle:
-    mystery-box-bees:
-    mystery-box-cake:
-    mystery-box-carrots:
-    mystery-box-stinky:
     order-by-height:
     rowboat:
     team-cheer:
     thank-rangers:
     tightrope:
     windy-walk:
+  
   airguitar:
     aircello:
     airdrum:
     airsax:
     airtrombone:
+  
   animals:
     bee:
     bird:
@@ -126,6 +122,7 @@ walks:
     snake:
     turtle:
     worm:
+
   fin:
     home:
 
@@ -140,6 +137,8 @@ walks:
     point-at-yellow:
     race:
     staring-contest:
+    tag:
+
 
   spoken-word:
     karaoke-all-star:
@@ -156,15 +155,18 @@ walks:
     poetry-separation-w-s-merwin:
     poetry-thank-you-ross-gay:
     poetry-we-never-know-emily-dickinson:
+  
   language:
     walk-arabic:
     walk-danish:
     walk-german:
     walk-japanese:
     walk-mandarin-taiwan:
+  
   normal:
     walk:
       ignore_reselection: true
+  
   normalish:
     backwards-walk:
     walkdress:
@@ -173,8 +175,12 @@ walks:
       audio: walk
     wok:
       audio: walk
+  
   silly:
     fall:
+    fishing-big:
+    fishing-none:
+    fishing-small:
     flying:
     frankensteins-monster-walk:
     ghost:
@@ -182,6 +188,10 @@ walks:
     invisible-car:
     jello:
     moonwalk:
+    mystery-box-bees:
+    mystery-box-cake:
+    mystery-box-carrots:
+    mystery-box-stinky:
     puff-cheeks:
     # teleport-a:
     # teleport-b:
@@ -190,10 +200,24 @@ walks:
     unicycle:
     werewolf:
     witch:
-    wizard:
     zombie:
+
   sleep:
     sleep:
+
+
+reselection:
+  # walk cooldowns are opt-out. Set ignore_reselection: true
+  # on a given walk to disable cooldown for that walk.
+  walk_cooldown: 10
+  # category cooldowns are opt-in. Set cooldown_categories:
+  # on a given category to enable cooldown for that category.
+  category_cooldown: 3
+  cooldown_categories:
+    - airguitar
+    - game
+    - spoken-word
+    - language
 
 weights:
   default:
@@ -358,17 +382,6 @@ weights:
   go_home:
     fin: 1
 
-reselection:
-  # walk cooldowns are opt-out. Set ignore_reselection: true
-  # on a given walk to disable cooldown for that walk.
-  walk_cooldown: 10
-  # category cooldowns are opt-in. Set cooldown_categories:
-  # on a given category to enable cooldown for that category.
-  category_cooldown: 3
-  cooldown_categories:
-    - airguitar
-    - spoken-word
-    - language
 
 menu:
   - start: '2025-06-05T01:45:00'
@@ -411,6 +424,7 @@ menu:
     weights: quiet_hours
   - start: '2025-07-20T08:00:00'
     weights: go_home
+
 
 schedule: []
   #- time: '2019-07-06T21:00:00'
