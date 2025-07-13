@@ -109,8 +109,6 @@ walks:
     bird:
     cat:
     cow:
-    corgi:
-      audio: dog
     crab:
     dog:
     duck:
@@ -177,16 +175,15 @@ walks:
   
   normalish:
     backwards-walk:
-    walkdress:
-      audio: walk
-    walkpants:
-      audio: walk
     wok:
       audio: walk
   political:
     abolishice:
     abolish-ice:
   silly:
+    corgi:
+      audio: dog
+    cult-of-the-eye:
     fall:
     fishing-big:
     fishing-none:

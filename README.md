@@ -260,7 +260,7 @@ done
 # convert back to mp3s and increase the volume a little
 cd normalized
 for filename in *.mkv; do
-    ffmpeg -i $filename -filter:a "volume=2.0" -codec:a libmp3lame -b:a 192k ${filename%%.*}.mp3 
+    ffmpeg -i $filename -filter:a "volume=2.0" -codec:a libmp3lame -b:a 48k ${filename%%.*}.mp3 
 done
 ```
 
