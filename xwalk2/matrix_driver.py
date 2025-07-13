@@ -93,8 +93,8 @@ class MatrixViewer(SubscribeComponent):
 
     def process_message(self, message: BaseModel):
         if isinstance(message, PlayScene):
-            self.play_all([message.intro, message.walk, message.outro, message.stop])
-            #self.play(message.walk)
+            #self.play_all([message.intro, message.walk, message.outro, message.stop])
+            self.play(message.walk)
         elif isinstance(message, EndScene):
             if self._playing != ['stop']:
                 self.play(WalkDefinition(image="stop", audio="", duration=-1))

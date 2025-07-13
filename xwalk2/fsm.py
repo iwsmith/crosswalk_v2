@@ -34,7 +34,8 @@ class Controller:
         intro, walk, outro = self.animations.select_animation_sequence(walk=queued_walk)
 
         # Get durations for timing
-        total_duration = intro.duration + walk.duration + outro.duration
+        #total_duration = intro.duration + walk.duration + outro.duration
+        total_duration =  walk.duration 
 
         # Create PlayScene
         play_command = PlayScene(
