@@ -12,6 +12,7 @@ from xwalk2.util import ImageLibrary, SubscribeComponent, add_default_args
 
 VIEWER_COMMAND = [
     "led-image-viewer",
+    "-m",
     "--led-cols=64",
     "--led-chain=2",
     "--led-gpio-mapping=adafruit-hat-pwm",

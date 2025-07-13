@@ -47,7 +47,7 @@ COMMON_ARGS=(
   --led-chain=2
   --led-gpio-mapping=adafruit-hat-pwm
   --led-pixel-mapper "U-mapper;Rotate:$ROTATION"
-  --led-no-drop-privs
+  --led-drop-priv-user=crosswalk
 )
 
 rm -rf $OUTPUT_DIR/*
