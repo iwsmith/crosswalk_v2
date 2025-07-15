@@ -136,8 +136,7 @@ class AnimationLibrary:
 
         if not valid_walks:
             logger.error(
-                f"No valid walks available for selection. {category=} {len(walk_names)=}, {len(valid_walks)=}\n"
-                "Check your config for walk definitions and reselection settings."
+                f"No valid walks available for selection. {category=} {len(walk_names)=}, {len(valid_walks)=}"
             )
             valid_walks = walk_names
 

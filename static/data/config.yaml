@@ -179,6 +179,7 @@ walks:
       audio: walk
   political:
     abolishice:
+      audio: abolish-ice
     abolish-ice:
   silly:
     corgi:

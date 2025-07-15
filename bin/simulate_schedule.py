@@ -22,11 +22,13 @@ if __name__ == "__main__":
 
   cats = df['category'].value_counts().sort('count', descending=True)
   cats = cats.with_columns(pct=pl.col('count')/pl.col('count').sum())
-  print(cats)
+  print(cats.head(10))
 
   walks = df['walk'].value_counts().sort('count', descending=True)
   walks = walks.with_columns(pct=pl.col('count')/pl.col('count').sum())
   print(walks.head(10))
+
+  print(df.head(10))
 
 
   
