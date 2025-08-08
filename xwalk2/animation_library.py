@@ -89,37 +89,38 @@ class AnimationLibrary:
         categories = list(weights.keys())
         walk_names: list[str] = []
 
-        if len(categories) == 1:
-            for walks in self.config.walks.values():
-                walk_names.extend(walks.keys())
+        # We need to change this beacuse of the go home schedule
+        # if len(categories) == 1:
+        #     for walks in self.config.walks.values():
+        #         walk_names.extend(walks.keys())
 
-            category = "all (_)"
-        else:
-            valid_categories = []
-            for cat in categories:
-                if cat in self.config.reselection.cooldown_categories:
-                    # Skip categories in cooldown
-                    if cat in self.category_history:
-                        continue
-                    else:
-                        valid_categories.append(cat)
+        #     category = "all (_)"
+        # else:
+        valid_categories = []
+        for cat in categories:
+            if cat in self.config.reselection.cooldown_categories:
+                # Skip categories in cooldown
+                if cat in self.category_history:
+                    continue
                 else:
-                    # Add to valid categories if not in cooldown
                     valid_categories.append(cat)
+            else:
+                # Add to valid categories if not in cooldown
+                valid_categories.append(cat)
 
-            if not valid_categories:
-                logger.error(
-                    "No valid categories available for walk selection. "
-                    "Check your config for reselection cooldown categories."
-                )
-                valid_categories = categories
+        if not valid_categories:
+            logger.error(
+                "No valid categories available for walk selection. "
+                "Check your config for reselection cooldown categories."
+            )
+            valid_categories = categories
 
-            vaild_weights = [weights[cat] for cat in valid_categories]
+        vaild_weights = [weights[cat] for cat in valid_categories]
 
-            cat_weights = np.array(vaild_weights, dtype=np.float32)
-            cat_weights /= cat_weights.sum()  # Normalize weights
-            category = str(np.random.choice(valid_categories, p=cat_weights))
-            walk_names = list(self.config.walks[category].keys())
+        cat_weights = np.array(vaild_weights, dtype=np.float32)
+        cat_weights /= cat_weights.sum()  # Normalize weights
+        category = str(np.random.choice(valid_categories, p=cat_weights))
+        walk_names = list(self.config.walks[category].keys())
 
         valid_walks = []
         for walk in walk_names:

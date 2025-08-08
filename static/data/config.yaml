@@ -34,7 +34,6 @@ walks:
     finger-wiggle:
     football:
     golf:
-    hammer-time:
     handshake:
     hold-hands:
     hop:
@@ -172,15 +171,20 @@ walks:
   normal:
     walk:
       ignore_reselection: true
+      audio:
+        walk-esplanade
   
   normalish:
     backwards-walk:
     wok:
       audio: walk
+    hammer-time:
+
   political:
     abolishice:
       audio: abolish-ice
     abolish-ice:
+
   silly:
     corgi:
       audio: dog
@@ -207,14 +211,13 @@ walks:
     tree:
     unicycle:
     werewolf:
-    witch:
+    witcr:
     zombie:
 
   sleep:
     sleep:
   trip:
-    gif-nyan:
-      audio: trip
+    nyan-cat:
     gif-rainbow-heart:
       audio: trip
 
@@ -263,10 +266,10 @@ weights:
     silly: 0
     sleep: 0
   monday:
-    actions: 0
+    actions: 2
     actionsplus: 0
     airguitar: 0
-    animals: 0
+    animals: 2
     fin: 0
     game: 0
     spoken-word: 0
@@ -296,13 +299,14 @@ weights:
     airguitar: 5
     animals: 20
     fin: 0
-    game: 0
+    game: 5
     spoken-word: 0
-    language: 25
-    normal: 20
-    normalish: 10
+    language: 20
+    normal: 15
+    normalish: 5
     silly: 0
     sleep: 0
+    political: 2
   wednesday_night:
     actions: 15
     actionsplus: 0
@@ -316,6 +320,7 @@ weights:
     normalish: 10
     silly: 0
     sleep: 5
+    political: 2
   thursday:
     actions: 15
     actionsplus: 10
@@ -329,20 +334,22 @@ weights:
     normalish: 5
     silly: 5
     sleep: 0
+    political: 2
   thursday_night:
-    actions: 15
-    actionsplus: 5
+    actions: 30
+    actionsplus: 10
     airguitar: 5
     animals: 20
     fin: 0
     game: 0
     spoken-word: 10
-    language: 5
-    normal: 15
-    normalish: 10
-    silly: 5
-    sleep: 5
+    language: 3
+    normal: 3
+    normalish: 3
+    silly: 10
+    sleep: 1
     trip: 5
+    political: 2
   friday:
     actions: 15
     actionsplus: 10
@@ -350,26 +357,28 @@ weights:
     animals: 10
     fin: 0
     game: 5
-    spoken-word: 0
-    language: 15
-    normal: 20
+    spoken-word: 5
+    language: 5
+    normal: 10
     normalish: 5
     silly: 5
     sleep: 0
+    political: 2
   friday_night:
-    actions: 15
-    actionsplus: 5
+    actions: 30
+    actionsplus: 10
     airguitar: 5
     animals: 20
     fin: 0
     game: 0
     spoken-word: 10
-    language: 5
-    normal: 15
-    normalish: 10
-    silly: 5
-    sleep: 5
-    trip: 10
+    language: 3
+    normal: 3
+    normalish: 3
+    silly: 10
+    sleep: 1
+    trip: 5
+    political: 2
   saturday:
     actions: 15
     actionsplus: 10
@@ -377,26 +386,28 @@ weights:
     animals: 10
     fin: 0
     game: 5
-    spoken-word: 0
-    language: 15
-    normal: 20
+    spoken-word: 5
+    language: 5
+    normal: 5
     normalish: 5
     silly: 5
     sleep: 0
+    political: 2
   saturday_night:
-    actions: 15
-    actionsplus: 5
+    actions: 30
+    actionsplus: 10
     airguitar: 5
     animals: 20
     fin: 0
     game: 0
     spoken-word: 10
-    language: 5
-    normal: 15
-    normalish: 10
-    silly: 5
-    sleep: 5
-    trip: 15
+    language: 3
+    normal: 3
+    normalish: 3
+    silly: 10
+    sleep: 1
+    trip: 5
+    political: 2
   quiet_hours:
     sleep: 1
   go_home:

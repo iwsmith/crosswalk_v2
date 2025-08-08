@@ -63,7 +63,7 @@ class MatrixViewer(SubscribeComponent):
         """Kill the currently playing animation, if any."""
         if self._process:
             logger.debug(f"Killing: {self._playing} {self._process.pid}")
-            subprocess.call(["/usr/bin/pkill", "-P", str(self._process.pid)])
+            subprocess.call(["/usr/bin/pkill", "-9", "-P", str(self._process.pid)])
             self._process.kill()
             self._process = None
         self._playing = []

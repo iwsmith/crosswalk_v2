@@ -288,3 +288,17 @@ This command must be run on *both* crosswalks!
 `magick -delay 400 img_00.png -delay 0 img_01.png  img.gif`
 
 You can simulate schedules by using `uv run bin/simulate_schedule.py tuesday`
+
+## Notes from Critical
+* Have component timers user the controller's recieved itme
+* button-b seems to get upset ocassionally
+* logger would be nice
+* limit how much walk history gets printed
+* show config hash
+* nyan cat should go meow meow meow
+* airdrop for xwalk laptop
+* port for hackerman to xwalk
+
+## Walk ideas
+* right turn only, left turn only
+* red light/green light
