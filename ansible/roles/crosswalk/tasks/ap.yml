@@ -1,0 +1,97 @@
+---
+- name: Create primary Wi-Fi connection profile
+  when: "'access_point' in group_names"
+  copy:
+    dest: /etc/NetworkManager/system-connections/corginia.nmconnection
+    mode: '0600'
+    content: |
+      [connection]
+      id=corginia
+      type=wifi
+      interface-name=wlan0
+      autoconnect=true
+
+      [wifi]
+      ssid=corginia_slow
+      mode=infrastructure
+
+      [wifi-security]
+      key-mgmt=wpa-psk
+      psk={{ corginia_wifi_password }}
+
+      [ipv4]
+      method=auto
+
+      [ipv6]
+      method=ignore
+
+- name: Create fallback AP connection profile (not autoconnect)
+  when: "'access_point' in group_names"
+  copy:
+    dest: /etc/NetworkManager/system-connections/crosswalk.nmconnection
+    mode: '0600'
+    content: |
+      [connection]
+      id=crosswalk
+      type=wifi
+      interface-name=wlan0
+      autoconnect=false
+
+      [wifi]
+      mode=ap
+      ssid=crosswalk
+
+      [wifi-security]
+      key-mgmt=wpa-psk
+      psk={{ crosswalk_wifi_password }}
+
+      [ipv4]
+      method=shared
+
+      [ipv6]
+      method=ignore
+
+- name: Create fallback check script
+  when: "'access_point' in group_names"
+  copy:
+    dest: /usr/local/bin/check_wifi_fallback.sh
+    mode: '0755'
+    content: |
+      #!/bin/bash
+      PRIMARY_SSID="corginia"
+      FALLBACK_SSID="crosswalk"
+
+      # Check if connected to primary SSID
+      CURRENT_SSID=$(nmcli -t -f active,ssid dev wifi | grep '^yes:' | cut -d: -f2)
+
+      if [ "$CURRENT_SSID" != "$PRIMARY_SSID" ]; then
+        echo "Primary SSID not connected, switching to fallback AP..."
+        nmcli con up id "$FALLBACK_SSID"
+      else
+        echo "Connected to primary SSID ($PRIMARY_SSID), no action needed."
+      fi
+
+- name: Create systemd service for fallback check
+  when: "'access_point' in group_names"
+  copy:
+    dest: /etc/systemd/system/wifi-fallback.service
+    mode: '0644'
+    content: |
+      [Unit]
+      Description=Check WiFi fallback and activate AP if primary WiFi unavailable
+      After=network-online.target
+      Wants=network-online.target
+
+      [Service]
+      Type=oneshot
+      ExecStart=/usr/local/bin/check_wifi_fallback.sh
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Enable and start wifi-fallback service
+  when: "'access_point' in group_names"
+  systemd:
+    name: wifi-fallback.service
+    enabled: true
+    state: started

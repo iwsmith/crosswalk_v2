@@ -73,6 +73,18 @@
     mode: '4755'
     remote_src: yes
 
+- name: Ensure /opt/crosswalk_stream is owned by crosswalk
+  become: yes
+  file:
+    path: /opt/crosswalk_stream
+    state: directory
+    owner: crosswalk
+    group: crosswalk
+    mode: '0755'
+
+- name: Make streams from gifs
+  ansible.builtin.shell: /opt/crosswalk/bin/make_stream.sh /opt/crosswalk/static/data/ /opt/crosswalk_stream/ {{crosswalk_led_angle}}
+
 - name: Install xwalk service files
   become: yes
   template:

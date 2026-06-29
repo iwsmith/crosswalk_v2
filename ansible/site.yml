@@ -1,5 +1,7 @@
 ---
 - hosts: signs
   become: true
+  vars_files:
+    - private/secrets.yaml
   roles:
     - crosswalk

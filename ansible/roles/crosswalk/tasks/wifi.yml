@@ -1,0 +1,33 @@
+---
+- name: Set Wi-Fi networks list
+  set_fact:
+    wifi_networks:
+      - ssid: "crosswalk"
+        password: "{{ crosswalk_wifi_password }}"
+        priority: 1
+      - ssid: "corginia_slow"
+        password: "{{ corginia_wifi_password }}"
+        priority: 5
+  when: "'access_point' not in group_names"
+
+- name: Ensure NetworkManager is installed
+  apt:
+    name: network-manager
+    state: present
+    update_cache: yes
+  when: "'access_point' not in group_names"
+
+- name: Add Wi-Fi connections
+  nmcli:
+    conn_name: "{{ item.ssid }}"
+    type: wifi
+    ifname: wlan0
+    ssid: "{{ item.ssid }}"
+    wifi_sec:
+      key-mgmt: wpa-psk
+      psk: "{{ item.password }}"
+    state: present
+    autoconnect: yes
+    priority: "{{ item.priority }}"
+  loop: "{{ wifi_networks }}"
+  when: "'access_point' not in group_names"
