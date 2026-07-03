@@ -35,9 +35,35 @@ ul.compact-list button:hover {
 
         #status { background: #f0f0f0; padding: 20px; margin: 20px 0; }
         .button-group { margin: 20px 0; }
+        .noscript-warning {
+            background: #b00020;
+            color: #fff;
+            padding: 12px 16px;
+            margin: -40px -40px 20px -40px;
+            font-weight: bold;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
+    <noscript>
+        <div class="noscript-warning">
+            ⚠️ JavaScript is disabled or not loading. This control panel needs it to
+            refresh status and send commands — buttons will not work until it is enabled.
+        </div>
+    </noscript>
+    <div id="js-load-warning" class="noscript-warning" style="display:none">
+        ⚠️ The control panel script (htmx) failed to load, so buttons and status
+        updates will not work. Check that /static/htmx.min.js is being served.
+    </div>
     {% block content %}{% endblock %}
+    <script>
+        // htmx.min.js is loaded synchronously in <head>, so by the time this
+        // runs it is either present or failed. If it failed (e.g. the local
+        // static file isn't being served), surface a warning. No external deps.
+        if (!window.htmx) {
+            document.getElementById('js-load-warning').style.display = 'block';
+        }
+    </script>
 </body>
 </html>
