@@ -21,7 +21,7 @@ VIEWER_COMMAND = [
     "--led-drop-priv-user=crosswalk",
 ]
 
-ROTATION = os.getenv("XWALK_LED_ANGLE")
+ROTATION = os.getenv("XWALK_LED_ANGLE", "90")
 SHELL_MAPPER = f'--led-pixel-mapper="U-mapper;Rotate:{ROTATION}"'  # When execing in shell we need to quote
 EXEC_MAPPER = f"--led-pixel-mapper=U-mapper;Rotate:{ROTATION}"  # When calling popen without a shell we don't quote
 
@@ -55,7 +55,13 @@ class MatrixViewer(SubscribeComponent):
         else:
             args.append(EXEC_MAPPER)
         if not forever:
-            args.append("-l 1")  # Note: `l=1` doesn't work, `l 1` does
+            # Note: `-l=1` doesn't work, `-l 1` does. In exec (non-shell) mode
+            # these must be two separate argv tokens; only joined with a space
+            # when building a shell command string.
+            if shell:
+                args.append("-l 1")
+            else:
+                args.extend(["-l", "1"])
         args.append(str(self.animations[animation]))
         return args
 

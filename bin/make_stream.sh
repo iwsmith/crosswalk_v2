@@ -50,14 +50,20 @@ COMMON_ARGS=(
   --led-drop-priv-user=crosswalk
 )
 
-rm -rf $OUTPUT_DIR/*
+# Build into a staging directory and swap it in atomically at the end so a
+# running matrix driver never sees a half-populated stream directory. The
+# staging dir is world-readable (mktemp defaults to 0700) so the unprivileged
+# crosswalk service can read the swapped-in files.
+STAGING="$(mktemp -d "${OUTPUT_DIR%/}.build.XXXXXX")"
+chmod 0755 "$STAGING"
+trap 'rm -rf "$STAGING"' EXIT
 
 # Process all .gif files
 find "$INPUT_DIR" -type f -name "*$EXT" | while read -r file; do
     # Get relative path and output location
     rel_path=$(realpath --relative-to="$INPUT_DIR" "$file")
     output_path="${rel_path%$EXT}.stream"
-    full_output="$OUTPUT_DIR/$output_path"
+    full_output="$STAGING/$output_path"
 
     # Ensure output directory exists
     mkdir -p "$(dirname "$full_output")"
@@ -65,3 +71,13 @@ find "$INPUT_DIR" -type f -name "*$EXT" | while read -r file; do
     echo "Processing $file → $full_output"
     $CMD "${COMMON_ARGS[@]}" "$file" -O"$full_output"
 done
+
+# Atomically replace the live directory with the freshly built one.
+OLD="${OUTPUT_DIR%/}.old"
+rm -rf "$OLD"
+if [[ -d "$OUTPUT_DIR" ]]; then
+    mv "$OUTPUT_DIR" "$OLD"
+fi
+mv "$STAGING" "$OUTPUT_DIR"
+trap - EXIT
+rm -rf "$OLD"

@@ -1,3 +1,4 @@
+import logging
 import os
 from argparse import ArgumentParser
 import threading
@@ -10,6 +11,8 @@ import zmq
 from pydantic import BaseModel
 
 from xwalk2.models import Heatbeat, parse_message
+
+logger = logging.getLogger(__name__)
 
 
 class Heartbeat:
@@ -101,8 +104,18 @@ class SubscribeComponent:
             try:
                 while True:
                     msg = socket.recv_string()
-                    message = parse_message(msg)
-                    self.process_message(message)
+                    # Don't let a single malformed message or missing asset
+                    # (e.g. KeyError from an unknown gif/audio name) tear down
+                    # the whole component.
+                    try:
+                        message = parse_message(msg)
+                        self.process_message(message)
+                    except Exception:
+                        logger.exception(
+                            "%s failed to handle message: %s",
+                            self.component_name,
+                            msg,
+                        )
             except KeyboardInterrupt:
                 print(f"\nShutting down {self.component_name}")
             finally:
@@ -176,8 +189,17 @@ class SubscribeInteractComponent:
             try:
                 while True:
                     msg = subscribe_socket.recv_string()
-                    message = parse_message(msg)
-                    self.process_message(message)
+                    # Don't let a single malformed message or missing asset
+                    # tear down the whole component.
+                    try:
+                        message = parse_message(msg)
+                        self.process_message(message)
+                    except Exception:
+                        logger.exception(
+                            "%s failed to handle message: %s",
+                            self.component_name,
+                            msg,
+                        )
             except KeyboardInterrupt:
                 print(f"\nShutting down {self.component_name}")
             finally:

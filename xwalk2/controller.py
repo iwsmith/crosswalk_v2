@@ -92,6 +92,12 @@ def main():
                     state.walk_queue.extend(categories.keys())
                 return make_response(message=f"All walks queued. {len(state.walk_queue)} total queued.")
             else:
+                # Reject unknown walks up front rather than letting the FSM try
+                # (and fail) to build a scene for a non-existent animation.
+                if state.animations.config.get_walk(request.walk) is None:
+                    return make_response(
+                        message=f"Unknown walk '{request.walk}'", success=False
+                    )
                 state.walk_queue.append(request.walk)
                 return make_response(message=f"Walk '{request.walk}' queued. {len(state.walk_queue)} total queued.")
         elif isinstance(request, APIQueueClear):

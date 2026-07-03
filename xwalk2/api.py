@@ -1,3 +1,4 @@
+import threading
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -33,17 +34,31 @@ class SystemStatus(BaseModel):
     animations: Animations | None = None  # Optional animations data
 
 
+CONTROLLER_ADDRESS = "tcp://localhost:5559"
+
+
 class APIController:
     def __init__(self):
         self.context = zmq.Context()
         self.api_socket = None  # Single REQ socket for all communication
         self.start_time = time.time()
+        # Serialize access: a REQ socket requires strict send/recv alternation,
+        # so concurrent FastAPI requests must not share it simultaneously.
+        self._lock = threading.Lock()
+
+    def _open_socket(self):
+        """(Re)create the REQ socket and connect to the controller."""
+        if self.api_socket is not None:
+            # Discard a socket that may be in a bad state. LINGER=0 so a pending
+            # unsent/unreceived message doesn't block close().
+            self.api_socket.close(linger=0)
+        self.api_socket = self.context.socket(zmq.REQ)
+        self.api_socket.connect(CONTROLLER_ADDRESS)
 
     def start(self):
         """Initialize ZMQ connection"""
         try:
-            self.api_socket = self.context.socket(zmq.REQ)
-            self.api_socket.connect("tcp://localhost:5559")
+            self._open_socket()
             print("API Controller initialized successfully")
             print("Connected to controller on port 5559")
         except Exception as e:
@@ -53,23 +68,30 @@ class APIController:
     def stop(self):
         """Clean up ZMQ connection"""
         if self.api_socket:
-            self.api_socket.close()
+            self.api_socket.close(linger=0)
         if self.context:
             self.context.term()
 
     def _send_request(self, request: APIRequests) -> APIResponse:
         if not self.api_socket:
             raise RuntimeError("API Controller not initialized")
-        try:
-            self.api_socket.send_string(request.model_dump_json())
-            if self.api_socket.poll(timeout=5000):
-                response_data = self.api_socket.recv_string()
-                return APIResponse.model_validate_json(response_data)
-            else:
-                raise TimeoutError("Controller did not respond within timeout")
-        except zmq.ZMQError as e:
-            print(f"ZMQ communication error: {e}")
-            raise ConnectionError("Failed to communicate with controller")
+        # A REQ socket is a strict lockstep state machine. If a request times out
+        # (we never recv the reply) or errors mid-exchange, the socket is left in
+        # an unusable state and every later request would fail. Hold a lock so
+        # exchanges don't interleave, and rebuild the socket on any failure.
+        with self._lock:
+            try:
+                self.api_socket.send_string(request.model_dump_json())
+                if self.api_socket.poll(timeout=5000):
+                    response_data = self.api_socket.recv_string()
+                    return APIResponse.model_validate_json(response_data)
+                else:
+                    self._open_socket()  # reset the wedged REQ socket
+                    raise TimeoutError("Controller did not respond within timeout")
+            except zmq.ZMQError as e:
+                print(f"ZMQ communication error: {e}")
+                self._open_socket()  # reset the wedged REQ socket
+                raise ConnectionError("Failed to communicate with controller")
 
     def timer_expired(self) -> APIResponse:
         """Send timer expired event"""
