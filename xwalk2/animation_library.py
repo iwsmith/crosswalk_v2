@@ -115,9 +115,9 @@ class AnimationLibrary:
             )
             valid_categories = categories
 
-        vaild_weights = [weights[cat] for cat in valid_categories]
+        valid_weights = [weights[cat] for cat in valid_categories]
 
-        cat_weights = np.array(vaild_weights, dtype=np.float32)
+        cat_weights = np.array(valid_weights, dtype=np.float32)
         cat_weights /= cat_weights.sum()  # Normalize weights
         category = str(np.random.choice(valid_categories, p=cat_weights))
         walk_names = list(self.config.walks[category].keys())

@@ -12,7 +12,7 @@ from tkinter import Canvas
 import argparse
 import logging
 
-from xwalk2.util import Heartbeat, add_default_args
+from xwalk2.util import HeartbeatSender, add_default_args
 from xwalk2.models import CurrentState, EndScene, PlayScene, ResetCommand, parse_message, WalkDefinition
 
 
@@ -328,7 +328,7 @@ def main(args):
     socket.connect(args.controller)
     socket.setsockopt_string(zmq.SUBSCRIBE, "")  # Subscribe to all messages
 
-    heartbeat_thread = Heartbeat(
+    heartbeat_thread = HeartbeatSender(
         "matrix_display_virtual", args.hostname, args.heartbeat
     )
     heartbeat_thread.start()

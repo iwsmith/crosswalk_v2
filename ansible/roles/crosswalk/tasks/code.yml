@@ -80,7 +80,7 @@
   make:
     chdir: /opt/rpi-rgb-led-matrix/utils
 
-- name: Copy led-iamge-viewer to /usr/local/bin with setuid
+- name: Copy led-image-viewer to /usr/local/bin with setuid
   become: yes
   copy:
     src: /opt/rpi-rgb-led-matrix/utils/led-image-viewer

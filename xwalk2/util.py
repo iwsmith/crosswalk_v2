@@ -10,12 +10,12 @@ from typing import Dict, List, Optional
 import zmq
 from pydantic import BaseModel
 
-from xwalk2.models import Heatbeat, parse_message
+from xwalk2.models import Heartbeat, parse_message
 
 logger = logging.getLogger(__name__)
 
 
-class Heartbeat:
+class HeartbeatSender:
     def __init__(
         self,
         component: str,
@@ -39,7 +39,7 @@ class Heartbeat:
 
         try:
             while not self.stop_event.is_set():
-                msg = Heatbeat(
+                msg = Heartbeat(
                     host=self.host, component=self.component, sent_at=datetime.now(), initial=(initial <= 2)
                 ).model_dump_json()
                 if initial <= 2:
@@ -63,7 +63,10 @@ class Heartbeat:
         if self._started:
             self.stop_event.set()
             if self.thread:
-                self.thread.join(0)
+                # Actually wait for the beat loop to notice stop_event and exit
+                # (it sleeps up to every_s between beats). join(0) returned
+                # immediately and left the non-daemon thread running.
+                self.thread.join(timeout=self.every_s + 1)
             self._started = False
 
     def __enter__(self):
@@ -96,7 +99,7 @@ class SubscribeComponent:
         socket.connect(self.subscribe_address)
         socket.setsockopt_string(zmq.SUBSCRIBE, "")
 
-        with Heartbeat(
+        with HeartbeatSender(
             self.component_name,
             self.host_name,
             heartbeat_address=self.heartbeat_address,
@@ -147,7 +150,7 @@ class InteractComponent:
         self.socket = context.socket(zmq.PUB)
         self.socket.connect(self.interact_address)
 
-        with Heartbeat(self.component_name, self.host_name, self.heartbeat_address):
+        with HeartbeatSender(self.component_name, self.host_name, self.heartbeat_address):
             try:
                 self.loop()
             except KeyboardInterrupt:
@@ -185,7 +188,7 @@ class SubscribeInteractComponent:
         subscribe_socket.connect(self.subscribe_address)
         subscribe_socket.setsockopt_string(zmq.SUBSCRIBE, "")
 
-        with Heartbeat(self.component_name, self.host_name, self.heartbeat_address):
+        with HeartbeatSender(self.component_name, self.host_name, self.heartbeat_address):
             try:
                 while True:
                     msg = subscribe_socket.recv_string()

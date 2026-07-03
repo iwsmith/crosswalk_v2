@@ -4,7 +4,7 @@ import subprocess
 
 from pydantic import BaseModel
 
-from xwalk2.models import PlayScene, WalkDefinition
+from xwalk2.models import EndScene, PlayScene, ResetCommand, WalkDefinition
 from xwalk2.util import AudioLibrary, SubscribeComponent, add_default_args
 
 MPG123_COMMAND = ["mpg123", "-o", "alsa", "-q"]
@@ -32,6 +32,10 @@ class AudioPlayer(SubscribeComponent):
         if isinstance(message, PlayScene):
             self.play_all([message.intro, message.walk, message.outro])
             #self.play(message.walk)
+        elif isinstance(message, (EndScene, ResetCommand)):
+            # Stop any in-progress playback when the scene ends or is reset,
+            # matching the matrix/button-light components.
+            self.kill()
 
     def _build_command(self, animation):
         """

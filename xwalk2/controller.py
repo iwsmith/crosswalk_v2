@@ -14,7 +14,7 @@ from xwalk2.models import (
     APITimerExpired,
     ButtonPress,
     CurrentState,
-    Heatbeat,
+    Heartbeat,
     TimerExpired,
     parse_message,
     parse_api
@@ -137,7 +137,7 @@ def main():
                 break
 
             if heartbeats in socks:
-                beat = Heatbeat.model_validate_json(heartbeats.recv_string())
+                beat = Heartbeat.model_validate_json(heartbeats.recv_string())
                 component_name = f"{beat.component}/{beat.host}"
                 if component_name not in components or beat.initial:
                     logger.info(f"{component_name} sent {beat.initial} or {component_name in components}")

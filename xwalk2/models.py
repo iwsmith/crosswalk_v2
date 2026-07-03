@@ -86,7 +86,7 @@ class Animations(BaseModel):
         return None
 
 
-class Heatbeat(BaseModel):
+class Heartbeat(BaseModel):
     type: Literal["heartbeat"] = "heartbeat"
     host: str
     component: str
@@ -192,7 +192,7 @@ class TimerExpired(BaseModel):
 
 message_registry = {
     "button_press": ButtonPress,
-    "heartbeat": Heatbeat,
+    "heartbeat": Heartbeat,
     "play_scene": PlayScene,
     "end_scene": EndScene,
     "current_state": CurrentState,
