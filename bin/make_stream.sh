@@ -47,7 +47,12 @@ COMMON_ARGS=(
   --led-chain=2
   --led-gpio-mapping=adafruit-hat-pwm
   --led-pixel-mapper "U-mapper;Rotate:$ROTATION"
-  --led-drop-priv-user=crosswalk
+  # This is an offline gif->stream conversion, not a live display. Do NOT drop
+  # privileges: the script runs as root and writes into a root-owned staging
+  # dir, so dropping to the crosswalk user here would make every -O write fail
+  # with permission denied and leave the stream dir empty. (We chown the
+  # finished tree to crosswalk below, before swapping it in.)
+  --led-no-drop-privs
 )
 
 # Build into a staging directory and swap it in atomically at the end so a
@@ -71,6 +76,10 @@ find "$INPUT_DIR" -type f -name "*$EXT" | while read -r file; do
     echo "Processing $file → $full_output"
     $CMD "${COMMON_ARGS[@]}" "$file" -O"$full_output"
 done
+
+# led-image-viewer ran as root, so the streams are root-owned. Hand the tree to
+# the crosswalk service user (which only needs read) before swapping it in.
+chown -R crosswalk:crosswalk "$STAGING" 2>/dev/null || true
 
 # Atomically replace the live directory with the freshly built one.
 OLD="${OUTPUT_DIR%/}.old"
