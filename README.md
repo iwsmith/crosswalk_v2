@@ -31,6 +31,48 @@ Some useful commands:
 - `systemctl status xwalk_*` get xwalk status
 - `systemctl restart xwalk_*` restart all xwalk services
 
+#### Deploying new code
+
+The `code` tasks deploy by **`git pull`-ing `main` from GitHub on each box** — they
+do *not* copy your local working tree. So push first, then run the playbook.
+
+1. **Push to `main`:**
+
+   ```bash
+   git add -A && git commit -m "..." && git push origin main
+   ```
+
+2. **Run the `code` tag against both boxes** (the `signs` group is both crosswalk-a
+   and crosswalk-b, so no `--limit` means both):
+
+   ```bash
+   cd ansible
+   uv run ansible-playbook site.yml -i inventory.ini --tags code
+   ```
+
+   This pulls `main`, runs `uv sync`, regenerates the LED streams (with each box's
+   angle from host_vars), and installs / `daemon-reload`s the service units.
+
+3. **Restart the services.** The `code` tasks use `state: started`, which will *not*
+   restart an already-running service, so new code isn't live until you restart:
+
+   ```bash
+   uv run ansible signs -i inventory.ini -b -m shell -a 'systemctl restart xwalk_*'
+   ```
+
+4. **Verify:**
+
+   ```bash
+   uv run ansible signs -i inventory.ini -b -m shell -a 'systemctl --no-pager status "xwalk_*" | grep -E "●|Active"'
+   ```
+
+Notes:
+
+- Python-only change with no new gifs? You can skip stream regeneration with
+  `--start-at-task "Install xwalk service files"`. If you *added* gifs, run the full
+  `--tags code` so streams rebuild on both boxes.
+- Step 3 briefly interrupts both signs — fine anytime, just not mid-interaction.
+
 ### The Normal Way
 
 1. <https://docs.astral.sh/uv/getting-started/installation/> (a Python package and project manager):
@@ -122,15 +164,17 @@ The web interface will be available at `http://localhost:8000` with a control pa
 ## Project Structure
 
 - `xwalk2/` - Main package directory
-  - `animation.py` - Animation system implementation
-  - `api.py` - Web API interface
-  - `button_lights.py` - Button lighting control
-  - `button_switch.py` - Button switch handling
-  - `controller.py` - Main controller logic
-  - `matrix_driver.py` - Matrix display driver
-  - `models.py` - Data models
-  - `timer.py` - Timing utilities
-  - `util.py` - Utility functions
+  - `animation_library.py` - Animation selection / weighting logic
+  - `api.py` - Web API interface (FastAPI)
+  - `audio_player.py` - Audio playback component
+  - `button_light.py` / `button_light_virtual.py` - Button lighting control
+  - `button_switch.py` / `button_switch_virtual.py` - Button switch handling
+  - `controller.py` - Main controller loop and ZMQ sockets
+  - `fsm.py` - Controller state machine (ready/walk)
+  - `matrix_driver.py` / `matrix_driver_virtual.py` - LED matrix display driver
+  - `models.py` - Pydantic data models / wire messages
+  - `timer.py` - Scene timer component
+  - `util.py` - Shared component base classes and helpers
 
 ## Architecture
 

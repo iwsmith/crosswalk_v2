@@ -30,6 +30,15 @@
       psk: "{{ item.password }}"
     state: present
     autoconnect: yes
-    priority: "{{ item.priority }}"
   loop: "{{ wifi_networks }}"
   when: "'access_point' not in group_names"
+
+- name: Set Wi-Fi autoconnect priority
+  # The nmcli module's `priority` only sets bridge-STP priority, so set the real
+  # connection.autoconnect-priority here (higher wins → prefer corginia_slow).
+  command: >-
+    nmcli connection modify "{{ item.ssid }}"
+    connection.autoconnect-priority {{ item.priority }}
+  loop: "{{ wifi_networks }}"
+  when: "'access_point' not in group_names"
+  changed_when: false

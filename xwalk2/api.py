@@ -2,17 +2,14 @@ import threading
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
-from typing import Dict
 
 import zmq
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel
 
 from xwalk2.models import (
-    Animations,
     APIQueueClear,
     APIButtonPress,
     APIQueueWalk,
@@ -21,17 +18,6 @@ from xwalk2.models import (
     APIStatusRequest,
     APITimerExpired,
 )
-
-
-class ActionRequest(BaseModel):
-    action: str
-
-
-class SystemStatus(BaseModel):
-    playing: bool
-    components: Dict[str, float]  # Using float for timestamp
-    uptime: float
-    animations: Animations | None = None  # Optional animations data
 
 
 CONTROLLER_ADDRESS = "tcp://localhost:5559"

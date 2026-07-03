@@ -42,10 +42,25 @@
   become: yes
   become_user: crosswalk
   git:
-    repo: https://github.com/iwsmith/crosswalk_v2.git 
+    repo: https://github.com/iwsmith/crosswalk_v2.git
     dest: /opt/crosswalk
-    version: main  
+    version: main
     update: yes
+  register: crosswalk_repo
+
+- name: Fetch git-LFS assets (gifs, audio)
+  become: yes
+  become_user: crosswalk
+  command: git lfs pull
+  args:
+    chdir: /opt/crosswalk
+  # The git module clone/pull does NOT fetch LFS objects, so without this the box
+  # ends up with pointer files that break stream generation and audio playback.
+  # Some assets may be missing on the LFS server; don't abort the whole deploy
+  # over a 404 — everything else still gets fetched.
+  register: lfs_pull
+  failed_when: false
+  changed_when: false
 
 - name: Install crosswalk dependencies with uv sync
   become: yes
@@ -82,8 +97,19 @@
     group: crosswalk
     mode: '0755'
 
+- name: Check for existing streams
+  ansible.builtin.find:
+    paths: /opt/crosswalk_stream
+    patterns: "*.stream"
+    recurse: yes
+  register: existing_streams
+  changed_when: false
+
 - name: Make streams from gifs
   ansible.builtin.shell: /opt/crosswalk/bin/make_stream.sh /opt/crosswalk/static/data/ /opt/crosswalk_stream/ {{crosswalk_led_angle}}
+  # Only rebuild when the repo actually changed (new/updated gifs) or when no
+  # streams exist yet — otherwise this reruns and reports "changed" every play.
+  when: crosswalk_repo is changed or existing_streams.matched == 0
 
 - name: Install xwalk service files
   become: yes

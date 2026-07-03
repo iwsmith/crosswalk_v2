@@ -238,14 +238,10 @@ class AnimationLibrary:
             audio_walk = walk_info.audio or walk
         else:
             audio_walk = walk
-        
+
         logger.info(f"selected {intro=} {walk=} {outro=}")
 
         audio_intro = intro
-        if self.config.get_walk(walk):
-            audio_walk = self.config.get_walk(walk).audio or walk
-        else:
-            audio_walk = walk
         audio_outro = outro
 
         # Get durations for logging
