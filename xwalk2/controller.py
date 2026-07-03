@@ -142,7 +142,19 @@ def main():
                 if component_name not in components or beat.initial:
                     logger.info(f"{component_name} sent {beat.initial} or {component_name in components}")
                     new_component = True
-                components[component_name] = beat.sent_at
+                # Record liveness on the controller's own clock, not the
+                # sender's (beat.sent_at). The signs have no RTC and can run on
+                # skewed clocks; trusting the remote timestamp made "last seen"
+                # nonsensical (e.g. negative when a sign's clock ran ahead).
+                now = datetime.now()
+                skew = (now - beat.sent_at).total_seconds()
+                if abs(skew) > 30:
+                    logger.warning(
+                        "Clock skew: %s heartbeat sent_at is %.0fs from controller time",
+                        component_name,
+                        skew,
+                    )
+                components[component_name] = now
 
             # If there is a new component it will need our current state
             if new_component:
