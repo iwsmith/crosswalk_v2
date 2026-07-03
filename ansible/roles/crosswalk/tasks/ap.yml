@@ -1,55 +1,65 @@
 ---
-- name: Create primary Wi-Fi connection profile
+- name: Ensure NetworkManager and dnsmasq are installed (AP needs shared mode)
   when: "'access_point' in group_names"
-  copy:
-    dest: /etc/NetworkManager/system-connections/corginia.nmconnection
-    mode: '0600'
-    content: |
-      [connection]
-      id=corginia
-      type=wifi
-      interface-name=wlan0
-      autoconnect=true
+  apt:
+    name:
+      - network-manager
+      - dnsmasq-base
+    state: present
+    update_cache: yes
+  tags:
+    - packages
 
-      [wifi]
-      ssid=corginia_slow
-      mode=infrastructure
-
-      [wifi-security]
-      key-mgmt=wpa-psk
-      psk={{ corginia_wifi_password }}
-
-      [ipv4]
-      method=auto
-
-      [ipv6]
-      method=ignore
-
-- name: Create fallback AP connection profile (not autoconnect)
+# Create the primary client connection with the nmcli module (same mechanism
+# crosswalk-b uses). Hand-writing the keyfile stored the PSK in a way
+# NetworkManager rejected ("Secrets were required, but not provided"); letting
+# nmcli manage it stores the secret correctly.
+- name: Create primary Wi-Fi client connection (corginia_slow)
   when: "'access_point' in group_names"
-  copy:
-    dest: /etc/NetworkManager/system-connections/crosswalk.nmconnection
-    mode: '0600'
-    content: |
-      [connection]
-      id=crosswalk
-      type=wifi
-      interface-name=wlan0
-      autoconnect=false
+  community.general.nmcli:
+    conn_name: corginia_slow
+    type: wifi
+    ifname: wlan0
+    ssid: corginia_slow
+    wifi_sec:
+      key-mgmt: wpa-psk
+      psk: "{{ corginia_wifi_password }}"
+    autoconnect: true
+    method4: auto
+    method6: ignore
+    state: present
 
-      [wifi]
-      mode=ap
-      ssid=crosswalk
+- name: Remove stale corginia connection profile (renamed to corginia_slow)
+  when: "'access_point' in group_names"
+  file:
+    path: /etc/NetworkManager/system-connections/corginia.nmconnection
+    state: absent
+  register: stale_corginia_profile
 
-      [wifi-security]
-      key-mgmt=wpa-psk
-      psk={{ crosswalk_wifi_password }}
+- name: Reload NetworkManager connections after removing stale profile
+  when: "'access_point' in group_names and stale_corginia_profile.changed"
+  command: nmcli connection reload
 
-      [ipv4]
-      method=shared
-
-      [ipv6]
-      method=ignore
+# Same story for the fallback AP: let nmcli store the PSK and the AP/shared
+# settings so the secret is accepted and the AP actually starts.
+- name: Create fallback AP connection (crosswalk, not autoconnect)
+  when: "'access_point' in group_names"
+  community.general.nmcli:
+    conn_name: crosswalk
+    type: wifi
+    ifname: wlan0
+    ssid: crosswalk
+    wifi:
+      mode: ap
+      band: bg
+      channel: "{{ crosswalk_ap_channel }}"
+    wifi_sec:
+      key-mgmt: wpa-psk
+      psk: "{{ crosswalk_wifi_password }}"
+    autoconnect: false
+    method4: shared
+    method6: ignore
+    state: present
 
 - name: Create fallback check script
   when: "'access_point' in group_names"
@@ -58,18 +68,67 @@
     mode: '0755'
     content: |
       #!/bin/bash
-      PRIMARY_SSID="corginia"
-      FALLBACK_SSID="crosswalk"
+      # Prefer the primary client connection; fall back to hosting the crosswalk
+      # AP only when the primary is actually out of range. Run periodically by
+      # wifi-fallback.timer.
+      #
+      # Key property: with a single radio, wlan0 is EITHER a client OR an AP, not
+      # both. This script must not tear the AP down on every tick to "retry" the
+      # primary — doing so makes the AP flap (briefly visible, then gone) and
+      # never lets a client of the AP stay connected. So once the AP is up and
+      # the primary is still not visible, we leave the AP alone.
+      set -u
 
-      # Check if connected to primary SSID
-      CURRENT_SSID=$(nmcli -t -f active,ssid dev wifi | grep '^yes:' | cut -d: -f2)
+      PRIMARY_SSID="corginia_slow"
+      PRIMARY_CONN="corginia_slow"
+      FALLBACK_CONN="crosswalk"
+      RETRIES=4        # association attempts when the primary IS visible
+      RETRY_DELAY=5    # seconds between attempts
 
-      if [ "$CURRENT_SSID" != "$PRIMARY_SSID" ]; then
-        echo "Primary SSID not connected, switching to fallback AP..."
-        nmcli con up id "$FALLBACK_SSID"
-      else
+      current_ssid() {
+        nmcli -t -f active,ssid dev wifi | awk -F: '$1=="yes"{print $2; exit}'
+      }
+
+      # Name of the connection currently active on wlan0 (empty if none).
+      active_conn() {
+        nmcli -t -f NAME,DEVICE connection show --active \
+          | awk -F: '$2=="wlan0"{print $1; exit}'
+      }
+
+      # Is the primary SSID currently in range? (Only meaningful in client mode;
+      # an AP-mode radio generally can't scan.)
+      primary_visible() {
+        nmcli -t -f SSID dev wifi list --rescan yes | grep -Fxq "$PRIMARY_SSID"
+      }
+
+      # Already on the primary network: nothing to do.
+      if [ "$(current_ssid)" = "$PRIMARY_SSID" ]; then
         echo "Connected to primary SSID ($PRIMARY_SSID), no action needed."
+        exit 0
       fi
+
+      if primary_visible; then
+        for i in $(seq 1 "$RETRIES"); do
+          echo "Primary in range; attempt $i/$RETRIES to bring up $PRIMARY_CONN..."
+          nmcli con up id "$PRIMARY_CONN" && sleep 2
+          if [ "$(current_ssid)" = "$PRIMARY_SSID" ]; then
+            echo "Connected to primary SSID ($PRIMARY_SSID)."
+            exit 0
+          fi
+          sleep "$RETRY_DELAY"
+        done
+        echo "Primary visible but could not associate; falling back to AP."
+      fi
+
+      # Primary not reachable. If we're already serving the AP, leave it up so it
+      # doesn't flap; otherwise bring it up.
+      if [ "$(active_conn)" = "$FALLBACK_CONN" ]; then
+        echo "Already hosting fallback AP ($FALLBACK_CONN); leaving it up."
+        exit 0
+      fi
+
+      echo "Primary unavailable; starting fallback AP ($FALLBACK_CONN)..."
+      nmcli con up id "$FALLBACK_CONN"
 
 - name: Create systemd service for fallback check
   when: "'access_point' in group_names"
@@ -86,12 +145,29 @@
       Type=oneshot
       ExecStart=/usr/local/bin/check_wifi_fallback.sh
 
-      [Install]
-      WantedBy=multi-user.target
+- name: Create systemd timer for periodic fallback check
+  when: "'access_point' in group_names"
+  copy:
+    dest: /etc/systemd/system/wifi-fallback.timer
+    mode: '0644'
+    content: |
+      [Unit]
+      Description=Periodically check WiFi fallback
 
-- name: Enable and start wifi-fallback service
+      [Timer]
+      # Run shortly after boot, then every couple of minutes so the AP comes up
+      # if the primary drops later and we switch back when it returns.
+      OnBootSec=60
+      OnUnitActiveSec=120
+      Unit=wifi-fallback.service
+
+      [Install]
+      WantedBy=timers.target
+
+- name: Enable and start wifi-fallback timer
   when: "'access_point' in group_names"
   systemd:
-    name: wifi-fallback.service
+    name: wifi-fallback.timer
     enabled: true
     state: started
+    daemon_reload: true

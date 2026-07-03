@@ -1,7 +1,7 @@
 ---
 - import_tasks: initial.yml
   tags:
-    -initial
+    - initial
 
 - import_tasks: code.yml
   tags:
@@ -11,6 +11,12 @@
   tags:
     - sound
     
+- import_tasks: wifi_country.yml
+  tags:
+    - wifi
+    - ap
+    - country
+
 - import_tasks: ap.yml
   tags:
     - ap

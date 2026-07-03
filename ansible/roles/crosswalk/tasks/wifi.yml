@@ -16,6 +16,8 @@
     state: present
     update_cache: yes
   when: "'access_point' not in group_names"
+  tags:
+    - packages
 
 - name: Add Wi-Fi connections
   nmcli:

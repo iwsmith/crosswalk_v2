@@ -1,0 +1,23 @@
+---
+# Set the Wi-Fi regulatory domain. Without this the onboard radio comes up with
+# an unset regdomain ("country 99: DFS-UNSET"): client mode mostly works, but AP
+# (master) mode is refused by the kernel and any started AP is torn down
+# immediately. Runs on every sign (both the AP host and the clients).
+
+- name: Set Wi-Fi regulatory country (persists across reboots)
+  become: yes
+  command: raspi-config nonint do_wifi_country {{ crosswalk_wifi_country }}
+  changed_when: false
+
+- name: Unblock the Wi-Fi radio
+  become: yes
+  command: rfkill unblock wifi
+  changed_when: false
+
+- name: Apply the regulatory domain to the running session
+  become: yes
+  command: iw reg set {{ crosswalk_wifi_country }}
+  changed_when: false
+  # Self-managed drivers ignore `iw reg set`; raspi-config above is the
+  # authoritative path, so don't fail the play if this is a no-op.
+  failed_when: false

@@ -1,2 +1,12 @@
 ---
 crosswalk_home: /opt/crosswalk
+
+# Wi-Fi regulatory domain. Required for the radio to operate correctly — and
+# mandatory for AP (master) mode, which the kernel refuses to start when the
+# device regdomain is unset (shows as "country 99: DFS-UNSET" in `iw reg get`).
+crosswalk_wifi_country: US
+
+# 2.4 GHz channel the fallback AP hosts on. Pinning it makes AP bring-up
+# deterministic instead of letting NetworkManager pick (and possibly choose a
+# channel disallowed by the regdomain).
+crosswalk_ap_channel: 6
