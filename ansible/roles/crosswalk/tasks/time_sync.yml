@@ -1,0 +1,50 @@
+---
+# Keep the signs' clocks in agreement. Raspberry Pis have no RTC, and on the
+# isolated crosswalk AP network there is no internet NTP, so without this the two
+# boxes drift apart. crosswalk-a serves time to the local network (from its own
+# clock if there is no upstream), and the other signs sync from it.
+
+- name: Install chrony
+  become: yes
+  apt:
+    name: chrony
+    state: present
+    update_cache: yes
+  tags:
+    - packages
+
+- name: Configure chrony as the local time server (access point host)
+  become: yes
+  copy:
+    dest: /etc/chrony/conf.d/crosswalk.conf
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      # Serve time to the local crosswalk network.
+      allow
+      # Provide time from the local clock even with no upstream source, so the
+      # other signs can still synchronise on the isolated AP network.
+      local stratum 10
+  when: "'access_point' in group_names"
+  notify: Restart chrony
+
+- name: Configure chrony to sync from the crosswalk time server (client signs)
+  become: yes
+  copy:
+    dest: /etc/chrony/conf.d/crosswalk.conf
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      # Prefer crosswalk-a so every sign shares one clock, even offline.
+      server crosswalk-a.local iburst prefer
+  when: "'access_point' not in group_names"
+  notify: Restart chrony
+
+- name: Ensure chrony is enabled and running
+  become: yes
+  systemd:
+    name: chrony
+    enabled: yes
+    state: started

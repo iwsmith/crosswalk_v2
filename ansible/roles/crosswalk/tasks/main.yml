@@ -10,7 +10,11 @@
 - import_tasks: sound.yml
   tags:
     - sound
-    
+
+- import_tasks: time_sync.yml
+  tags:
+    - time
+
 - import_tasks: wifi_country.yml
   tags:
     - wifi

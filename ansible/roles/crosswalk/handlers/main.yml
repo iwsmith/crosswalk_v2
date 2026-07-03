@@ -3,3 +3,8 @@
   systemd:
     name: NetworkManager
     state: restarted
+
+- name: Restart chrony
+  systemd:
+    name: chrony
+    state: restarted
