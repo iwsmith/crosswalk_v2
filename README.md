@@ -14,7 +14,7 @@ Make sure [git-lfs](https://git-lfs.com/) is installed! Assets are stored there.
 
 ### To an RPI
 
-We use anisble playboks to deploy to the RPI.
+We use anisble playbooks to deploy to the RPI.
 
 `cd anisble`
 `uv run ansible-playbook site.yml -i inventory.ini`
@@ -302,3 +302,25 @@ You can simulate schedules by using `uv run bin/simulate_schedule.py tuesday`
 ## Walk ideas
 * right turn only, left turn only
 * red light/green light
+
+### Testing the fallback Wi-Fi AP
+
+On the AP host (crosswalk-a), verify the `crosswalk` fallback AP actually comes up.
+Because wlan0 has a single radio, bringing up the AP drops the `corginia_slow`
+client — so `bin/test_ap.sh` runs the test detached with an automatic revert
+(safe even if you're SSH'd in over Wi-Fi):
+
+```bash
+sudo /opt/crosswalk/bin/test_ap.sh          # AP up, capture checks, hold 180s, revert
+sudo /opt/crosswalk/bin/test_ap.sh results  # read the checks captured while AP was up
+sudo /opt/crosswalk/bin/test_ap.sh check    # run checks inline (use over Ethernet)
+sudo /opt/crosswalk/bin/test_ap.sh down     # revert to the client now
+```
+
+A healthy AP shows `crosswalk:wlan0:activated`, `iw dev wlan0 info` → `type AP`,
+an IPv4 of `10.42.0.1/24`, and a running `dnsmasq`. During the hold window,
+connect a phone to SSID `crosswalk` and confirm it gets a `10.42.0.x` lease.
+
+## TODO
+
+1. Reset wifi prioritiy in wifi.yml so crosswalk is higher (10)
