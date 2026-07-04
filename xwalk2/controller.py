@@ -15,6 +15,7 @@ from xwalk2.models import (
     ButtonPress,
     CurrentState,
     Heartbeat,
+    SysCommand,
     TimerExpired,
     parse_message,
     parse_api
@@ -111,6 +112,14 @@ def main():
             # Handle timer expired event
             state.timer_expired()
             return make_response(message="Timer expired event sent")
+        elif isinstance(request, SysCommand):
+            # Broadcast to the per-host sys_control agents on the control channel.
+            send_command(request)
+            target = request.target
+            detail = f" ({request.unit})" if request.unit else ""
+            return make_response(
+                message=f"System command '{request.action}'{detail} sent to {target}"
+            )
         elif isinstance(request, APIStatusRequest):
             # Handle status request
             return make_response()

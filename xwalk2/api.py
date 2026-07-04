@@ -1,7 +1,9 @@
+import os
 import threading
 import time
 from contextlib import asynccontextmanager
 from datetime import datetime
+from urllib.parse import parse_qs
 
 import zmq
 from fastapi import FastAPI, Request
@@ -17,10 +19,40 @@ from xwalk2.models import (
     APIResponse,
     APIStatusRequest,
     APITimerExpired,
+    SysCommand,
 )
 
 
 CONTROLLER_ADDRESS = "tcp://localhost:5559"
+
+# This box's hostname; used to seed the known-hosts list shown in the UI.
+OWN_HOST = os.getenv("XWALK_HOSTNAME", "crosswalk-a")
+
+# Plausible-time guard: reject anything outside ~[2020-01-01, 2100-01-01) so a
+# bogus browser value can't set the clock to 1970 or the far future.
+_MIN_EPOCH = 1577836800  # 2020-01-01 UTC
+_MAX_EPOCH = 4102444800  # 2100-01-01 UTC
+
+# Heartbeat component name -> systemd unit, for the per-component restart button.
+COMPONENT_UNITS = {
+    "timer": "xwalk_timer",
+    "audio-player": "xwalk_audio_player",
+    "button_led": "xwalk_button_light",
+    "button_physical": "xwalk_button_switch",
+    "matrix-viewer": "xwalk_matrix_driver",
+    "sys-control": "xwalk_sys_control",
+}
+
+
+def _known_hosts(status) -> list:
+    """The set of boxes we know about: ourselves plus any host seen in a
+    component heartbeat."""
+    hosts = {OWN_HOST}
+    for name in status.components:
+        parts = name.split("/", 1)
+        if len(parts) == 2 and parts[1]:
+            hosts.add(parts[1])
+    return sorted(hosts)
 
 
 class APIController:
@@ -100,6 +132,13 @@ class APIController:
         request = APIStatusRequest()
         return self._send_request(request)
 
+    def sys_command(self, action, target="all", unit=None, epoch=None) -> APIResponse:
+        """Ask the controller to broadcast a system-control command to the
+        per-host sys_control agents."""
+        return self._send_request(
+            SysCommand(action=action, target=target, unit=unit, epoch=epoch)
+        )
+
 
 api_controller = APIController()
 
@@ -120,14 +159,54 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 templates = Jinja2Templates(directory="templates")
+# Available to every template for the per-component restart buttons.
+templates.env.globals["component_units"] = COMPONENT_UNITS
+
+
+def _status_response(request: Request, status, notice: str):
+    """Render the status partial with an optional one-off notice."""
+    return templates.TemplateResponse(
+        "components/status.html",
+        {"request": request, "status": status, "now": datetime.now(), "notice": notice},
+    )
 
 
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     status = api_controller.get_status()
     return templates.TemplateResponse(
-        "index.html", {"request": request, "status": status, "now": datetime.now()}
+        "index.html",
+        {
+            "request": request,
+            "status": status,
+            "now": datetime.now(),
+            "hosts": _known_hosts(status),
+        },
     )
+
+
+@app.post("/restart/all", response_class=HTMLResponse)
+async def restart_all(request: Request):
+    """Restart all xwalk components on every box."""
+    resp = api_controller.sys_command("restart_all", target="all")
+    return _status_response(request, resp, resp.message)
+
+
+@app.post("/restart/{host}/{unit}", response_class=HTMLResponse)
+async def restart_unit(host: str, unit: str, request: Request):
+    """Restart one component (or all, if unit == 'all') on a specific box."""
+    if unit == "all":
+        resp = api_controller.sys_command("restart_all", target=host)
+    else:
+        resp = api_controller.sys_command("restart", target=host, unit=unit)
+    return _status_response(request, resp, resp.message)
+
+
+@app.post("/reboot/{host}", response_class=HTMLResponse)
+async def reboot(host: str, request: Request):
+    """Reboot a box, or all of them when host == 'all'."""
+    resp = api_controller.sys_command("reboot", target=host)
+    return _status_response(request, resp, resp.message)
 
 
 @app.get("/status", response_class=HTMLResponse)
@@ -176,6 +255,34 @@ async def fire_timer(request: Request):
         "components/status.html",
         {"request": request, "status": status, "now": datetime.now()},
     )
+
+
+@app.post("/clock", response_class=HTMLResponse)
+async def set_clock(request: Request):
+    """Set the signs' system clocks from the browser's time.
+
+    The browser posts its own `Date.now()` (Unix epoch in milliseconds, UTC) as
+    an url-encoded form field. We broadcast it as a `set_clock` command to every
+    sign's sys_control agent. Parsing the body by hand avoids a
+    `python-multipart` dependency.
+    """
+    body = (await request.body()).decode("utf-8", "replace")
+    raw = parse_qs(body).get("epoch_ms", [None])[0]
+    try:
+        seconds = float(raw) / 1000.0
+    except (TypeError, ValueError):
+        seconds = None
+
+    if seconds is None:
+        resp = api_controller.get_status()
+        notice = "Missing or invalid time value; clock unchanged."
+    elif not (_MIN_EPOCH <= seconds < _MAX_EPOCH):
+        resp = api_controller.get_status()
+        notice = f"Refused implausible time ({seconds:.0f}); clock unchanged."
+    else:
+        resp = api_controller.sys_command("set_clock", target="all", epoch=seconds)
+        notice = "🕐 " + resp.message
+    return _status_response(request, resp, notice)
 
 
 if __name__ == "__main__":

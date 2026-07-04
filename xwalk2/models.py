@@ -190,6 +190,21 @@ class TimerExpired(BaseModel):
     duration: float
 
 
+class SysCommand(BaseModel):
+    """System-control command for the per-host sys_control agents.
+
+    Doubles as the API request (the API sends it to the controller, which
+    re-broadcasts it on the control channel). Each agent acts only on commands
+    whose target is "all" or its own host, so no cross-host SSH is needed.
+    """
+
+    type: Literal["sys_command"] = "sys_command"
+    action: Literal["restart", "restart_all", "reboot", "set_clock"]
+    target: str = "all"  # hostname or "all"
+    unit: Optional[str] = None  # systemd unit for action == "restart"
+    epoch: Optional[float] = None  # unix seconds for action == "set_clock"
+
+
 message_registry = {
     "button_press": ButtonPress,
     "heartbeat": Heartbeat,
@@ -198,6 +213,7 @@ message_registry = {
     "current_state": CurrentState,
     "reset": ResetCommand,
     "timer_expired": TimerExpired,
+    "sys_command": SysCommand,
 }
 
 api_registry = {
@@ -206,10 +222,16 @@ api_registry = {
     "press_button": APIButtonPress,
     "timer_expired": APITimerExpired,
     "status": APIStatusRequest,
+    "sys_command": SysCommand,
 }
 
 APIRequests = (
-    APIQueueWalk | APIButtonPress | APITimerExpired | APIStatusRequest | APIQueueClear
+    APIQueueWalk
+    | APIButtonPress
+    | APITimerExpired
+    | APIStatusRequest
+    | APIQueueClear
+    | SysCommand
 )
 
 

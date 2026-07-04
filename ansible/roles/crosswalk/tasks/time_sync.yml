@@ -48,3 +48,52 @@
     name: chrony
     enabled: yes
     state: started
+
+# Clock-setting moved into crosswalk-ctl (see control.yml); remove the old
+# standalone helper and its sudoers rule from previously-provisioned boxes.
+- name: Remove obsolete standalone set-clock helper
+  become: yes
+  file:
+    path: /usr/local/bin/set-crosswalk-clock
+    state: absent
+
+- name: Remove obsolete set-clock sudoers rule
+  become: yes
+  file:
+    path: /etc/sudoers.d/crosswalk-clock
+    state: absent
+
+# --- Hardware RTC (DS1307) ---------------------------------------------------
+# The signs have a DS1307 RTC add-on. Enabling it (so /dev/rtc0 exists), dropping
+# the software fake clock, and letting chrony keep the RTC updated means the
+# boxes hold correct time across reboots even with no internet.
+
+- name: Enable I2C and the DS1307 RTC device-tree overlay
+  become: yes
+  ansible.builtin.lineinfile:
+    path: /boot/firmware/config.txt
+    line: "{{ item }}"
+    state: present
+  loop:
+    - "dtparam=i2c_arm=on"
+    - "dtoverlay=i2c-rtc,ds1307"
+  notify: Reboot pi
+
+- name: Remove fake-hwclock (conflicts with a real RTC)
+  become: yes
+  apt:
+    name: fake-hwclock
+    state: absent
+    purge: yes
+
+- name: Enable chrony RTC synchronisation
+  become: yes
+  copy:
+    dest: /etc/chrony/conf.d/rtc.conf
+    owner: root
+    group: root
+    mode: '0644'
+    content: |
+      # Keep the hardware RTC in step with the system clock.
+      rtcsync
+  notify: Restart chrony

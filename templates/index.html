@@ -34,13 +34,56 @@
             hx-confirm="This will queue all walks. Are you sure?"
         >➕ Queue All</button>
 
-        <button 
-            hx-delete="/queue/" 
-            hx-target="#status" 
+        <button
+            hx-delete="/queue/"
+            hx-target="#status"
             hx-swap="innerHTML"
         >❌ Clear Queue</button>
+
+        <button
+            hx-post="/clock"
+            hx-vals='js:{epoch_ms: Date.now()}'
+            hx-target="#status"
+            hx-swap="innerHTML"
+            hx-confirm="Set the crosswalk system clock to this device's current time?"
+        >🕐 Set Clock to My Time</button>
     </div>
-    
+
+    <div class="button-group">
+        <h3>System Control</h3>
+        <button
+            hx-post="/restart/all"
+            hx-target="#status"
+            hx-swap="innerHTML"
+            hx-confirm="Restart all crosswalk components on ALL boxes?"
+        >♻️ Restart All Components (all boxes)</button>
+
+        <button
+            hx-post="/reboot/all"
+            hx-target="#status"
+            hx-swap="innerHTML"
+            hx-confirm="Reboot ALL crosswalk boxes now?"
+        >🔁 Reboot All Boxes</button>
+
+        {% for host in hosts %}
+        <div style="margin-top: 8px;">
+            <strong>{{ host }}</strong>
+            <button
+                hx-post="/restart/{{ host }}/all"
+                hx-target="#status"
+                hx-swap="innerHTML"
+                hx-confirm="Restart all components on {{ host }}?"
+            >♻️ Restart components</button>
+            <button
+                hx-post="/reboot/{{ host }}"
+                hx-target="#status"
+                hx-swap="innerHTML"
+                hx-confirm="Reboot {{ host }} now?"
+            >🔁 Reboot</button>
+        </div>
+        {% endfor %}
+    </div>
+
     <div id="status">
     {% include "components/status.html" %}
     </div>

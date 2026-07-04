@@ -1,0 +1,59 @@
+---
+# Privileged helper for the sys_control agent: a root-owned script to restart
+# xwalk services, reboot, or set the clock, plus a narrow sudoers rule so the
+# unprivileged crosswalk user can invoke just that one command. Each box runs
+# its own agent (xwalk_sys_control), so there is no cross-host SSH.
+
+- name: Install crosswalk-ctl helper (root-owned)
+  become: yes
+  copy:
+    dest: /usr/local/bin/crosswalk-ctl
+    owner: root
+    group: root
+    mode: '0755'
+    content: |
+      #!/bin/bash
+      # Restart xwalk services, reboot, or set the clock. Restart/reboot are
+      # detached via systemd-run so restarting xwalk_api / xwalk_controller /
+      # xwalk_sys_control (or rebooting) doesn't kill the caller mid-action.
+      set -euo pipefail
+      case "${1:-}" in
+        restart)
+          unit="${2:-}"
+          [[ "$unit" =~ ^xwalk_[a-z_]+$ ]] || { echo "invalid unit: $unit" >&2; exit 1; }
+          systemd-run --collect --quiet systemctl restart "$unit.service"
+          ;;
+        restart-all)
+          systemd-run --collect --quiet systemctl restart 'xwalk_*'
+          ;;
+        reboot)
+          systemd-run --collect --quiet --on-active=2 systemctl reboot
+          ;;
+        set-clock)
+          epoch="${2:-}"
+          [[ "$epoch" =~ ^[0-9]+(\.[0-9]+)?$ ]] || { echo "invalid epoch: $epoch" >&2; exit 1; }
+          date -s "@$epoch" >/dev/null
+          # Persist across reboot: write to the hardware RTC if one is present,
+          # otherwise fall back to fake-hwclock.
+          if [[ -e /dev/rtc0 || -e /dev/rtc ]]; then
+            hwclock --systohc || true
+          elif command -v fake-hwclock >/dev/null 2>&1; then
+            fake-hwclock save || true
+          fi
+          ;;
+        *)
+          echo "usage: $0 {restart <xwalk_unit>|restart-all|reboot|set-clock <epoch>}" >&2
+          exit 1
+          ;;
+      esac
+
+- name: Allow the crosswalk user to run crosswalk-ctl without a password
+  become: yes
+  copy:
+    dest: /etc/sudoers.d/crosswalk-ctl
+    owner: root
+    group: root
+    mode: '0440'
+    content: |
+      crosswalk ALL=(root) NOPASSWD: /usr/local/bin/crosswalk-ctl
+    validate: 'visudo -cf %s'

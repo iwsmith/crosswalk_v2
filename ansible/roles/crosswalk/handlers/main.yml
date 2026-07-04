@@ -8,3 +8,8 @@
   systemd:
     name: chrony
     state: restarted
+
+- name: Reboot pi
+  become: yes
+  ansible.builtin.reboot:
+    reboot_timeout: 300

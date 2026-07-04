@@ -1,5 +1,7 @@
 <h3>System Status</h3>
 
+{% if notice %}<p><strong>{{ notice }}</strong></p>{% endif %}
+
 {{ status.message or "" }}
 
 <p><strong>Playing:</strong> {{ "🟢 Yes" if status.playing else "🔴 No" }}</p>
@@ -24,9 +26,19 @@
 <p><strong>Components:</strong></p>
 <ul>
   {% for name, timestamp in status.components.items() %}
+    {% set parts = name.split('/') %}
+    {% set unit = component_units.get(parts[0]) %}
     <li>
       <strong>{{ name }}</strong>:
       Last seen {{ (now - timestamp).total_seconds() | round }}s ago
+      {% if unit and parts | length == 2 %}
+        <button
+          hx-post="/restart/{{ parts[1] }}/{{ unit }}"
+          hx-target="#status"
+          hx-swap="innerHTML"
+          hx-confirm="Restart {{ parts[0] }} on {{ parts[1] }}?"
+        >♻️ Restart</button>
+      {% endif %}
     </li>
   {% endfor %}
 </ul>
