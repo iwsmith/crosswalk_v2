@@ -2,46 +2,80 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Crosswalk V2 Control Panel</title>
     <script src="/static/htmx.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 16px;
+            max-width: 900px;
+            margin-inline: auto;
+            font-size: 16px;
+        }
+
+        h1 { font-size: 1.4rem; }
+        h3 { font-size: 1.1rem; }
+        h4 { font-size: 1rem; }
+
         ul.compact-list {
             list-style: none;
             margin: 0;
             padding: 0;
         }
 
-ul.compact-list > li {
-  display: flex;
-  align-items: center;
-  padding: 2px 4px;
-  margin: 2px 0;
-}
+        ul.compact-list > li {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            padding: 4px;
+            margin: 2px 0;
+        }
 
-ul.compact-list button {
-  padding: 4px 8px;
-  font-size: 0.9rem;
-  line-height: 1;
-  border: 1px solid #ccc;
-  background: #f8f8f8;
-  border-radius: 4px;
-  cursor: pointer;
-}
+        /* Touch-friendly tap targets everywhere, not just compact-list */
+        button {
+            padding: 10px 14px;
+            min-height: 44px;
+            font-size: 0.95rem;
+            line-height: 1;
+            border: 1px solid #ccc;
+            background: #f8f8f8;
+            border-radius: 6px;
+            cursor: pointer;
+        }
 
-ul.compact-list button:hover {
-  background: #e0e0e0;
-}
+        ul.compact-list button {
+            padding: 8px 10px;
+            min-height: 40px;
+            font-size: 0.9rem;
+        }
 
-        #status { background: #f0f0f0; padding: 20px; margin: 20px 0; }
-        .button-group { margin: 20px 0; }
+        button:hover { background: #e0e0e0; }
+        button:active { background: #d5d5d5; }
+
+        #status { background: #f0f0f0; padding: 16px; margin: 16px 0; border-radius: 8px; }
+        .button-group { margin: 16px 0; }
+        .button-group button { margin: 4px 4px 4px 0; }
+
         .noscript-warning {
             background: #b00020;
             color: #fff;
             padding: 12px 16px;
-            margin: -40px -40px 20px -40px;
+            margin: 0 0 16px 0;
+            border-radius: 8px;
             font-weight: bold;
             text-align: center;
+        }
+
+        ul { padding-left: 1.2em; }
+
+        @media (min-width: 640px) {
+            body { padding: 40px; font-size: inherit; }
+            h1 { font-size: 1.8rem; }
         }
     </style>
 </head>

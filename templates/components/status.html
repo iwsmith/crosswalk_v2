@@ -43,9 +43,13 @@
   {% endfor %}
 </ul>
 
-<p><strong>Walk History:</strong></p>
+<p><strong>Walk History</strong>
+  {% if status.walk_history | length > 20 %}
+    <span>(most recent 20 of {{ status.walk_history | length }})</span>
+  {% endif %}
+</p>
 <ul>
-  {% for happened_at, walk in status.walk_history %}
+  {% for happened_at, walk in status.walk_history[-20:] | reverse %}
     <li> {{happened_at.strftime("%d/%m/%Y %H:%M:%S")}} - <strong>{{ walk }}</strong></li>
   {% endfor %}
 </ul>
