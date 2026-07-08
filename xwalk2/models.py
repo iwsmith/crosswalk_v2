@@ -79,11 +79,19 @@ class Animations(BaseModel):
         return self
 
     def get_walk(self, walk_name: str) -> Optional[WalkInfo]:
-        """Get walk information by name"""
+        """Get walk information by name.
+
+        Returns None both for unknown walks and for walks with no extra info
+        (bare YAML entries) — use has_walk() to test existence.
+        """
         for category, walks in self.walks.items():
             if walk_name in walks:
                 return walks[walk_name]
         return None
+
+    def has_walk(self, walk_name: str) -> bool:
+        """Whether a walk with this name exists in any category."""
+        return any(walk_name in walks for walks in self.walks.values())
 
 
 class Heartbeat(BaseModel):

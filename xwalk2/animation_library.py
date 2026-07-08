@@ -89,13 +89,6 @@ class AnimationLibrary:
         categories = list(weights.keys())
         walk_names: list[str] = []
 
-        # We need to change this beacuse of the go home schedule
-        # if len(categories) == 1:
-        #     for walks in self.config.walks.values():
-        #         walk_names.extend(walks.keys())
-
-        #     category = "all (_)"
-        # else:
         valid_categories = []
         for cat in categories:
             if cat in self.config.reselection.cooldown_categories:
@@ -120,7 +113,13 @@ class AnimationLibrary:
         cat_weights = np.array(valid_weights, dtype=np.float32)
         cat_weights /= cat_weights.sum()  # Normalize weights
         category = str(np.random.choice(valid_categories, p=cat_weights))
-        walk_names = list(self.config.walks[category].keys())
+        # "_" is the wildcard category (e.g. the default weights): pick from
+        # every walk in every category.
+        if category == "_":
+            for walks in self.config.walks.values():
+                walk_names.extend(walks.keys())
+        else:
+            walk_names = list(self.config.walks[category].keys())
 
         valid_walks = []
         for walk in walk_names:

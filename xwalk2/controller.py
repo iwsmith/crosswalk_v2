@@ -95,7 +95,9 @@ def main():
             else:
                 # Reject unknown walks up front rather than letting the FSM try
                 # (and fail) to build a scene for a non-existent animation.
-                if state.animations.config.get_walk(request.walk) is None:
+                # Must be has_walk: get_walk() also returns None for known
+                # walks that have no extra info (bare YAML entries).
+                if not state.animations.config.has_walk(request.walk):
                     return make_response(
                         message=f"Unknown walk '{request.walk}'", success=False
                     )

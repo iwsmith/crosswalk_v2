@@ -32,22 +32,31 @@ class Controller:
         # We would choose a walk here
         queued_walk = self.walk_queue.pop(0) if self.walk_queue else None
         try:
-            intro, walk, outro = self.animations.select_animation_sequence(
-                walk=queued_walk
-            )
-        except Exception:
-            # A bad queued walk (e.g. missing audio) must not strand the machine
-            # in 'walk' with no PlayScene and no timer. Fall back to a normal
-            # random selection so the button press still produces a scene.
-            if queued_walk is not None:
+            try:
+                intro, walk, outro = self.animations.select_animation_sequence(
+                    walk=queued_walk
+                )
+            except Exception:
+                # A bad queued walk (e.g. missing audio) must not strand the
+                # machine in 'walk' with no PlayScene and no timer. Fall back to
+                # a normal random selection so the button press still produces a
+                # scene.
+                if queued_walk is None:
+                    raise
                 logger.exception(
                     "Failed to build scene for queued walk %r; "
                     "falling back to a random walk",
                     queued_walk,
                 )
                 intro, walk, outro = self.animations.select_animation_sequence(walk=None)
-            else:
-                raise
+        except Exception:
+            # Even random selection failed (bad config, missing asset). The
+            # state has already changed to 'walk'; without a PlayScene no timer
+            # will ever fire, so the machine would be stuck ignoring button
+            # presses forever. Go back to 'ready' instead.
+            logger.exception("Failed to build any scene; returning to ready")
+            self.reset()
+            return
 
         # Get durations for timing
         total_duration = intro.duration + walk.duration + outro.duration
