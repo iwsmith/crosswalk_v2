@@ -68,37 +68,25 @@
     mode: '0755'
     content: |
       #!/bin/bash
-      # Prefer the primary client connection; fall back to hosting the crosswalk
-      # AP only when the primary is actually out of range. Run periodically by
-      # wifi-fallback.timer.
+      # Run once at boot (wifi-fallback.service): try the primary client
+      # connection, and if it doesn't come up, host the crosswalk AP instead
+      # for the rest of this boot.
       #
-      # Key property: with a single radio, wlan0 is EITHER a client OR an AP, not
-      # both. This script must not tear the AP down on every tick to "retry" the
-      # primary — doing so makes the AP flap (briefly visible, then gone) and
-      # never lets a client of the AP stay connected. So once the AP is up and
-      # the primary is still not visible, we leave the AP alone.
+      # Deliberately boot-only, with no periodic retry: a single radio is
+      # EITHER a client OR an AP, not both, and it generally can't scan for
+      # the primary while already acting as an AP. Rejoining the primary once
+      # it's back in range is a manual `nmcli con up id corginia_slow` (or a
+      # reboot), not something this script chases automatically.
       set -u
 
       PRIMARY_SSID="corginia_slow"
       PRIMARY_CONN="corginia_slow"
       FALLBACK_CONN="crosswalk"
-      RETRIES=4        # association attempts when the primary IS visible
+      RETRIES=4        # association attempts before giving up and starting the AP
       RETRY_DELAY=5    # seconds between attempts
 
       current_ssid() {
         nmcli -t -f active,ssid dev wifi | awk -F: '$1=="yes"{print $2; exit}'
-      }
-
-      # Name of the connection currently active on wlan0 (empty if none).
-      active_conn() {
-        nmcli -t -f NAME,DEVICE connection show --active \
-          | awk -F: '$2=="wlan0"{print $1; exit}'
-      }
-
-      # Is the primary SSID currently in range? (Only meaningful in client mode;
-      # an AP-mode radio generally can't scan.)
-      primary_visible() {
-        nmcli -t -f SSID dev wifi list --rescan yes | grep -Fxq "$PRIMARY_SSID"
       }
 
       # Already on the primary network: nothing to do.
@@ -107,37 +95,27 @@
         exit 0
       fi
 
-      if primary_visible; then
-        for i in $(seq 1 "$RETRIES"); do
-          echo "Primary in range; attempt $i/$RETRIES to bring up $PRIMARY_CONN..."
-          nmcli con up id "$PRIMARY_CONN" && sleep 2
-          if [ "$(current_ssid)" = "$PRIMARY_SSID" ]; then
-            echo "Connected to primary SSID ($PRIMARY_SSID)."
-            exit 0
-          fi
-          sleep "$RETRY_DELAY"
-        done
-        echo "Primary visible but could not associate; falling back to AP."
-      fi
+      for i in $(seq 1 "$RETRIES"); do
+        echo "Attempt $i/$RETRIES to bring up $PRIMARY_CONN..."
+        nmcli con up id "$PRIMARY_CONN" && sleep 2
+        if [ "$(current_ssid)" = "$PRIMARY_SSID" ]; then
+          echo "Connected to primary SSID ($PRIMARY_SSID)."
+          exit 0
+        fi
+        sleep "$RETRY_DELAY"
+      done
 
-      # Primary not reachable. If we're already serving the AP, leave it up so it
-      # doesn't flap; otherwise bring it up.
-      if [ "$(active_conn)" = "$FALLBACK_CONN" ]; then
-        echo "Already hosting fallback AP ($FALLBACK_CONN); leaving it up."
-        exit 0
-      fi
-
-      echo "Primary unavailable; starting fallback AP ($FALLBACK_CONN)..."
+      echo "Primary unreachable; starting fallback AP ($FALLBACK_CONN)..."
       nmcli con up id "$FALLBACK_CONN"
 
-- name: Create systemd service for fallback check
+- name: Create systemd service for boot-time WiFi fallback check
   when: "'access_point' in group_names"
   copy:
     dest: /etc/systemd/system/wifi-fallback.service
     mode: '0644'
     content: |
       [Unit]
-      Description=Check WiFi fallback and activate AP if primary WiFi unavailable
+      Description=Try primary WiFi at boot; host the fallback AP if it's unavailable
       After=network-online.target
       Wants=network-online.target
 
@@ -145,29 +123,27 @@
       Type=oneshot
       ExecStart=/usr/local/bin/check_wifi_fallback.sh
 
-- name: Create systemd timer for periodic fallback check
-  when: "'access_point' in group_names"
-  copy:
-    dest: /etc/systemd/system/wifi-fallback.timer
-    mode: '0644'
-    content: |
-      [Unit]
-      Description=Periodically check WiFi fallback
-
-      [Timer]
-      # Run shortly after boot, then every couple of minutes so the AP comes up
-      # if the primary drops later and we switch back when it returns.
-      OnBootSec=60
-      OnUnitActiveSec=120
-      Unit=wifi-fallback.service
-
       [Install]
-      WantedBy=timers.target
+      WantedBy=multi-user.target
 
-- name: Enable and start wifi-fallback timer
+- name: Enable and start wifi-fallback service
   when: "'access_point' in group_names"
   systemd:
-    name: wifi-fallback.timer
+    name: wifi-fallback.service
     enabled: true
     state: started
     daemon_reload: true
+
+- name: Remove leftover wifi-fallback timer from the old periodic-retry design
+  when: "'access_point' in group_names"
+  block:
+    - name: Stop and disable wifi-fallback.timer
+      systemd:
+        name: wifi-fallback.timer
+        enabled: false
+        state: stopped
+      ignore_errors: true
+    - name: Remove wifi-fallback.timer unit file
+      file:
+        path: /etc/systemd/system/wifi-fallback.timer
+        state: absent

@@ -4,11 +4,11 @@
     name: "start quiet hours"
     hour: '2-8'
     minute: '*/10'
-    job: 'amixer -c 1 set Speaker 50\%'
+    job: 'amixer -c Device set Speaker 50\%'
 
 - name: Quiet hours exit cron
   cron:
     name: "stop quiet hours"
     hour: '9-22'
     minute: '*/10'
-    job: 'amixer -c 1 set Speaker 90\%'
+    job: 'amixer -c Device set Speaker 90\%'

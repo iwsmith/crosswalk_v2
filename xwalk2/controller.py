@@ -174,22 +174,28 @@ def main():
                 send_command(current_state)
 
             if api_socket in socks:
+                # recv must complete before we can send anything back: a REP
+                # socket requires strict recv -> send alternation. If recv
+                # itself fails (e.g. never completes), there is no request to
+                # reply to and attempting to send anyway would raise a second,
+                # unhandled zmq.ZMQError ("Operation cannot be accomplished in
+                # current state") that would crash the whole controller.
                 try:
-                    # Receive API request
                     request_data = api_socket.recv_string()
-                    api_request = parse_api(request_data)
-                    response = handle_api_request(api_request)
-                    # Send response
-                    api_socket.send_string(response.model_dump_json())
-
-                except Exception as e:
-                    logger.error("Error handling API request", exc_info=True)
-                    # Send error response
-                    error_response = make_response(
-                        success=False,
-                        message=f"Server error: {str(e)}",
-                    )
-                    api_socket.send_string(error_response.model_dump_json())
+                except Exception:
+                    logger.error("Failed to receive API request", exc_info=True)
+                else:
+                    try:
+                        api_request = parse_api(request_data)
+                        response = handle_api_request(api_request)
+                        api_socket.send_string(response.model_dump_json())
+                    except Exception as e:
+                        logger.error("Error handling API request", exc_info=True)
+                        error_response = make_response(
+                            success=False,
+                            message=f"Server error: {str(e)}",
+                        )
+                        api_socket.send_string(error_response.model_dump_json())
 
             if interactions in socks:
                 # Handle interactions from other components
