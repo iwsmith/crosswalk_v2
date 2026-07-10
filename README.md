@@ -350,7 +350,7 @@ You can simulate schedules by using `uv run bin/simulate_schedule.py tuesday`
 ### Testing the fallback Wi-Fi AP
 
 On the AP host (crosswalk-a), verify the `crosswalk` fallback AP actually comes up.
-Because wlan0 has a single radio, bringing up the AP drops the `corginia_slow`
+Because wlan0 has a single radio, bringing up the AP drops the `corginia_art`
 client — so `bin/test_ap.sh` runs the test detached with an automatic revert
 (safe even if you're SSH'd in over Wi-Fi):
 

@@ -14,13 +14,13 @@
 # crosswalk-b uses). Hand-writing the keyfile stored the PSK in a way
 # NetworkManager rejected ("Secrets were required, but not provided"); letting
 # nmcli manage it stores the secret correctly.
-- name: Create primary Wi-Fi client connection (corginia_slow)
+- name: Create primary Wi-Fi client connection (corginia_art)
   when: "'access_point' in group_names"
   community.general.nmcli:
-    conn_name: corginia_slow
+    conn_name: corginia_art
     type: wifi
     ifname: wlan0
-    ssid: corginia_slow
+    ssid: corginia_art
     wifi_sec:
       key-mgmt: wpa-psk
       psk: "{{ corginia_wifi_password }}"
@@ -36,8 +36,17 @@
     state: absent
   register: stale_corginia_profile
 
-- name: Reload NetworkManager connections after removing stale profile
-  when: "'access_point' in group_names and stale_corginia_profile.changed"
+- name: Remove stale corginia_slow connection profile (renamed to corginia_art)
+  when: "'access_point' in group_names"
+  file:
+    path: /etc/NetworkManager/system-connections/corginia_slow.nmconnection
+    state: absent
+  register: stale_corginia_slow_profile
+
+- name: Reload NetworkManager connections after removing stale profiles
+  when: >-
+    'access_point' in group_names and
+    (stale_corginia_profile.changed or stale_corginia_slow_profile.changed)
   command: nmcli connection reload
 
 # Same story for the fallback AP: let nmcli store the PSK and the AP/shared
@@ -75,12 +84,12 @@
       # Deliberately boot-only, with no periodic retry: a single radio is
       # EITHER a client OR an AP, not both, and it generally can't scan for
       # the primary while already acting as an AP. Rejoining the primary once
-      # it's back in range is a manual `nmcli con up id corginia_slow` (or a
+      # it's back in range is a manual `nmcli con up id corginia_art` (or a
       # reboot), not something this script chases automatically.
       set -u
 
-      PRIMARY_SSID="corginia_slow"
-      PRIMARY_CONN="corginia_slow"
+      PRIMARY_SSID="corginia_art"
+      PRIMARY_CONN="corginia_art"
       FALLBACK_CONN="crosswalk"
       RETRIES=4        # association attempts before giving up and starting the AP
       RETRY_DELAY=5    # seconds between attempts

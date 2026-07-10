@@ -2,7 +2,7 @@
 #
 # Test that the crosswalk fallback Wi-Fi AP comes up correctly.
 #
-# wlan0 has a single radio, so bringing up the AP drops the corginia_slow
+# wlan0 has a single radio, so bringing up the AP drops the corginia_art
 # client connection. If you are SSH'd in over Wi-Fi that will disconnect you,
 # so by default this runs the whole test DETACHED (as a transient systemd unit)
 # with an automatic revert back to the client — you can safely get kicked off
@@ -15,12 +15,12 @@
 #   sudo bin/test_ap.sh results                   # print the captured check log
 #   sudo bin/test_ap.sh down                      # revert to the client now
 #
-# Env overrides: AP_CONN (default "crosswalk"), CLIENT_CONN (default "corginia_slow").
+# Env overrides: AP_CONN (default "crosswalk"), CLIENT_CONN (default "corginia_art").
 
 set -u
 
 AP_CONN="${AP_CONN:-crosswalk}"
-CLIENT_CONN="${CLIENT_CONN:-corginia_slow}"
+CLIENT_CONN="${CLIENT_CONN:-corginia_art}"
 WLAN="${WLAN:-wlan0}"
 LOG="${AP_TEST_LOG:-/tmp/ap_test.log}"
 UNIT="ap-test"

@@ -133,6 +133,58 @@
     state: started
   loop: "{{ crosswalk_services }}"
 
+# xwalk_button_switch sometimes never registers gpiozero's edge-detection
+# callback when it starts too early in boot (silent - no error/warning
+# logged), leaving physical button presses undetected until the service is
+# restarted by hand. Root cause is a live-hardware GPIO timing question, not
+# something fixable from here; this is a known-good mitigation: restart it
+# once, shortly after boot, once the system has settled.
+- name: Create xwalk_button_switch warmup-restart service
+  become: yes
+  when: "'xwalk_button_switch' in crosswalk_services"
+  copy:
+    dest: /etc/systemd/system/xwalk-button-switch-warmup.service
+    mode: '0644'
+    content: |
+      [Unit]
+      Description=One-time delayed restart of xwalk_button_switch to clear a cold-boot GPIO race
+      After=xwalk_button_switch.service
+      Requires=xwalk_button_switch.service
+
+      [Service]
+      Type=oneshot
+      ExecStart=/bin/systemctl restart xwalk_button_switch.service
+
+- name: Create xwalk_button_switch warmup-restart timer
+  become: yes
+  when: "'xwalk_button_switch' in crosswalk_services"
+  copy:
+    dest: /etc/systemd/system/xwalk-button-switch-warmup.timer
+    mode: '0644'
+    content: |
+      [Unit]
+      Description=Restart xwalk_button_switch shortly after boot to clear a cold-boot GPIO race
+
+      [Timer]
+      OnBootSec=45s
+      Unit=xwalk-button-switch-warmup.service
+
+      [Install]
+      WantedBy=timers.target
+
+- name: Reload systemd to register warmup-restart units
+  become: yes
+  when: "'xwalk_button_switch' in crosswalk_services"
+  command: systemctl daemon-reload
+
+- name: Enable and start xwalk_button_switch warmup-restart timer
+  become: yes
+  when: "'xwalk_button_switch' in crosswalk_services"
+  systemd:
+    name: xwalk-button-switch-warmup.timer
+    enabled: true
+    state: started
+
 
 # - name: Create code directory
 #   file:

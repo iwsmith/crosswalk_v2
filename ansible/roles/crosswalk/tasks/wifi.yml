@@ -5,7 +5,7 @@
       - ssid: "crosswalk"
         password: "{{ crosswalk_wifi_password }}"
         priority: 1
-      - ssid: "corginia_slow"
+      - ssid: "corginia_art"
         password: "{{ corginia_wifi_password }}"
         priority: 5
   when: "'access_point' not in group_names"
@@ -35,10 +35,21 @@
 
 - name: Set Wi-Fi autoconnect priority
   # The nmcli module's `priority` only sets bridge-STP priority, so set the real
-  # connection.autoconnect-priority here (higher wins → prefer corginia_slow).
+  # connection.autoconnect-priority here (higher wins → prefer corginia_art).
   command: >-
     nmcli connection modify "{{ item.ssid }}"
     connection.autoconnect-priority {{ item.priority }}
   loop: "{{ wifi_networks }}"
   when: "'access_point' not in group_names"
   changed_when: false
+
+- name: Remove stale corginia_slow connection profile (renamed to corginia_art)
+  when: "'access_point' not in group_names"
+  file:
+    path: /etc/NetworkManager/system-connections/corginia_slow.nmconnection
+    state: absent
+  register: stale_corginia_slow_profile
+
+- name: Reload NetworkManager connections after removing stale profile
+  when: "'access_point' not in group_names and stale_corginia_slow_profile.changed"
+  command: nmcli connection reload
