@@ -91,7 +91,7 @@
       PRIMARY_SSID="corginia_art"
       PRIMARY_CONN="corginia_art"
       FALLBACK_CONN="crosswalk"
-      RETRIES=4        # association attempts before giving up and starting the AP
+      RETRIES=1        # association attempts before giving up and starting the AP
       RETRY_DELAY=5    # seconds between attempts
 
       current_ssid() {
@@ -111,7 +111,10 @@
           echo "Connected to primary SSID ($PRIMARY_SSID)."
           exit 0
         fi
-        sleep "$RETRY_DELAY"
+        # Only wait between attempts, not after the last one.
+        if [ "$i" -lt "$RETRIES" ]; then
+          sleep "$RETRY_DELAY"
+        fi
       done
 
       echo "Primary unreachable; starting fallback AP ($FALLBACK_CONN)..."
