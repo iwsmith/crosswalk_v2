@@ -68,8 +68,8 @@ class MatrixViewer(SubscribeComponent):
     def kill(self) -> None:
         """Kill the currently playing animation, if any."""
         if self._process:
-            logger.debug(f"Killing: {self._playing} {self._process.pid}")
-            subprocess.call(["/usr/bin/pkill", "-9", "-P", str(self._process.pid)])
+            logger.info(f"Killing: {self._playing} {self._process.pid}")
+            subprocess.call(["/usr/bin/kill", "-9", str(self._process.pid)])
             self._process.kill()
             self._process = None
         self._playing = []
@@ -77,7 +77,7 @@ class MatrixViewer(SubscribeComponent):
     def _exec(self, command, shell=False):
         """Execute a new subprocess command."""
         self.kill()
-        logger.debug("Executing: %s", command)
+        logger.info("Executing: %s", command)
         self._process = subprocess.Popen(command, shell=shell)
 
     def play(self, animation: WalkDefinition):
