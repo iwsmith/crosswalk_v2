@@ -41,6 +41,8 @@ class MatrixViewer(SubscribeComponent):
             component_name, host_name, subscribe_address, heartbeat_address
         )
         self.animations = ImageLibrary(image_root)
+        # Possible pgrep -l led-image-v
+        logger.info("Starting new MatrixVieswer")
         self._process = None
         self._playing: List[str] = []
 
@@ -69,16 +71,20 @@ class MatrixViewer(SubscribeComponent):
         """Kill the currently playing animation, if any."""
         if self._process:
             logger.info(f"Killing: {self._playing} {self._process.pid}")
+            # Kill all children of process. We do this for the chained command for LED image viewer.
+            subprocess.call(["/usr/bin/pkill", "-9", "-P", str(self._process.pid)])
+            # Kill the process with kill and also _process.kill(). This is just for vibes.
             subprocess.call(["/usr/bin/kill", "-9", str(self._process.pid)])
             self._process.kill()
             self._process = None
+        subprocess.call(["/usr/bin/pkill", "led-image"])
         self._playing = []
 
     def _exec(self, command, shell=False):
         """Execute a new subprocess command."""
         self.kill()
-        logger.info("Executing: %s", command)
         self._process = subprocess.Popen(command, shell=shell)
+        logger.info("Executing: %s (%d)", command, self._process.pid or -1)
 
     def play(self, animation: WalkDefinition):
         """

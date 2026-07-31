@@ -368,3 +368,8 @@ connect a phone to SSID `crosswalk` and confirm it gets a `10.42.0.x` lease.
 ## TODO
 
 1. Reset wifi prioritiy in wifi.yml so crosswalk is higher (10)
+
+## Critical 26 notes
+1. Setup uv to `--offline` in the systemd files
+2. Had some weird issue with uv needing packages that were missing on B?
+3. Hitting multiple led-image viewer processes running simultaneously. Occurs on both crosswalks at the same time. 
