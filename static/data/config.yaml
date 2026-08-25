@@ -77,11 +77,6 @@ walks:
   
   actionsplus:
     canoe:
-    dance-hokey-pokey:
-    dance-hustle:
-    dance-macarena:
-    dance-twerk:
-    dance-twist:
     eat-ice-cream:
     hammer:
     head-pat-belly-rub:
@@ -156,17 +151,8 @@ walks:
     poetry-we-never-know-emily-dickinson:
   
   language:
-    walk-arabic:
-      intro: wait-arabic
-    walk-danish:
-      intro: wait-danish
-    walk-german:
-      intro: wait-german
     walk-japanese:
       intro: wait-japanese
-    walk-mandarin-taiwan:
-      intro: wait-mandarin-taiwan
-      outro: countdown-mandarin-taiwan
   
   normal:
     walk:
@@ -412,6 +398,20 @@ weights:
     sleep: 1
   go_home:
     fin: 1
+  jpfestival:
+    actions: 5
+    actionsplus: 3
+    airguitar: 0
+    animals: 5
+    fin: 0
+    game: 0
+    spoken-word: 0
+    language: 15
+    normal: 5
+    normalish: 5
+    silly: 4
+    sleep: 0
+    political: 0
 
 
 menu:
@@ -455,6 +455,8 @@ menu:
     weights: quiet_hours
   - start: '2026-07-19T08:00:00'
     weights: go_home
+  - start: '2026-08-01T08:00:00'
+    weights: jpfestival
 
 
 schedule: []
